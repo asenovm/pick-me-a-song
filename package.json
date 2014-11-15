@@ -1,0 +1,30 @@
+{
+  "name": "pick-me-a-song",
+  "version": "0.0.1",
+  "description": "A music recommender system that uses the Last.FM API for retrieving information about music tastes",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asenovm/pick-me-a-song.git"
+  },
+  "keywords": [
+    "music",
+    "recommender",
+    "system",
+    "last.fm",
+    "data",
+    "mining"
+  ],
+  "author": "Martin Asenov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asenovm/pick-me-a-song/issues"
+  },
+  "homepage": "https://github.com/asenovm/pick-me-a-song",
+  "dependencies": {
+    "lastfm": "~0.9.2"
+  }
+}
