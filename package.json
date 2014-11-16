@@ -25,6 +25,8 @@
   },
   "homepage": "https://github.com/asenovm/pick-me-a-song",
   "dependencies": {
-    "lastfm": "~0.9.2"
+    "lastfmapi": "0.0.5",
+    "mongodb": "~1.4.20",
+    "underscore": "~1.7.0"
   }
 }
