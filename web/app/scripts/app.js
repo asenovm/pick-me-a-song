@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webApp', [
+angular.module('pickMeASong', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
@@ -9,8 +9,8 @@ angular.module('webApp', [
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
+        templateUrl: 'views/recommender.html',
+        controller: 'RecommenderController'
       })
       .otherwise({
         redirectTo: '/'
