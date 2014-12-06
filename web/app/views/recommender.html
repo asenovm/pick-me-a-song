@@ -9,9 +9,9 @@
 
 <div class="jumbotron">
   <h3>Enter your favourite bands</h3>
-  <p class="lead" ng-repeat="band in bands">
+  <p class="lead text-center" ng-repeat="band in bands">
     <input type="text" ng-model="band.name"/>
-    <button class="btn btn-primary btn-small" ng-click="bands.push({})">
+    <button class="btn btn-primary btn-small" ng-click="bands.push({})" ng-class="{ invisible: !$last }">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
   </p>
