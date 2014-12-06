@@ -12,6 +12,10 @@ angular.module('pickMeASong', [
         templateUrl: 'views/recommender.html',
         controller: 'RecommenderController'
       })
+      .when('/about', {
+        templateUrl: 'views/about.html',
+        controller: 'AboutController'
+      })
       .otherwise({
         redirectTo: '/'
       });
