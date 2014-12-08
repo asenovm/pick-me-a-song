@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "description": "the web services for the recommender system",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asenovm/pick-me-a-song"
+  },
+  "keywords": [
+    "web",
+    "services",
+    "recommender",
+    "system",
+    "music",
+    "data",
+    "mining"
+  ],
+  "author": "Martin Asenov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asenovm/pick-me-a-song/issues"
+  },
+  "homepage": "https://github.com/asenovm/pick-me-a-song",
+  "dependencies": {
+    "mongodb": "~1.4.23",
+    "express": "~4.10.4"
+  }
+}
