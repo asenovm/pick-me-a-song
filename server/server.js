@@ -1,10 +1,25 @@
 var express = require('express'),
+    recommender = require('./recommender'),
     app = express();
 
+app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:9000');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+
 app.get('/recommendations', function (req, res) {
-    console.log('params are ');
-    console.dir(req.params);
-    res.end();
+    var bands = req.query.bands;
+    recommender.getRecommendationsFor(bands, function (err, recommendations) {
+        if(err) {
+            console.error(err);
+            res.status(500).end();
+        } else {
+            res.json(recommendations);
+            res.end();
+        }
+    });
 });
 
 app.listen(3000);
