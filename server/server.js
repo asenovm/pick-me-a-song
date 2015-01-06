@@ -1,4 +1,5 @@
 var express = require('express'),
+    _ = require('underscore'),
     recommender = require('./recommender'),
     app = express();
 
@@ -10,7 +11,8 @@ app.use(function (req, res, next) {
 });
 
 app.get('/recommendations', function (req, res) {
-    var bands = req.query.bands;
+    var bands = JSON.parse(req.query.bands);
+
     recommender.getRecommendationsFor(bands, function (err, recommendations) {
         if(err) {
             console.error(err);

@@ -8,7 +8,7 @@ angular.module('pickMeASong')
         $http({
             url: 'http://localhost:3000/recommendations',
             method: 'GET',
-            params: { bands: $scope.bands }
+            params: { bands: JSON.stringify($scope.bands) }
         }).success(function (data, status, headers, config) {
             console.log('success is called with data = ');
             console.dir(data);
