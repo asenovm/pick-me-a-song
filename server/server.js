@@ -11,9 +11,9 @@ app.use(function (req, res, next) {
 });
 
 app.get('/recommendations', function (req, res) {
-    var bands = JSON.parse(req.query.bands);
+    var artists = JSON.parse(req.query.artists);
 
-    recommender.getRecommendationsFor(bands, function (err, recommendations) {
+    recommender.getRecommendationsFor(artists, function (err, recommendations) {
         if(err) {
             console.error(err);
             res.status(500).end();

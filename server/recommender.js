@@ -1,8 +1,8 @@
 var _ = require('underscore'),
     db = require('./db');
 
-exports.getRecommendationsFor = function (bands, callback) {
-    db.retrieveAllUsers(bands, function (err, similarUsers) {
+exports.getRecommendationsFor = function (artists, callback) {
+    db.retrieveAllUsers(artists, function (err, similarUsers) {
         if(err) {
             console.log('an error occurred');
             console.dir(err);

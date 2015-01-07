@@ -34,11 +34,11 @@ function crawl(user) {
 }
 
 function visitNode (user, page, totalPages) {
-    if (page > totalPages) {
+    if (page > totalPages || page > config.endPage) {
         return;
     }
 
-    lastfm.user.getLovedTracks({ user: user, page: page, limit: config.itemsPerPage }, function (err, result) {
+    lastfm.user.getTopTracks({ user: user, page: page, limit: config.itemsPerPage}, function (err, result) {
         if (err) {
             console.log('get tracks err is ', err);
         } else if (result['@attr']) {

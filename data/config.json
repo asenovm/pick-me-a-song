@@ -4,5 +4,6 @@
     "userAgent": "pick-me-a-song",
     "crawlRoot": "IanAR",
     "startPage": 1,
-    "itemsPerPage": 50
+    "endPage": 6,
+    "itemsPerPage": 100
 }

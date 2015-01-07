@@ -1,7 +1,7 @@
-  <h3>Enter your favourite bands</h3>
-  <p class="lead text-center" ng-repeat="band in bands">
-    <input type="text" ng-model="band.name"/>
-    <button class="btn btn-primary btn-small" ng-click="bands.push({})" ng-class="{ invisible: !$last }">
+  <h3>List your favourite artists </h3>
+  <p class="lead text-center" ng-repeat="artist in artists">
+    <input type="text" ng-model="artist.name"/>
+    <button class="btn btn-primary btn-small" ng-click="artists.push({})" ng-class="{ invisible: !$last }">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
   </p>

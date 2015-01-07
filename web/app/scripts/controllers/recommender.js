@@ -2,13 +2,13 @@
 
 angular.module('pickMeASong')
   .controller('RecommenderController', ['$http', '$scope', function ($http, $scope) {
-    $scope.bands = [{}];
+    $scope.artists = [{}];
 
     $scope.getRecommendations = function () {
         $http({
             url: 'http://localhost:3000/recommendations',
             method: 'GET',
-            params: { bands: JSON.stringify($scope.bands) }
+            params: { artists: JSON.stringify($scope.artists) }
         }).success(function (data, status, headers, config) {
             console.log('success is called with data = ');
             console.dir(data);
