@@ -85,3 +85,8 @@ body {
     font-size: 14px !important;
 }
 
+input[type=number] {
+    width: 130px;
+    text-align: center;
+}
+
