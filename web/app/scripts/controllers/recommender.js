@@ -2,7 +2,7 @@
 
 angular.module('pickMeASong')
   .controller('RecommenderController', ['$http', '$scope', function ($http, $scope) {
-    $scope.artists = [{}];
+    $scope.artists = [{ score: 1 }];
 
     $scope.getRecommendations = function () {
         $http({

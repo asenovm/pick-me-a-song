@@ -1,5 +1,6 @@
 var mongo = require('mongodb'),
     fs = require('fs'),
+    _ = require('underscore'),
     config = JSON.parse(fs.readFileSync('db.json')),
     ObjectID = mongo.BSONPure.ObjectID,
     MongoClient = mongo.MongoClient, db,
@@ -11,9 +12,11 @@ MongoClient.connect(config.dbURL, function (err, dbInstance) {
 
 //XXX export a common module for interacting with the db both from the scraper and from the server part
 
-exports.retrieveAllUsers = function (bands, callback) {
+exports.retrieveAllUsers = function (artists, callback) {
     var collection = db.collection(COLLECTION_USERS),
-        band = bands[0].name;
+        names = _.map(artists, function (artist) {
+            return artist.name;
+        });
 
-    collection.find({ tracks: { $elemMatch: { "artist.name": band }}}).toArray(callback);
+    collection.find({ tracks: { $elemMatch: { "artist.name": { "$in": names }}}}).toArray(callback);
 }
