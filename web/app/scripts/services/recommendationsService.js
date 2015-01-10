@@ -1,20 +1,22 @@
 'use strict';
 
 angular.module('pickMeASong')
-    .service('recommendationsService', ['$http', function ($http) {
+    .service('recommendationsService', ['$http', '$q', function ($http, $q) {
 
     this.getRecommendations = function (artists) {
+        var deferred = $q.defer();
+
         $http({
             url: 'http://localhost:3000/recommendations',
             method: 'GET',
             params: { artists: JSON.stringify(artists) }
         }).success(function (data, status, headers, config) {
-            console.log('success is called with data = ');
-            console.dir(data);
+            deferred.resolve(data);
         }).error(function (data, status, headers, config) {
-            console.log('error is called with data = ');
-            console.dir(data);
+            deferred.reject(data);
         });
+
+        return deferred.promise;
     };
 
 }]);
