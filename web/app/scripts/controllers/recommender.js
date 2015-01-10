@@ -8,7 +8,7 @@ angular.module('pickMeASong')
     $scope.artists = [{ score: 1 }];
 
     $scope.getRecommendations = function () {
-        recommendationsService.getRecommendations($scope.artists).finally(function () {
+        recommendationsService.fetchRecommendations($scope.artists).finally(function () {
             $location.path(PATH_RECOMMENDATIONS);
         });
     };

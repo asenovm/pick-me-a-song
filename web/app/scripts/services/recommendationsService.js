@@ -3,7 +3,13 @@
 angular.module('pickMeASong')
     .service('recommendationsService', ['$http', '$q', function ($http, $q) {
 
-    this.getRecommendations = function (artists) {
+    var recommendations = [];
+
+    this.getRecommendations = function () {
+        return recommendations;
+    };
+
+    this.fetchRecommendations = function (artists) {
         var deferred = $q.defer();
 
         $http({
@@ -11,6 +17,7 @@ angular.module('pickMeASong')
             method: 'GET',
             params: { artists: JSON.stringify(artists) }
         }).success(function (data, status, headers, config) {
+            recommendations = data;
             deferred.resolve(data);
         }).error(function (data, status, headers, config) {
             deferred.reject(data);

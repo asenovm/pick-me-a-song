@@ -90,3 +90,19 @@ input[type=number] {
     text-align: center;
 }
 
+.recommendations-container {
+    width: 100%;
+    height: 100%;
+}
+
+.song-container {
+    width: 50%;
+    padding-bottom: 20px;
+    display: inline-block;
+}
+
+.song-inner-container {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

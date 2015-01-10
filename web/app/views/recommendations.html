@@ -1,1 +1,13 @@
 <h3>Recommendations page</h3>
+<div class="recommendations-container">
+    <div ng-repeat="track in recommendations" class="song-container">
+        <a ng-href="{{ track.url }}">
+            <div class="song-inner-container">
+                {{ track.artist.name }} - {{ track.name }}
+                <div class="song-cover-container">
+                    <img ng-src="{{ track.image[2]['#text'] || 'images/default_image.png'}}" />
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
