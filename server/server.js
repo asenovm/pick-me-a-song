@@ -13,12 +13,11 @@ app.use(function (req, res, next) {
 app.get('/recommendations', function (req, res) {
     var artists = JSON.parse(req.query.artists);
 
-    recommender.getRecommendationsFor(artists, function (err, recommendations) {
+    recommender.getRecommendationsFor(artists, function (err, recommendedTracks) {
         if(err) {
-            console.error(err);
             res.status(500).end();
         } else {
-            res.json(recommendations);
+            res.json(recommendedTracks);
             res.end();
         }
     });
