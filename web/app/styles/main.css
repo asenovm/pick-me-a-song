@@ -106,3 +106,16 @@ input[type=number] {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+table {
+    text-align: center;
+}
+
+table th {
+    text-align: center;
+}
+
+.recommender-container {
+    padding-top: 20px;
+    padding-bottom: 50px;
+}

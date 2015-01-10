@@ -5,4 +5,6 @@ angular.module('pickMeASong')
 
     $scope.recommendations = recommendationsService.getRecommendations();
 
+    console.log('recommendations are ', $scope.recommendations);
+
   }]);

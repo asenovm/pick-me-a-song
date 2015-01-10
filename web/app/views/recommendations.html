@@ -1,13 +1,15 @@
-<h3>Recommendations page</h3>
-<div class="recommendations-container">
-    <div ng-repeat="track in recommendations" class="song-container">
-        <a ng-href="{{ track.url }}">
-            <div class="song-inner-container">
-                {{ track.artist.name }} - {{ track.name }}
-                <div class="song-cover-container">
-                    <img ng-src="{{ track.image[2]['#text'] || 'images/default_image.png'}}" />
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
+<h3 class="text-center">Recommendations page</h3><br/>
+<table class="table table-bordered table-striped">
+    <th>Artist Name</th>
+    <th>Song Name</th>
+    <th>Listen</th>
+    <th>Album Cover</th>
+    <th>Feedback</th>
+    <tr ng-repeat="track in recommendations">
+        <td>{{ track.artist.name }}</td>
+        <td>{{ track.name }}</td>
+        <td><a ng-href="{{ track.url }}">URL</a>
+        <td><img ng-src="{{ track.image[2]['#text'] || 'images/default_image.png'}}" /></td>
+        <td><button type="button" class="btn btn-success">Like</button></td>
+    </tr>
+</table>

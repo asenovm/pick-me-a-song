@@ -1,4 +1,5 @@
-  <h3>List your favourite artists along with their importance to you</h3>
+<div class="recommender-container">
+  <h3 class="text-center">List your favourite artists along with their importance <br/> to you <em>(ranging 1-10)</em></h3>
   <p class="lead text-center" ng-repeat="artist in artists">
     <input type="text" ng-model="artist.name" placeholder="artist name"/>
     <input type="number" ng-model="artist.score" min="1" max="10"/>
@@ -6,4 +7,8 @@
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
   </p>
-  <p><a class="btn btn-lg btn-success" ng-click="getRecommendations();">Get Recommendations</a></p>
+
+  <p class="text-center">
+    <a class="btn btn-lg btn-success" ng-click="getRecommendations();">Get Recommendations</a>
+  </p>
+</div>
