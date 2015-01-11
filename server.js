@@ -25,7 +25,7 @@ app.get('/recommendations', function (req, res) {
     });
 });
 
-app.get('web/*', function (req, res) {
+app.get('*', function (req, res) {
     fileServer.serve(req, res);
 });
 
