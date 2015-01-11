@@ -27,6 +27,7 @@
   "dependencies": {
     "lastfmapi": "0.0.5",
     "mongodb": "~1.4.20",
-    "underscore": "~1.7.0"
+    "underscore": "~1.7.0",
+    "node-static": "~0.7.6"
   }
 }
