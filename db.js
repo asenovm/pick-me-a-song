@@ -10,8 +10,6 @@ MongoClient.connect(config.dbURL, function (err, dbInstance) {
     db = dbInstance;
 });
 
-//XXX export a common module for interacting with the db both from the scraper and from the server part
-
 exports.retrieveAllUsers = function (artists, callback) {
     var collection = db.collection(COLLECTION_USERS),
         names = _.map(artists, function (artist) {

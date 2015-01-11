@@ -41,10 +41,7 @@ function getSimilarityForUser(user, artists) {
     });
 
     var nominator = _.reduce(tracks, function (memo, track) {
-        var trackAuthor = _.find(artists, function (artist) {
-            return artist.name === track.artist.name;
-        });
-
+        var trackAuthor = _.find(artists, matchTrackAuthor(track));
         return memo + track.playcount * trackAuthor.score
     }, 0);
 
@@ -53,12 +50,15 @@ function getSimilarityForUser(user, artists) {
     }, 0);
 
     var artistDenominator = _.reduce(tracks, function (memo, track) {
-        var trackAuthor = _.find(artists, function (artist) {
-            return artist.name === track.artist.name;
-        });
-
+        var trackAuthor = _.find(artists, matchTrackAuthor(track));
         return memo + trackAuthor.score * trackAuthor.score;
     }, 0);
 
     return nominator / (Math.sqrt(userDenominator) * Math.sqrt(artistDenominator));
+}
+
+function matchTrackAuthor(track) {
+    return function (artist) {
+        return artist.name === track.artist.name;
+    };
 }
