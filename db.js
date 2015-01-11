@@ -20,3 +20,13 @@ exports.retrieveAllUsers = function (artists, callback) {
 
     collection.find({ tracks: { $elemMatch: { "artist.name": { "$in": names }}}}).toArray(callback);
 }
+
+exports.updateUserProfile = function (user, callback) {
+    var users = db.collection(COLLECTION_USERS);
+    users.update({ user: user.name }, { $pushAll: { tracks: user.tracks }}, { upsert: true }, callback);
+};
+
+exports.hasUser = function (user, callback) {
+    var users = db.collection(COLLECTION_USERS);
+    users.findOne({ user: user }, callback);
+};
