@@ -1,4 +1,6 @@
 var fs = require('fs'),
+    express = require('express'),
+    app = express(),
     config = JSON.parse(fs.readFileSync('config.json')),
     LastfmAPI = require('lastfmapi'),
     _ = require('underscore'),
@@ -52,3 +54,5 @@ function visitNode (user, page, totalPages) {
         }
     });
 }
+
+app.listen(process.env.PORT || 3067);
