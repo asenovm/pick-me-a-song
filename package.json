@@ -1,20 +1,21 @@
 {
-  "name": "pick-me-a-song",
+  "name": "server",
   "version": "0.0.1",
-  "description": "A music recommender system that uses the Last.FM API for retrieving information about music tastes",
-  "main": "app.js",
+  "description": "the web services for the recommender system",
+  "main": "server.js",
   "scripts": {
-    "test": "node app.js"
+    "test": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/asenovm/pick-me-a-song.git"
+    "url": "https://github.com/asenovm/pick-me-a-song"
   },
   "keywords": [
-    "music",
+    "web",
+    "services",
     "recommender",
     "system",
-    "last.fm",
+    "music",
     "data",
     "mining"
   ],
@@ -25,9 +26,7 @@
   },
   "homepage": "https://github.com/asenovm/pick-me-a-song",
   "dependencies": {
-    "lastfmapi": "0.0.5",
-    "mongodb": "~1.4.20",
-    "underscore": "~1.7.0",
-    "node-static": "~0.7.6"
+    "mongodb": "~1.4.23",
+    "express": "~4.10.4"
   }
 }

@@ -1,5 +1,7 @@
 var express = require('express'),
     _ = require('underscore'),
+    static = require('node-static'),
+    fileServer = new static.Server('./web'),
     recommender = require('./recommender'),
     app = express();
 
@@ -23,4 +25,8 @@ app.get('/recommendations', function (req, res) {
     });
 });
 
-app.listen(3000);
+app.get('*', function (req, res) {
+    fileServer.serve(req, res);
+});
+
+app.listen(process.env.PORT || 3000);
