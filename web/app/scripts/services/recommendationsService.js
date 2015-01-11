@@ -13,7 +13,7 @@ angular.module('pickMeASong')
         var deferred = $q.defer();
 
         $http({
-            url: '/recommendations',
+            url: 'http://localhost:3000/recommendations',
             method: 'GET',
             params: { artists: JSON.stringify(artists) }
         }).success(function (data, status, headers, config) {
