@@ -5,6 +5,13 @@ angular.module('pickMeASong')
 
     $scope.recommendations = recommendationsService.getRecommendations();
 
-    console.log('recommendations are ', $scope.recommendations);
+    $scope.onLikeClicked = function (track, $event) {
+        var $target = $(event.target);
+        if($target.hasClass('btn-warning')) {
+            $target.removeClass('btn-warning').addClass('btn-success').button('default');    
+        } else {
+            $target.addClass('btn-warning').removeClass('btn-success').button('liked');
+        }
+    };
 
   }]);
