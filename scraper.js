@@ -48,6 +48,10 @@ function visitNode (user, page, totalPages) {
                 totalPages = meta.totalPages,
                 tracks = _.isArray(result.track) ? result.track : [result.track];
 
+            _.each(tracks, function (track) {
+                track.name = track.name.toUpperCase();
+            });
+
             db.updateUserProfile({ name: user, tracks: tracks }, function (err, result) {
                 visitNode(user, page + 1, totalPages);
             });
