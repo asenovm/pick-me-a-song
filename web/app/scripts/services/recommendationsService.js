@@ -32,4 +32,19 @@ angular.module('pickMeASong')
         return deferred.promise;
     };
 
+    this.likeTrack = function (likedTracks, allTracks) {
+        $http({
+            url: '/like',
+            method: 'POST',
+            body: {
+                likedTracks: likedTracks.length,
+                allTracks: allTracks.length
+            }
+        }).success(function (data, status, headers, config) {
+            console.log('server now knows about the liked tracks');
+        }).error(function (data, status, headers, config) {
+            console.log('server error - doesnt know about the liked tracks');
+        });
+    };
+
 }]);

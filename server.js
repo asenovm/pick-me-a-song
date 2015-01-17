@@ -25,6 +25,17 @@ app.get('/recommendations', function (req, res) {
     });
 });
 
+app.post('/like', function (req, res) {
+    var likedTracks = req.body.likedTracks,
+        allTracks = req.body.allTracks;
+
+    console.log('liked tracks are ', likedTracks);
+    console.log('all tracks are ', allTracks);
+    console.log('req body is ', req.body);
+
+    res.status(200).end();
+});
+
 app.get('*', function (req, res) {
     fileServer.serve(req, res);
 });
