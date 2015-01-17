@@ -4,6 +4,7 @@ angular.module('pickMeASong', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
+  'LocalStorageModule',
   'ngRoute'
 ])
   .config(function ($routeProvider) {

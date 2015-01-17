@@ -1,11 +1,15 @@
 'use strict';
 
 angular.module('pickMeASong')
-    .service('recommendationsService', ['$http', '$q', function ($http, $q) {
+    .service('recommendationsService', ['$http', '$q', 'localStorageService', function ($http, $q, $localStorage) {
 
+    var KEY_RECOMMENDED_ITEMS = "recommendedItems";
     var recommendations = [];
 
     this.getRecommendations = function () {
+        if(_.isEmpty(recommendations)) {
+            return $localStorage.get(KEY_RECOMMENDED_ITEMS);
+        }
         return recommendations;
     };
 
@@ -18,8 +22,10 @@ angular.module('pickMeASong')
             params: { artists: JSON.stringify(artists) }
         }).success(function (data, status, headers, config) {
             recommendations = data;
+            $localStorage.set(KEY_RECOMMENDED_ITEMS, recommendations);
             deferred.resolve(data);
         }).error(function (data, status, headers, config) {
+            $localStorage.set(KEY_RECOMMENDED_ITEMS, []);
             deferred.reject(data);
         });
 

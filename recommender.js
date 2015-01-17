@@ -1,5 +1,7 @@
 var _ = require('underscore'),
-    db = require('./db');
+    db = require('./db'),
+    MIN_COMMON_USERS = 5,
+    MIN_RECOMMENDED_ITEMS_PER_USER = 3;
 
 exports.getRecommendationsFor = function (artists, callback) {
     db.retrieveAllUsers(artists, function (err, users) {
@@ -24,8 +26,8 @@ exports.getRecommendationsFor = function (artists, callback) {
             });
         }
 
-        recommendedTracks = _.map(users, function (user) {
-            return user.tracks;
+        recommendedTracks = _.map(users, function (user, index) {
+            return _.first(user.tracks, (Math.min(users.length, MIN_COMMON_USERS) - index) * MIN_RECOMMENDED_ITEMS_PER_USER);
         });
 
         callback(err, _.flatten(recommendedTracks));
