@@ -4,6 +4,7 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     fileServer = new static.Server('./web'),
     recommender = require('./recommender'),
+    evaluator = require('./evaluator'),
     app = express();
 
 app.use(function (req, res, next) {
@@ -30,13 +31,12 @@ app.get('/recommendations', function (req, res) {
 
 app.post('/like', function (req, res) {
     var likedTracks = req.body.likedTracks,
-        allTracks = req.body.allTracks;
+        recommendedTracks = req.body.recommendedTracks,
+        userId = req.body.userId,
+        precision = evaluator.getPrecision(likedTracks, recommendedTracks),
+        nDCG = evaluator.getNDCG(likedTracks, recommendedTracks);
 
-    console.log('liked tracks are ', likedTracks);
-    console.log('all tracks are ', allTracks);
-    console.log('req body is ', req.body);
-
-    res.status(200).end();
+    res.end();
 });
 
 app.get('*', function (req, res) {
