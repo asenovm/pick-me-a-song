@@ -36,7 +36,8 @@ angular.module('pickMeASong')
         $http({
             url: '/like',
             method: 'POST',
-            body: {
+            headers: { 'Content-Type': 'application/json' },
+            data: {
                 likedTracks: likedTracks.length,
                 allTracks: allTracks.length
             }

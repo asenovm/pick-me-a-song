@@ -1,6 +1,7 @@
 var express = require('express'),
     _ = require('underscore'),
     static = require('node-static'),
+    bodyParser = require('body-parser'),
     fileServer = new static.Server('./web'),
     recommender = require('./recommender'),
     app = express();
@@ -11,6 +12,8 @@ app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
+
+app.use(bodyParser.json());
 
 app.get('/recommendations', function (req, res) {
     var artists = JSON.parse(req.query.artists);
