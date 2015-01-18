@@ -3,6 +3,7 @@
 angular.module('pickMeASong')
     .service('recommendationsService', ['$http', '$q', 'localStorageService', function ($http, $q, $localStorage) {
 
+    var SCORE_ARTIST_DEFAULT = 10;
     var KEY_RECOMMENDED_ITEMS = "recommendedItems";
     var KEY_USER_ID = "userId";
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
@@ -56,6 +57,28 @@ angular.module('pickMeASong')
         }).error(function (data, status, headers, config) {
             console.log('server error - doesnt know about the liked tracks');
         });
+    };
+
+    this.onFacebookLogin = function (callback) {
+        var that = this;
+        return function (response) {
+            if(response.status === "connected") {
+                FB.api('/me/music', function (response) {
+                    var likes = _.map(response.data, function (artist) {
+                        return {
+                            name: artist.name,
+                            score: SCORE_ARTIST_DEFAULT
+                        };
+                    });
+                    console.log('user fb music likes are ', likes);
+                    that.fetchRecommendations(likes).finally(function () {
+                        console.log('fetch recommendations is called!!');
+                        console.log('callback is ', callback);
+                        callback();
+                    });
+                });
+            }
+        };
     };
 
 }]);

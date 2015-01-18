@@ -116,6 +116,12 @@ table th {
 }
 
 .recommender-container {
+    margin: 0 auto;
     padding-top: 20px;
     padding-bottom: 50px;
+    width: 520px;
+}
+
+p.recommend {
+    margin-top: 65px;
 }

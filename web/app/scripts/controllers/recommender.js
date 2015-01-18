@@ -7,9 +7,14 @@ angular.module('pickMeASong')
 
     $scope.artists = [{ score: 1 }];
 
-    $scope.getRecommendations = function () {
-        recommendationsService.fetchRecommendations($scope.artists).finally(function () {
-            $location.path(PATH_RECOMMENDATIONS);
-        });
+    $scope.showRecommendations = function () {
+        $location.path(PATH_RECOMMENDATIONS);
     };
+
+    $scope.getRecommendations = function () {
+        recommendationsService.fetchRecommendations($scope.artists).finally($scope.showRecommendations);
+    };
+
+    window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.showRecommendations);
+
   }]);

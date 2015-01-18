@@ -1,14 +1,21 @@
 <div class="recommender-container">
-  <h3 class="text-center">List your favourite artists along with their importance <br/> to you <em>(ranging 1-10)</em></h3>
+  <h4 class="text-center">List your favourite music artists along with their importance <br/> to you <em>(ranging 1-10)</em></h4>
+
+  <br/>
+
   <p class="lead text-center" ng-repeat="artist in artists">
     <input type="text" ng-model="artist.name" placeholder="artist name"/>
     <input type="number" ng-model="artist.score" min="1" max="10"/>
     <button class="btn btn-primary btn-small" ng-click="artists.push({ score: 1 })" ng-class="{ invisible: !$last }">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
     </button>
+    <br/>
+    <h4 class="text-center">or 
+    <div class="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" on-login="onFacebookLogin" scope="public_profile, user_likes"></div>
+    with your Facebook account to get <strong>personalized music recommendations.</strong></h4>
   </p>
 
-  <p class="text-center">
-    <a class="btn btn-lg btn-success" click-on-enter="" ng-click="getRecommendations();">Get Recommendations</a>
+  <p class="text-center recommend">
+    <a class="btn btn-lg btn-success" click-on-enter="" ng-click="getRecommendations();">Recommend</a>
   </p>
 </div>
