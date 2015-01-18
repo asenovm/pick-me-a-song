@@ -1,5 +1,8 @@
 var _ = require('underscore');
 
+exports.METRIC_NAME_PRECISION = "precision";
+exports.METRIC_NAME_NDCG = "ndcg";
+
 exports.getPrecision = function (likedTracksPositions, recommendedTracksCount) {
     return likedTracksPositions.length / recommendedTracksCount;
 };

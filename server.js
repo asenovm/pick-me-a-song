@@ -5,14 +5,8 @@ var express = require('express'),
     fileServer = new static.Server('./web'),
     recommender = require('./recommender'),
     evaluator = require('./evaluator'),
+    db = require('./db'),
     app = express();
-
-app.use(function (req, res, next) {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:9000');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-});
 
 app.use(bodyParser.json());
 
@@ -39,7 +33,16 @@ app.post('/like', function (req, res) {
     console.log('precision is ', precision);
     console.log('ndcg is ', nDCG);
 
-    res.end();
+    db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_PRECISION, precision, function (errPrecision, result) {
+        db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_NDCG, nDCG, function (errNDCG, result) {
+            if(errPrecision || errNDCG) {
+                res.status(500).end();
+            } else {
+                res.end();
+            }
+        });
+    });
+
 });
 
 app.get('*', function (req, res) {

@@ -43,7 +43,8 @@ angular.module('pickMeASong')
             headers: { 'Content-Type': 'application/json' },
             data: {
                 likedTracksPositions: likedTracksPositions,
-                recommendedTracksCount: recommendedTracks.length
+                recommendedTracksCount: recommendedTracks.length,
+                userId: 1
             }
         }).success(function (data, status, headers, config) {
             console.log('server now knows about the liked tracks');
