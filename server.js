@@ -2,6 +2,7 @@ var express = require('express'),
     _ = require('underscore'),
     static = require('node-static'),
     bodyParser = require('body-parser'),
+    uuid = require('node-uuid'),
     fileServer = new static.Server('./web'),
     recommender = require('./recommender'),
     evaluator = require('./evaluator'),
@@ -17,8 +18,10 @@ app.get('/recommendations', function (req, res) {
         if(err) {
             res.status(500).end();
         } else {
-            res.json(recommendedTracks);
-            res.end();
+            res.json({
+                id: uuid.v4(),
+                recommendedTracks: recommendedTracks
+            }).end();
         }
     });
 });
@@ -29,9 +32,6 @@ app.post('/like', function (req, res) {
         userId = req.body.userId,
         precision = evaluator.getPrecision(likedTracksPositions, recommendedTracksCount),
         nDCG = evaluator.getNDCG(likedTracksPositions, recommendedTracksCount);
-
-    console.log('precision is ', precision);
-    console.log('ndcg is ', nDCG);
 
     db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_PRECISION, precision, function (errPrecision, result) {
         db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_NDCG, nDCG, function (errNDCG, result) {

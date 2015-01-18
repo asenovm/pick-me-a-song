@@ -4,7 +4,9 @@ angular.module('pickMeASong')
     .service('recommendationsService', ['$http', '$q', 'localStorageService', function ($http, $q, $localStorage) {
 
     var KEY_RECOMMENDED_ITEMS = "recommendedItems";
+    var KEY_USER_ID = "userId";
     var recommendations = [];
+    var userId = $localStorage.get(KEY_USER_ID) || 1;
 
     this.getRecommendations = function () {
         if(_.isEmpty(recommendations)) {
@@ -21,9 +23,11 @@ angular.module('pickMeASong')
             method: 'GET',
             params: { artists: JSON.stringify(artists) }
         }).success(function (data, status, headers, config) {
-            recommendations = data;
+            recommendations = data.recommendedTracks;
+            userId = data.id;
+            $localStorage.set(KEY_USER_ID, userId);
             $localStorage.set(KEY_RECOMMENDED_ITEMS, recommendations);
-            deferred.resolve(data);
+            deferred.resolve(recommendations);
         }).error(function (data, status, headers, config) {
             $localStorage.set(KEY_RECOMMENDED_ITEMS, []);
             deferred.reject(data);
@@ -44,7 +48,7 @@ angular.module('pickMeASong')
             data: {
                 likedTracksPositions: likedTracksPositions,
                 recommendedTracksCount: recommendedTracks.length,
-                userId: 1
+                userId: userId
             }
         }).success(function (data, status, headers, config) {
             console.log('server now knows about the liked tracks');
