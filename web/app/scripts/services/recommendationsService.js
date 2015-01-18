@@ -32,14 +32,18 @@ angular.module('pickMeASong')
         return deferred.promise;
     };
 
-    this.likeTrack = function (likedTracks, allTracks) {
+    this.likeTrack = function (likedTracks, recommendedTracks) {
+        var likedTracksPositions = _.map(likedTracks, function (track) {
+            return _.indexOf(recommendedTracks, track);
+        });
+
         $http({
             url: '/like',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             data: {
-                likedTracks: likedTracks.length,
-                allTracks: allTracks.length
+                likedTracksPositions: likedTracksPositions,
+                recommendedTracksCount: recommendedTracks.length
             }
         }).success(function (data, status, headers, config) {
             console.log('server now knows about the liked tracks');

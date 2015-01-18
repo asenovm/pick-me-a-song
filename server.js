@@ -30,11 +30,14 @@ app.get('/recommendations', function (req, res) {
 });
 
 app.post('/like', function (req, res) {
-    var likedTracks = req.body.likedTracks,
-        recommendedTracks = req.body.recommendedTracks,
+    var likedTracksPositions = req.body.likedTracksPositions,
+        recommendedTracksCount = req.body.recommendedTracksCount,
         userId = req.body.userId,
-        precision = evaluator.getPrecision(likedTracks, recommendedTracks),
-        nDCG = evaluator.getNDCG(likedTracks, recommendedTracks);
+        precision = evaluator.getPrecision(likedTracksPositions, recommendedTracksCount),
+        nDCG = evaluator.getNDCG(likedTracksPositions, recommendedTracksCount);
+
+    console.log('precision is ', precision);
+    console.log('ndcg is ', nDCG);
 
     res.end();
 });
