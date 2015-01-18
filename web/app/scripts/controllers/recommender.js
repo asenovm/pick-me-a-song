@@ -21,8 +21,31 @@ angular.module('pickMeASong')
         $scope.$apply(function () {
             $scope.isLoading = true;
         });
-    }
+    };
+
+    $scope.fetchInfoFromFacebook = function () {
+        $scope.isLoading = true;
+        recommendationsService.fetchInfoFromFacebook($scope.showRecommendations);
+    };
 
     window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.setLoading, $scope.showRecommendations);
+
+    if(!window.fbInit) {
+        FB.init({
+          appId      : '1756098894615869',
+          xfbml      : true,
+          version    : 'v2.1'
+        });
+        window.fbInit = true;
+    }
+
+    FB.getLoginStatus(function (response) {
+        if(response.status === "connected") {
+            $scope.isLoggedOnFacebook = true;
+            recommendationsService.onFacebookConnected(response.authResponse);
+        } else {
+            $scope.isLoggedOnFacebook = false;
+        }
+    });
 
   }]);

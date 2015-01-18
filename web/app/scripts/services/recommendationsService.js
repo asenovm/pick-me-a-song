@@ -52,10 +52,6 @@ angular.module('pickMeASong')
                 recommendedTracksCount: recommendedTracks.length,
                 userId: userId
             }
-        }).success(function (data, status, headers, config) {
-            console.log('server now knows about the liked tracks');
-        }).error(function (data, status, headers, config) {
-            console.log('server error - doesnt know about the liked tracks');
         });
     };
 
@@ -64,17 +60,27 @@ angular.module('pickMeASong')
         return function (response) {
             if(response.status === "connected") {
                 loginSuccessfulCallback();
-                FB.api('/me/music', function (response) {
-                    var likes = _.map(response.data, function (artist) {
-                        return {
-                            name: artist.name,
-                            score: SCORE_ARTIST_DEFAULT
-                        };
-                    });
-                    that.fetchRecommendations(likes).finally(recommendationsFetchedCallback);
-                });
+                userId = response.authResponse.userID;
+                that.fetchInfoFromFacebook(recommendationsFetchedCallback);
             }
         };
+    };
+
+    this.fetchInfoFromFacebook = function (recommendationsFetchedCallback) {
+        var that = this;
+        FB.api('/me/music', function (response) {
+            var likes = _.map(response.data, function (artist) {
+                return {
+                    name: artist.name,
+                    score: SCORE_ARTIST_DEFAULT
+                };
+            });
+            that.fetchRecommendations(likes).finally(recommendationsFetchedCallback);
+        });
+    };
+
+    this.onFacebookConnected = function (authInfo) {
+        userId = authInfo.userID;
     };
 
 }]);

@@ -18,13 +18,6 @@
   </head>
   <body ng-app="pickMeASong">
     <div id="fb-root"></div>
-    <script>(function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&appId=1756061591286266&version=v2.0";
-      fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));</script>
     <!-- Add your site or application content here -->
     <div class="container">
         <div class="header">
@@ -56,6 +49,8 @@
     <script src="bower_components/underscore/underscore-min.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
+
+    <script src="//connect.facebook.net/en_US/sdk.js"></script>
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
