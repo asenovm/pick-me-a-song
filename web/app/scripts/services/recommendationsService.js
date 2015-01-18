@@ -5,14 +5,15 @@ angular.module('pickMeASong')
 
     var KEY_RECOMMENDED_ITEMS = "recommendedItems";
     var KEY_USER_ID = "userId";
-    var recommendations = [];
+    var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
 
     this.getRecommendations = function () {
-        if(_.isEmpty(recommendations)) {
-            return $localStorage.get(KEY_RECOMMENDED_ITEMS);
-        }
         return recommendations;
+    };
+
+    this.saveRecommendations = function () {
+        $localStorage.set(KEY_RECOMMENDED_ITEMS, recommendations);
     };
 
     this.fetchRecommendations = function (artists) {

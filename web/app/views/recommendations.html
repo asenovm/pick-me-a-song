@@ -10,6 +10,6 @@
         <td>{{ track.name }}</td>
         <td><a ng-href="{{ track.url }}">URL</a>
         <td><img ng-src="{{ track.image[2]['#text'] || 'images/default_image.png'}}" /></td>
-        <td><button type="button" class="btn btn-success" data-liked-text="Liked" data-default-text="Like" ng-click="onLikeClicked(track, $event)">Like</button></td>
+        <td><button id="{{ track.name }}" type="button" class="btn btn-success" data-liked-text="Liked" data-default-text="Like" on-rendered="" ng-click="onLikeClicked(track, $event)">Like</button></td>
     </tr>
 </table>

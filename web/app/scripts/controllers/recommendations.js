@@ -20,6 +20,8 @@ angular.module('pickMeASong')
             recommendationsService.likeTrack(likedTracks, $scope.recommendations);
             $target.addClass('btn-warning').removeClass('btn-success').button('liked');
         }
+
+        recommendationsService.saveRecommendations();
     };
 
   }]);
