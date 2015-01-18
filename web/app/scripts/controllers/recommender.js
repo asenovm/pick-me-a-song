@@ -17,6 +17,12 @@ angular.module('pickMeASong')
         recommendationsService.fetchRecommendations($scope.artists).finally($scope.showRecommendations);
     };
 
-    window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.showRecommendations);
+    $scope.setLoading = function () {
+        $scope.$apply(function () {
+            $scope.isLoading = true;
+        });
+    }
+
+    window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.setLoading, $scope.showRecommendations);
 
   }]);

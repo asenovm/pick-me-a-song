@@ -17,6 +17,10 @@ angular.module('pickMeASong', [
         templateUrl: 'views/about.html',
         controller: 'AboutController'
       })
+      .when('/settings', {
+        templateUrl: 'views/settings.html',
+        controller: 'SettingsController'
+      })
       .when('/recommendations', {
         templateUrl: 'views/recommendations.html',
         controller: 'RecommendationsController'

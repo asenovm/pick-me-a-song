@@ -59,10 +59,11 @@ angular.module('pickMeASong')
         });
     };
 
-    this.onFacebookLogin = function (callback) {
+    this.onFacebookLogin = function (loginSuccessfulCallback, recommendationsFetchedCallback) {
         var that = this;
         return function (response) {
             if(response.status === "connected") {
+                loginSuccessfulCallback();
                 FB.api('/me/music', function (response) {
                     var likes = _.map(response.data, function (artist) {
                         return {
@@ -70,12 +71,7 @@ angular.module('pickMeASong')
                             score: SCORE_ARTIST_DEFAULT
                         };
                     });
-                    console.log('user fb music likes are ', likes);
-                    that.fetchRecommendations(likes).finally(function () {
-                        console.log('fetch recommendations is called!!');
-                        console.log('callback is ', callback);
-                        callback();
-                    });
+                    that.fetchRecommendations(likes).finally(recommendationsFetchedCallback);
                 });
             }
         };
