@@ -1,0 +1,15 @@
+<h3 class="text-center">Recommendations page</h3><br/>
+<table class="table table-bordered table-striped">
+    <th>Artist Name</th>
+    <th>Song Name</th>
+    <th>Listen</th>
+    <th>Album Cover</th>
+    <th>Feedback</th>
+    <tr ng-repeat="track in recommendations">
+        <td>{{ track.artist.name }}</td>
+        <td>{{ track.name }}</td>
+        <td><a ng-href="{{ track.url }}">URL</a>
+        <td><img ng-src="{{ track.image[2]['#text'] || 'images/default_image.png'}}" /></td>
+        <td><button id="{{ track.name }}" type="button" class="btn btn-success" data-liked-text="Liked" data-default-text="Like" on-rendered="" ng-click="onLikeClicked(track, $event)">Like</button></td>
+    </tr>
+</table>

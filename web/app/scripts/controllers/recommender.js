@@ -4,6 +4,7 @@ angular.module('pickMeASong')
   .controller('RecommenderController', ['$scope', '$location', 'recommendationsService', function ($scope, $location, recommendationsService) {
 
     var PATH_RECOMMENDATIONS = 'recommendations';
+    var PATH_RATE_ITEMS = 'rateItems';
 
     $scope.artists = [{ score: 1 }];
 
@@ -35,7 +36,7 @@ angular.module('pickMeASong')
 
     $scope.rateItems = function () {
         recommendationsService.fetchTracksToRate(function (tracks) {
-            console.log('tracks received ', tracks);
+            $location.path(PATH_RATE_ITEMS);
         });
     };
 
