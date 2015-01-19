@@ -4,12 +4,12 @@
     <th>Song Name</th>
     <th>Listen</th>
     <th>Album Cover</th>
-    <th>Feedback</th>
+    <th>Rate</th>
     <tr ng-repeat="track in tracksToRate">
         <td>{{ track.artist.name }}</td>
         <td>{{ track.name }}</td>
         <td><a ng-href="{{ track.url }}">URL</a>
         <td><img ng-src="{{ track.image[2]['#text'] || 'images/default_image.png'}}" /></td>
-        <td><button id="{{ track.name }}" type="button" class="btn btn-success" data-liked-text="Liked" data-default-text="Like" on-rendered="" ng-click="onLikeClicked(track, $event)">Like</button></td>
+        <td><input id="input-id" type="number" class="rating" min=0 max=5 step=0.5 star-rating-init=""></td>
     </tr>
 </table>
