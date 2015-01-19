@@ -1,26 +1,31 @@
 <div class="recommender-container">
-  <h4 class="text-center">List your favourite music artists along with their importance <br/> to you <em>(ranging 1-10)</em></h4>
-
+  <h2 class="text-center">Find new music. Get personalized recommendations.</h2>
   <br/>
-
-  <p class="lead text-center" ng-repeat="artist in artists">
-    <input type="text" ng-model="artist.name" placeholder="artist name"/>
-    <input type="number" ng-model="artist.score" min="1" max="10"/>
-    <button class="btn btn-primary btn-small" ng-click="artists.push({ score: 1 })" ng-class="{ invisible: !$last }">
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-    </button>
-    <br/>
+  <p class="text-subheader">
+    We need some info about your music tastes in order to make recommendations.<br/>We can get it only if you would:
+  </p>
+  <br/>
+  <div class="data-source-options-container">
+    <div id="rate-songs-container">
+      <h4>
+        <button class="btn btn-sm btn-default btn-rate"><strong>Rate</strong></button> a couple of songs to allow us get a better taste of what music you enjoy.
+      </h4>
+    </div>
+    <div id="last-fm-login">
+      <h4>
+        <button class="btn btn-sm btn-default btn-last-fm"><strong>Link</strong></button> your Last.fm profile in order to allow us gather what tracks you've listened.
+      </h4>
+    </div>
     <div id="fb-login" ng-hide="isLoggedOnFacebook">
-        <h4 class="text-center">or <div class="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" on-login="onFacebookLogin" scope="public_profile, user_likes"></div> with your Facebook account to get<br/> <strong>personalized music recommendations.</strong></h4>
+        <h4>
+          <div class="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" on-login="onFacebookLogin" scope="public_profile, user_likes"></div> with your Facebook account<br/>to let us know about your music likes
+        </h4>
     </div>
     <div id="fb-fetch-data" ng-show="isLoggedOnFacebook">
-        <h4 class="text-center">or we can <button class="btn btn-sm btn-warning" ng-click="fetchInfoFromFacebook()">Fetch</button> info about them from your facebook profile<br/>and give you <strong>personalized music recommendations</strong></h4>
+        <h4 class="text-center"><button class="btn btn-sm btn-warning" ng-click="fetchInfoFromFacebook()">Fetch</button> info about your music likes from your facebook</strong></h4>
     </div>
-  </p>
+  </div>
 
-  <p class="text-center recommend">
-    <a class="btn btn-lg btn-success" click-on-enter="" ng-click="getRecommendations();">Recommend</a>
-  </p>
   <div ng-show="isLoading" class="loading-spinner">
     <div class="loading-spinner-container">
       <div class="spinner">

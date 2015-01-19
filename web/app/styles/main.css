@@ -117,7 +117,6 @@ table th {
 
 .recommender-container {
     margin: 0 auto;
-    padding-top: 20px;
     padding-bottom: 50px;
     width: 570px;
 }
@@ -262,6 +261,7 @@ p.recommend {
 
 h4 {
     line-height: 1.6em;
+    font-size: 16px;
 }
 
 .fb-login-button {
@@ -275,4 +275,16 @@ h4 {
 
 .text-header {
   color: #5c5c5c;
+}
+
+.text-subheader {
+  font-size: 15x;
+  width: 100%;
+  text-align: center;
+}
+
+.data-source-options-container {
+  width: 390px;
+  text-align: left;
+  margin: 0 auto;
 }
