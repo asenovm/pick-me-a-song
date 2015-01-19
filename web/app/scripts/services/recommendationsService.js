@@ -79,6 +79,23 @@ angular.module('pickMeASong')
         });
     };
 
+    this.fetchInfoFromLastFm = function (user, recommendationsFetchedCallback) {
+        var that = this;
+        lastFm.user.getTopTracks({ user: user}, {
+            success: function (data) {
+                var likes = _.map(data.toptracks.track || [], function (track) {
+                    return {
+                        name: track.artist.name,
+                        score: track.playcount
+                    };
+                });
+                that.fetchRecommendations(likes).finally(recommendationsFetchedCallback);
+            }, error: function (code, message) {
+                that.fetchRecommendations([]).finally(recommendationsFetchedCallback);
+            }
+        });
+    };
+
     this.onFacebookConnected = function (authInfo) {
         userId = authInfo.userID;
     };

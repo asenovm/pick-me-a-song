@@ -28,11 +28,23 @@ angular.module('pickMeASong')
         recommendationsService.fetchInfoFromFacebook($scope.showRecommendations);
     };
 
+    $scope.fetchInfoFromLastFm = function (username) {
+      $scope.isLoading = true;
+      recommendationsService.fetchInfoFromLastFm(username, $scope.showRecommendations);
+    };
+
     window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.setLoading, $scope.showRecommendations);
 
+    if(!window.lastFmInit) {
+      window.lastFm = new LastFM({
+        apiKey: '5a566b0690f3dcf4958d5bc8bd329e75',
+        apiSecret: 'dd065bd63db2120407e869d2641fc693'
+      });
+      window.lastFmInit = true;
+    }
     if(!window.fbInit) {
         FB.init({
-          appId      : '1756061591286266',
+          appId      : '1756098894615869',
           xfbml      : true,
           version    : 'v2.1'
         });

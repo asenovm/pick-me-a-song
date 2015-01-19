@@ -12,7 +12,8 @@
     "angular-sanitize": "1.2.6",
     "angular-route": "1.2.6",
     "angular-local-storage": "~0.1.5",
-    "underscore": "~1.7.0"
+    "underscore": "~1.7.0",
+    "lastfm": "https://github.com/fxb/javascript-last.fm-api.git"
   },
   "devDependencies": {
     "angular-mocks": "1.2.6",

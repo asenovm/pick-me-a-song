@@ -1,0 +1,13 @@
+{
+  "name": "lastfm",
+  "homepage": "https://github.com/fxb/javascript-last.fm-api",
+  "_release": "e03ee1f3c7",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "e03ee1f3c79174972c5072d724eee24fc531d5f7"
+  },
+  "_source": "https://github.com/fxb/javascript-last.fm-api.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/fxb/javascript-last.fm-api.git"
+}
