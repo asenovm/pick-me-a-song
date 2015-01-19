@@ -8,21 +8,21 @@
   <div class="data-source-options-container">
     <div id="rate-songs-container">
       <h4>
-        <button class="btn btn-sm btn-default btn-rate"><strong>Rate</strong></button> a couple of songs to allow us get a better taste of what music you enjoy.
+        <button class="btn btn-sm btn-default btn-rate"><strong>Rate <i class="fa fa-star-o"></i></strong></button> a couple of songs to allow us get a better taste of what music you enjoy.
       </h4>
     </div>
     <div id="last-fm-login">
       <h4>
-        <button class="btn btn-sm btn-default btn-last-fm"><strong>Link</strong></button> your Last.fm profile in order to allow us gather what tracks you've listened.
+        <button class="btn btn-sm btn-default btn-last-fm"><strong>Link <i class="fa fa-lastfm"></i></strong></button> your <strong>Last.fm</strong> profile in order to allow us gather what tracks you've listened.
       </h4>
     </div>
     <div id="fb-login" ng-hide="isLoggedOnFacebook">
         <h4>
-          <div class="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" on-login="onFacebookLogin" scope="public_profile, user_likes"></div> with your Facebook account<br/>to let us know about your music likes
+          <div class="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" on-login="onFacebookLogin" scope="public_profile, user_likes"></div> with your <strong>Facebook</strong> account<br/>to let us know about your music likes
         </h4>
     </div>
     <div id="fb-fetch-data" ng-show="isLoggedOnFacebook">
-        <h4 class="text-center"><button class="btn btn-sm btn-default btn-facebook" ng-click="fetchInfoFromFacebook()"><strong>Fetch</strong></button> info about your music likes from your facebook</strong></h4>
+        <h4><button class="btn btn-sm btn-default btn-facebook" ng-click="fetchInfoFromFacebook()"><strong>Fetch <i class="fa fa-facebook"></i></strong></button> info about your music likes from your <strong>Facebook</strong>.</strong></h4>
     </div>
   </div>
 

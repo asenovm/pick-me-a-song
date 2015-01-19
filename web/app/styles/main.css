@@ -279,7 +279,7 @@ h4 {
 }
 
 .text-subheader {
-  font-size: 15x;
+  font-size: 16x;
   width: 100%;
   text-align: center;
 }
@@ -291,5 +291,5 @@ h4 {
 }
 
 .btn-rate, .btn-facebook, .btn-last-fm {
-  width: 52px;
+  width: 60px;
 }
