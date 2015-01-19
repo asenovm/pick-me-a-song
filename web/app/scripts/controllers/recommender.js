@@ -42,14 +42,12 @@ angular.module('pickMeASong')
       });
       window.lastFmInit = true;
     }
-    if(!window.fbInit) {
-        FB.init({
-          appId      : '1756061591286266',
-          xfbml      : true,
-          version    : 'v2.1'
-        });
-        window.fbInit = true;
-    }
+
+    FB.init({
+      appId      : '1756061591286266',
+      xfbml      : true,
+      version    : 'v2.1'
+    });
 
     FB.getLoginStatus(function (response) {
         if(response.status === "connected") {
