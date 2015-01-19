@@ -306,3 +306,11 @@ button.lastfm-username {
   margin-left: 7px;
   font-size: 14px;
 }
+
+.info-footer {
+    padding-bottom: 20px;
+}
+
+.footer h4 {
+    line-height: normal;   
+}
