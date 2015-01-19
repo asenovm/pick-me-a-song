@@ -100,4 +100,15 @@ angular.module('pickMeASong')
         userId = authInfo.userID;
     };
 
+    this.fetchTracksToRate = function (callback) {
+        $http({
+            url: '/tracksToRate',
+            method: 'GET'
+        }).success(function (data, status, headers, config) {
+            callback(data);
+        }).error(function (data, status, headers, config) {
+            callback(null);
+        });
+    };
+
 }]);

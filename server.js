@@ -26,6 +26,16 @@ app.get('/recommendations', function (req, res) {
     });
 });
 
+app.get('/tracksToRate', function (req, res) {
+    db.getTracksToRate(function (err, result) {
+        if(err) {
+            res.status(500).end();
+        } else {
+            res.json(result).end();
+        }
+    });
+});
+
 app.post('/like', function (req, res) {
     var likedTracksPositions = req.body.likedTracksPositions,
         recommendedTracksCount = req.body.recommendedTracksCount,

@@ -33,6 +33,12 @@ angular.module('pickMeASong')
       recommendationsService.fetchInfoFromLastFm(username, $scope.showRecommendations);
     };
 
+    $scope.rateItems = function () {
+        recommendationsService.fetchTracksToRate(function (tracks) {
+            console.log('tracks received ', tracks);
+        });
+    };
+
     window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.setLoading, $scope.showRecommendations);
 
     if(!window.lastFmInit) {
