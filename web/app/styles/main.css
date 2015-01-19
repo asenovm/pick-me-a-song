@@ -293,3 +293,16 @@ h4 {
 .btn-rate, .btn-facebook, .btn-last-fm {
   width: 60px;
 }
+
+.btn-link-username {
+  font-size: 12px;
+}
+
+input.lastfm-username {
+  width: 240px !important;
+}
+
+button.lastfm-username {
+  margin-left: 7px;
+  font-size: 14px;
+}
