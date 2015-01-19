@@ -6,7 +6,7 @@ angular.module('pickMeASong')
     var PATH_RECOMMENDATIONS = 'recommendations';
     var PATH_RATE_ITEMS = 'rateItems';
 
-    $scope.artists = [{ score: 1 }];
+    $scope.tracksToRate = recommendationsService.getTracksToRate();
 
     $scope.showRecommendations = function () {
         $scope.isLoading = false;
@@ -37,6 +37,7 @@ angular.module('pickMeASong')
     $scope.rateItems = function () {
         recommendationsService.fetchTracksToRate(function (tracks) {
             $location.path(PATH_RATE_ITEMS);
+            $scope.tracksToRate = tracks;
         });
     };
 

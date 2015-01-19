@@ -5,7 +5,7 @@
     <th>Listen</th>
     <th>Album Cover</th>
     <th>Feedback</th>
-    <tr ng-repeat="track in recommendations">
+    <tr ng-repeat="track in tracksToRate">
         <td>{{ track.artist.name }}</td>
         <td>{{ track.name }}</td>
         <td><a ng-href="{{ track.url }}">URL</a>

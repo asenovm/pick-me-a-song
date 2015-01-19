@@ -6,8 +6,10 @@ angular.module('pickMeASong')
     var SCORE_ARTIST_DEFAULT = 10;
     var KEY_RECOMMENDED_ITEMS = "recommendedItems";
     var KEY_USER_ID = "userId";
+    var KEY_TRACKS_TO_RATE = "tracksToRate";
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
+    var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
 
     this.getRecommendations = function () {
         return recommendations;
@@ -106,9 +108,14 @@ angular.module('pickMeASong')
             method: 'GET'
         }).success(function (data, status, headers, config) {
             callback(data);
+            tracksToRate = data;
         }).error(function (data, status, headers, config) {
             callback(null);
         });
+    };
+
+    this.getTracksToRate = function () {
+        return tracksToRate;
     };
 
 }]);
