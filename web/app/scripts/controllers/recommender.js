@@ -32,7 +32,7 @@ angular.module('pickMeASong')
 
     if(!window.fbInit) {
         FB.init({
-          appId      : '1756061591286266',
+          appId      : '1756098894615869',
           xfbml      : true,
           version    : 'v2.1'
         });

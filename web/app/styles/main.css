@@ -2,6 +2,7 @@
 body {
   padding-top: 20px;
   padding-bottom: 20px;
+  background: #f7f7f7;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -287,4 +288,8 @@ h4 {
   width: 390px;
   text-align: left;
   margin: 0 auto;
+}
+
+.btn-rate, .btn-facebook, .btn-last-fm {
+  width: 52px;
 }
