@@ -11,7 +11,7 @@
     </button>
     <br/>
     <div id="fb-login" ng-hide="isLoggedOnFacebook">
-        <h4 class="text-center">or <div class="fb-login-button" style="display: inline-block !important;" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" on-login="onFacebookLogin" scope="public_profile, user_likes"></div> with your Facebook account to get<br/> <strong>personalized music recommendations.</strong></h4>
+        <h4 class="text-center">or <div class="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" on-login="onFacebookLogin" scope="public_profile, user_likes"></div> with your Facebook account to get<br/> <strong>personalized music recommendations.</strong></h4>
     </div>
     <div id="fb-fetch-data" ng-show="isLoggedOnFacebook">
         <h4 class="text-center">or we can <button class="btn btn-sm btn-warning" ng-click="fetchInfoFromFacebook()">Fetch</button> info about them from your facebook profile<br/>and give you <strong>personalized music recommendations</strong></h4>

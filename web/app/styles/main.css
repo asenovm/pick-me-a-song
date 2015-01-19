@@ -14,7 +14,7 @@ body {
 
 /* Custom page header */
 .header {
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #7a7a7a;
 }
 /* Make the masthead heading the same height as the navigation */
 .header h3 {
@@ -28,7 +28,7 @@ body {
 .footer {
   padding-top: 19px;
   color: #777;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid #7a7a7a;
 }
 
 /* Customize container */
@@ -262,4 +262,17 @@ p.recommend {
 
 h4 {
     line-height: 1.6em;
+}
+
+.fb-login-button {
+  width: 74px;
+  height: 25px;
+}
+
+.footer p {
+  color: #333;
+}
+
+.text-header {
+  color: #5c5c5c;
 }
