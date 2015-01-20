@@ -23,8 +23,10 @@ exports.getRecommendationsFor = function (artists, callback) {
             }), MIN_COMMON_USERS);
 
             _.each(users, function (user) {
-                user.tracks = _.sortBy(user.tracks, function (track) {
+                user.tracks = _.uniq(_.sortBy(user.tracks, function (track) {
                     return -track.playcount;
+                }), function (track) {
+                    return track.artist.name;
                 });
             });
 
