@@ -32,35 +32,5 @@
         <h4><button class="btn btn-sm btn-default btn-facebook" ng-click="fetchInfoFromFacebook()"><strong>Fetch <i class="fa fa-facebook"></i></strong></button> info about your music likes from your <strong>Facebook</strong>.</strong></h4>
     </div>
   </div>
-
-  <div ng-show="isLoading" class="loading-spinner">
-    <div class="loading-spinner-container">
-      <div class="spinner">
-        <div class="spinner-container container1">
-          <div class="circle1"></div>
-          <div class="circle2"></div>
-          <div class="circle3"></div>
-          <div class="circle4"></div>
-        </div>
-        <div class="spinner-container container2">
-          <div class="circle1"></div>
-          <div class="circle2"></div>
-          <div class="circle3"></div>
-          <div class="circle4"></div>
-        </div>
-        <div class="spinner-container container3">
-          <div class="circle1"></div>
-          <div class="circle2"></div>
-          <div class="circle3"></div>
-          <div class="circle4"></div>
-        </div>
-      </div>
-      <br/>
-      <br/>
-      <p class="text-center">
-        Getting your recommendations.<br/>
-        Please wait...
-      </p>
-    </div>
-  </div>
+  <div ng-include="'views/loading-spinner.html'" ng-show="isLoading"></div>
 </div>
