@@ -58,7 +58,7 @@ function getSimilarityForUser(user, artists) {
 
     var userAverageScore = userTotalScore / userScoreCount;
     var artistsTotalScore = _.reduce(artists, function (memo, artist) {
-        return memo + artist.score;
+        return memo + parseInt(artist.score, 10);
     }, 0);
     var artistsAverageScore = artistsTotalScore / artists.length;
 
@@ -66,6 +66,7 @@ function getSimilarityForUser(user, artists) {
         artistsNames = _.map(artists, function (artist) {
         return artist.name;
     }), commonArtistsNames = _.intersection(artistsNames, userArtistsNames);
+
 
     var nominator = _.reduce(commonArtistsNames, function (memo, name) {
         var userScore = playCountsPerArtist[name] - userAverageScore,
