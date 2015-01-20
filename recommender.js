@@ -12,6 +12,10 @@ exports.getRecommendationsFor = function (artists, callback) {
             console.log('an error occurred');
             console.dir(err);
         } else {
+            var artistNames = _.map(artists, function (artist) {
+                return artist.name;
+            });
+
             _.each(users, function (user) {
                 user.similarity = getSimilarityForUser(user, artists);
             });
@@ -23,10 +27,12 @@ exports.getRecommendationsFor = function (artists, callback) {
             }), MIN_COMMON_USERS);
 
             _.each(users, function (user) {
-                user.tracks = _.uniq(_.sortBy(user.tracks, function (track) {
+                user.tracks = _.reject(_.uniq(_.sortBy(user.tracks, function (track) {
                     return -track.playcount;
                 }), function (track) {
                     return track.artist.name;
+                }), function (track) {
+                    return _.contains(artistNames, track.artist.name);
                 });
             });
 
