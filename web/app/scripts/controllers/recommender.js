@@ -6,6 +6,7 @@ angular.module('pickMeASong')
     var PATH_RECOMMENDATIONS = 'recommendations';
     var PATH_RATE_ITEMS = 'rateItems';
 
+    $scope.minNumberRatedTracks = 10;
     $scope.tracksToRate = recommendationsService.getTracksToRate();
 
     $scope.showRecommendations = function () {
@@ -42,15 +43,23 @@ angular.module('pickMeASong')
     };
 
     $scope.submitRatedTracks = function () {
-        var allTracksRated = _.all($scope.tracksToRate, function (track) {
+        var ratedTracks = _.filter($scope.tracksToRate, function (track) {
             return track.userValue;
         });
 
-        if(allTracksRated) {
-            console.log('submit and all tracks are rated');
+        if(ratedTracks.length >= $scope.minNumberRatedTracks) {
+            $scope.artists = _.map(ratedTracks, function (track) {
+                return {
+                    name: track.artist.name,
+                    score: track.userValue
+                };
+            });
+            $scope.submitError = false;
+            $scope.getRecommendations();
         } else {
-            console.log('submit and not all tracks are rated');
+            $scope.submitError = true;
         }
+
     };
 
     window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.setLoading, $scope.showRecommendations);
