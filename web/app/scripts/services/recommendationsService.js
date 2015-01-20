@@ -15,26 +15,34 @@ angular.module('pickMeASong')
         return recommendations;
     };
 
-    this.saveRecommendations = function () {
+    this.saveRecommendations = function (items) {
+        recommendations = items || recommendations;
         $localStorage.set(KEY_RECOMMENDED_ITEMS, recommendations);
     };
 
     this.fetchRecommendations = function (artists) {
-        var deferred = $q.defer();
+        var deferred = $q.defer(),
+            that = this;
 
         $http({
             url: '/recommendations',
             method: 'GET',
             params: { artists: JSON.stringify(artists) }
         }).success(function (data, status, headers, config) {
-            recommendations = data.recommendedTracks;
             userId = data.id;
             $localStorage.set(KEY_USER_ID, userId);
-            $localStorage.set(KEY_RECOMMENDED_ITEMS, recommendations);
-            deferred.resolve(recommendations);
+            if(_.isEmpty(data.recommendedTracks)) {
+                that.fetchDefaultRecommendations(function () {
+                    deferred.resolve(recommendations);
+                });
+            } else {
+                that.saveRecommendations(data.recommendedTracks);
+                deferred.resolve(recommendations);
+            }
         }).error(function (data, status, headers, config) {
-            $localStorage.set(KEY_RECOMMENDED_ITEMS, []);
-            deferred.reject(data);
+            that.fetchDefaultRecommendations(function () {
+                deferred.reject(recommendations);
+            });
         });
 
         return deferred.promise;
@@ -77,6 +85,7 @@ angular.module('pickMeASong')
                     score: SCORE_ARTIST_DEFAULT
                 };
             });
+            console.log('likes are ', likes);
             that.fetchRecommendations(likes).finally(recommendationsFetchedCallback);
         });
     };
@@ -98,6 +107,14 @@ angular.module('pickMeASong')
         });
     };
 
+    this.fetchDefaultRecommendations = function (callback) {
+        var that = this;
+        this.fetchTracksToRate(function (tracks) {
+            that.saveRecommendations(tracks);
+            callback();
+        });
+    };
+
     this.onFacebookConnected = function (authInfo) {
         userId = authInfo.userID;
     };
@@ -111,7 +128,7 @@ angular.module('pickMeASong')
             tracksToRate = data;
             $localStorage.set(KEY_TRACKS_TO_RATE, tracksToRate);
         }).error(function (data, status, headers, config) {
-            callback(null);
+            callback([]);
         });
     };
 
