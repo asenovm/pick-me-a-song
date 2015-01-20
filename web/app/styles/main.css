@@ -314,3 +314,8 @@ button.lastfm-username {
 .footer h4 {
     line-height: normal;   
 }
+
+button.btn-default {
+    font-weight: bold;
+    font-size: 12px;
+}

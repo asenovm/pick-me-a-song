@@ -5,7 +5,11 @@ angular.module('pickMeASong')
     return {
         restrict: 'A',
         link: function ($scope, element, attrs) {
-            $(element).rating({ showClear: false, showCaption: false, size: 'sm', glyphicon: false, hoverEnabled: false });
+            var $element = $(element);
+            $element.rating({ showClear: false, showCaption: false, size: 'sm', hoverEnabled: false });
+            $element.on('rating.change', function (e, value) {
+                $scope.track.userValue = value;
+            });
         }
     };
 });

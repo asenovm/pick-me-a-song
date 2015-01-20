@@ -41,6 +41,18 @@ angular.module('pickMeASong')
         });
     };
 
+    $scope.submitRatedTracks = function () {
+        var allTracksRated = _.all($scope.tracksToRate, function (track) {
+            return track.userValue;
+        });
+
+        if(allTracksRated) {
+            console.log('submit and all tracks are rated');
+        } else {
+            console.log('submit and not all tracks are rated');
+        }
+    };
+
     window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.setLoading, $scope.showRecommendations);
 
     if(!window.lastFmInit) {
