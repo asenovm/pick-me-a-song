@@ -20,6 +20,11 @@ angular.module('pickMeASong')
         $localStorage.set(KEY_RECOMMENDED_ITEMS, recommendations);
     };
 
+    this.saveUserId = function (id) {
+        userId = id;
+        $localStorage.set(KEY_USER_ID, id);
+    };
+
     this.fetchRecommendations = function (artists) {
         var deferred = $q.defer(),
             that = this;
@@ -29,8 +34,7 @@ angular.module('pickMeASong')
             method: 'GET',
             params: { artists: JSON.stringify(artists) }
         }).success(function (data, status, headers, config) {
-            userId = data.id;
-            $localStorage.set(KEY_USER_ID, userId);
+            that.saveUserId(data.id);
             if(_.isEmpty(data.recommendedTracks)) {
                 that.fetchDefaultRecommendations(function () {
                     deferred.resolve(recommendations);
@@ -70,7 +74,7 @@ angular.module('pickMeASong')
         return function (response) {
             if(response.status === "connected") {
                 loginSuccessfulCallback();
-                userId = response.authResponse.userID;
+                that.saveUserId(response.authResponse.userID);
                 that.fetchInfoFromFacebook(recommendationsFetchedCallback);
             }
         };
@@ -92,16 +96,25 @@ angular.module('pickMeASong')
 
     this.fetchInfoFromLastFm = function (user, recommendationsFetchedCallback) {
         var that = this;
-        lastFm.user.getTopArtists({ user: user}, {
+        lastFm.user.getInfo({ user: user }, {
             success: function (data) {
-                var artists = _.map(data.topartists.artist, function (artist) {
-                    return {
-                        name: artist.name,
-                        score: artist.playcount
-                    };
+                that.saveUserId(data.user.id);
+                lastFm.user.getTopArtists({ user: user}, {
+                    success: function (data) {
+                        var artists = _.map(data.topartists.artist, function (artist) {
+                            return {
+                                name: artist.name,
+                                score: artist.playcount
+                            };
+                        });
+                        that.fetchRecommendations(artists).finally(recommendationsFetchedCallback);
+                    }, error: function (code, message) {
+                        that.fetchRecommendations([]).finally(recommendationsFetchedCallback);
+                    }
                 });
-                that.fetchRecommendations(artists).finally(recommendationsFetchedCallback);
-            }, error: function (code, message) {
+            },
+            error: function (code, message) {
+                that.saveUserId("client-generated-" + Date.now());
                 that.fetchRecommendations([]).finally(recommendationsFetchedCallback);
             }
         });
