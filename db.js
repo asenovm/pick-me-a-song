@@ -77,3 +77,10 @@ exports.findAndSaveTracksToRate = function () {
 
     });
 };
+
+exports.removeAll = function () {
+    db.collection(COLLECTION_USERS).remove({}, function (err, result) {
+        console.log('err is ', err);
+        console.log('result is ', result);
+    });
+};

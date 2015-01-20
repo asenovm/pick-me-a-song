@@ -17,6 +17,7 @@ function startCrawling() {
 }
 
 function crawl(user) {
+    console.log('crawling ' + user);
     visitNode(user, config.startPage, config.startPage);
     lastfm.user.getFriends({ user: user }, function (err, result) {
         if(err) {
@@ -40,17 +41,16 @@ function visitNode (user, page, totalPages) {
         return;
     }
 
+    console.log('visit node ' + user + ' ' + page);
+
     lastfm.user.getTopTracks({ user: user, page: page, limit: config.itemsPerPage}, function (err, result) {
         if (err) {
             console.log('get tracks err is ', err);
+            visitNode(user, page + 1, totalPages);
         } else if (result['@attr']) {
             var meta = result['@attr'],
                 totalPages = meta.totalPages,
                 tracks = _.isArray(result.track) ? result.track : [result.track];
-
-            _.each(tracks, function (track) {
-                track.name = track.name.toUpperCase();
-            });
 
             db.updateUserProfile({ name: user, tracks: tracks }, function (err, result) {
                 visitNode(user, page + 1, totalPages);
