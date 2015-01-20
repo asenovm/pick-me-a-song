@@ -1,1 +1,1 @@
-web: node tracksToRateRetriever.js
+web: node server.js
