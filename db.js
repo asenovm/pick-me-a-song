@@ -7,6 +7,7 @@ var mongo = require('mongodb'),
     COLLECTION_USERS = 'users',
     COLLECTION_EVALUATION = 'evaluation',
     COLLECTION_TRACKS_TO_RATE = 'tracksToRate',
+    FILE_TOP_TRACKS = 'topTracks.json',
     NUMBER_TRACKS_TO_RATE = 15;
 
 MongoClient.connect(config.dbURL, function (err, dbInstance) {
@@ -43,44 +44,10 @@ exports.getTracksToRate = function (callback) {
 };
 
 exports.findAndSaveTracksToRate = function () {
-    var users = db.collection(COLLECTION_USERS);
-    users.find({}).toArray(function (err, result) {
-        var tracks = _.flatten(_.map(result, function (user) {
-            return user.tracks;
-        })), trackNames = _.uniq(tracks, function (track) {
-            return track.name;
-        });
+    var topTracks = JSON.parse(fs.readFileSync(FILE_TOP_TRACKS)),
+        tracksToRate = db.collection(COLLECTION_TRACKS_TO_RATE);
 
-        tracks = _.map(trackNames, function (uniqueTrack) {
-            var totalPlaycount = 0;
-            _.each(tracks, function (track) {
-                if(track.name === uniqueTrack.name) {
-                    totalPlaycount += parseInt(track.playcount, 10);
-                }
-            })
-            return {
-                playcount: totalPlaycount,
-                track: uniqueTrack
-            };
-        });
-
-        tracks = _.first(_.sortBy(tracks, function (track) {
-            return -track.playcount;
-        }), NUMBER_TRACKS_TO_RATE);
-
-        var tracksToRate = db.collection(COLLECTION_TRACKS_TO_RATE);
-        tracksToRate.remove(function (err, result) {
-            tracksToRate.insert(_.map(tracks, function (track) {
-                return track.track;
-            }), _.noop);
-        });
-
-    });
-};
-
-exports.removeAll = function () {
-    db.collection(COLLECTION_USERS).remove({}, function (err, result) {
-        console.log('err is ', err);
-        console.log('result is ', result);
+    tracksToRate.remove({}, function (err, result) {
+        tracksToRate.insert(topTracks, _.noop);
     });
 };
