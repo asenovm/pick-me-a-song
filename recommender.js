@@ -1,7 +1,8 @@
 var _ = require('underscore'),
     db = require('./db'),
     MIN_COMMON_USERS = 5,
-    MIN_RECOMMENDED_ITEMS_PER_USER = 3;
+    MIN_RECOMMENDED_ITEMS_PER_USER = 2,
+    EPS = 0.001;
 
 exports.getRecommendationsFor = function (artists, callback) {
     db.retrieveAllUsers(artists, function (err, users) {
@@ -15,52 +16,75 @@ exports.getRecommendationsFor = function (artists, callback) {
                 user.similarity = getSimilarityForUser(user, artists);
             });
 
-            users = _.sortBy(users, function (user) {
-                return user.similarity;
-            });
+            users = _.first(_.sortBy(_.filter(users, function (user) {
+                return user.similarity >= 0;
+            }), function (user) {
+                return -user.similarity;
+            }), MIN_COMMON_USERS);
 
             _.each(users, function (user) {
                 user.tracks = _.sortBy(user.tracks, function (track) {
                     return -track.playcount;
                 });
             });
-        }
 
-        recommendedTracks = _.map(users, function (user, index) {
-            return _.first(user.tracks, (Math.min(users.length, MIN_COMMON_USERS) - index) * MIN_RECOMMENDED_ITEMS_PER_USER);
-        });
+            recommendedTracks = _.map(users, function (user, index) {
+                return _.first(user.tracks, (Math.min(users.length, MIN_COMMON_USERS) - index) * MIN_RECOMMENDED_ITEMS_PER_USER);
+            });
+        }
 
         callback(err, _.flatten(recommendedTracks));
     });
 };
 
 function getSimilarityForUser(user, artists) {
-    var tracks = [];
-    _.each(artists, function (artist) {
-        tracks = _.union(tracks, _.filter(user.tracks, function (track) {
-            return track.artist.name === artist.name;
-        }));
+    var tracksPerArtist = _.groupBy(user.tracks, function (track) {
+        return track.artist.name;
+    }), playCountsPerArtist = {};
+    
+    _.each(tracksPerArtist, function (value, key) {
+        playCountsPerArtist[key] = _.reduce(value, function (memo, track) {
+            return memo + parseInt(track.playcount, 10);
+        }, 0);
     });
 
-    var nominator = _.reduce(tracks, function (memo, track) {
-        var trackAuthor = _.find(artists, matchTrackAuthor(track));
-        return memo + track.playcount * trackAuthor.score
+    var userTotalScore = 0,
+        userScoreCount = 0;
+
+    _.each(playCountsPerArtist, function (value, key) {
+        userTotalScore += value;
+        ++userScoreCount;
+    });
+
+    var userAverageScore = userTotalScore / userScoreCount;
+    var artistsTotalScore = _.reduce(artists, function (memo, artist) {
+        return memo + artist.score;
+    }, 0);
+    var artistsAverageScore = artistsTotalScore / artists.length;
+
+    var userArtistsNames = _.keys(playCountsPerArtist),
+        artistsNames = _.map(artists, function (artist) {
+        return artist.name;
+    }), commonArtistsNames = _.intersection(artistsNames, userArtistsNames);
+
+    var nominator = _.reduce(commonArtistsNames, function (memo, name) {
+        var userScore = playCountsPerArtist[name] - userAverageScore,
+            artistScore = _.findWhere(artists, { name: name }).score - artistsAverageScore;
+
+        return memo + userScore * artistScore + EPS;
     }, 0);
 
-    var userDenominator = _.reduce(tracks, function (memo, track) {
-        return memo + track.playcount * track.playcount;
-    }, 0);
+    var userDenominator = Math.sqrt(_.reduce(commonArtistsNames, function (memo, name) {
+        var userScore = playCountsPerArtist[name] - userAverageScore;
+        return memo + userScore * userScore + EPS;
+    }, 0));
 
-    var artistDenominator = _.reduce(tracks, function (memo, track) {
-        var trackAuthor = _.find(artists, matchTrackAuthor(track));
-        return memo + trackAuthor.score * trackAuthor.score;
-    }, 0);
+    var artistsDenominator = Math.sqrt(_.reduce(commonArtistsNames, function (memo, name) {
+        var artistScore = _.findWhere(artists, { name: name }).score - artistsAverageScore;
+        return memo + artistScore * artistScore + EPS;
+    }, 0));
 
-    return nominator / (Math.sqrt(userDenominator) * Math.sqrt(artistDenominator));
-}
+    var denominator = userDenominator * artistsDenominator;
 
-function matchTrackAuthor(track) {
-    return function (artist) {
-        return artist.name === track.artist.name;
-    };
+    return nominator / denominator;
 }
