@@ -83,15 +83,15 @@ angular.module('pickMeASong')
 
     this.fetchInfoFromLastFm = function (user, recommendationsFetchedCallback) {
         var that = this;
-        lastFm.user.getTopTracks({ user: user}, {
+        lastFm.user.getTopArtists({ user: user}, {
             success: function (data) {
-                var likes = _.map(data.toptracks.track || [], function (track) {
+                var artists = _.map(data.topartists.artist, function (artist) {
                     return {
-                        name: track.artist.name,
-                        score: track.playcount
+                        name: artist.name,
+                        score: artist.playcount
                     };
                 });
-                that.fetchRecommendations(likes).finally(recommendationsFetchedCallback);
+                that.fetchRecommendations(artists).finally(recommendationsFetchedCallback);
             }, error: function (code, message) {
                 that.fetchRecommendations([]).finally(recommendationsFetchedCallback);
             }
@@ -109,6 +109,7 @@ angular.module('pickMeASong')
         }).success(function (data, status, headers, config) {
             callback(data);
             tracksToRate = data;
+            $localStorage.set(KEY_TRACKS_TO_RATE, tracksToRate);
         }).error(function (data, status, headers, config) {
             callback(null);
         });

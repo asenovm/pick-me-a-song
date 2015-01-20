@@ -45,13 +45,25 @@ angular.module('pickMeASong')
     $scope.submitRatedTracks = function () {
         var ratedTracks = _.filter($scope.tracksToRate, function (track) {
             return track.userValue;
+        }), ratedTracksUniqueArtists = _.uniq(ratedTracks, false, function (track) {
+            return track.artist.name;
         });
 
         if(ratedTracks.length >= $scope.minNumberRatedTracks) {
-            $scope.artists = _.map(ratedTracks, function (track) {
+            $scope.artists = _.map(ratedTracksUniqueArtists, function (track) {
+                var artistTotalValue = 0,
+                    artistTotalRatings = 0;
+
+                _.each(ratedTracks, function (ratedTrack) {
+                    if(ratedTrack.artist.name === track.artist.name) {
+                        ++artistTotalRatings;
+                        artistTotalValue += parseInt(ratedTrack.userValue, 10);
+                    }
+                });
+
                 return {
                     name: track.artist.name,
-                    score: track.userValue
+                    score: artistTotalValue / artistTotalRatings
                 };
             });
             $scope.submitError = false;
