@@ -6,23 +6,8 @@
   </p>
   <br/>
   <div class="data-source-options-container">
-    <div id="rate-songs-container">
-      <h4>
-        <button class="btn btn-sm btn-default btn-rate" ng-click="rateItems();"><strong>Rate <i class="fa fa-star-o"></i></strong></button> a couple of songs to allow us get a better taste of what music you enjoy.
-      </h4>
-    </div>
-    <div id="last-fm-login">
-      <h4>
-        <button class="btn btn-sm btn-default btn-last-fm" ng-click="showLastFmInput = !showLastFmInput;"><strong>Link <i class="fa fa-lastfm"></i></strong></button> your <strong>Last.fm</strong> profile in order to allow us gather what tracks you've listened.
-      </h4>
-      <div class="form-group lastfm-login-container" ng-show="showLastFmInput">
-        <div class="input-group">
-          <div class="input-group-addon"><i class="fa fa-lastfm"></i></div>
-          <input type="text" class="form-control lastfm-username" id="username" placeholder="Enter your Last.fm username" ng-model="lastFmUsername">
-          <button type="submit" class="btn btn-default lastfm-username" ng-click="fetchInfoFromLastFm(lastFmUsername);showLastFmInput = false;"><strong>Go</strong></button>
-        </div>
-      </div>
-    </div>
+    <div ng-include="'views/rate-datasource.html'"></div>
+    <div ng-include="'views/lastfm-datasource.html'"></div>
     <div id="fb-login" ng-hide="isLoggedOnFacebook">
         <h4>
           <div class="fb-login-button" data-max-rows="1" data-size="large" data-show-faces="false" data-auto-logout-link="false" on-login="onFacebookLogin" scope="public_profile, user_likes"></div> with your <strong>Facebook</strong> account<br/>to let us know about your music likes
