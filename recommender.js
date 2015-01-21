@@ -4,7 +4,7 @@ var _ = require('underscore'),
     MIN_RECOMMENDED_ITEMS_PER_USER = 2,
     EPS = 0.001;
 
-exports.getRecommendationsFor = function (artists, callback) {
+exports.getRecommendationsFor = function (artists, neighboursCount, recommendedItemsCount, callback) {
     db.retrieveAllUsers(artists, function (err, users) {
         var recommendedTracks = [];
 
@@ -24,7 +24,7 @@ exports.getRecommendationsFor = function (artists, callback) {
                 return user.similarity >= 0;
             }), function (user) {
                 return -user.similarity;
-            }), MIN_COMMON_USERS);
+            }), neighboursCount || MIN_COMMON_USERS);
 
             _.each(users, function (user) {
                 user.tracks = _.reject(_.uniq(_.sortBy(user.tracks, function (track) {
@@ -37,7 +37,7 @@ exports.getRecommendationsFor = function (artists, callback) {
             });
 
             recommendedTracks = _.map(users, function (user, index) {
-                return _.first(user.tracks, (Math.min(users.length, MIN_COMMON_USERS) - index) * MIN_RECOMMENDED_ITEMS_PER_USER);
+                return _.first(user.tracks, (Math.min(users.length, neighboursCount || MIN_COMMON_USERS) - index) * (recommendedItemsCount || MIN_RECOMMENDED_ITEMS_PER_USER));
             });
         }
 

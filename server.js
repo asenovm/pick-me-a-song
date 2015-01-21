@@ -12,9 +12,11 @@ var express = require('express'),
 app.use(bodyParser.json());
 
 app.get('/recommendations', function (req, res) {
-    var artists = JSON.parse(req.query.artists);
+    var artists = JSON.parse(req.query.artists),
+        neighboursCount = parseInt(req.query.neighboursCount, 10),
+        recommendedItemsCount = parseInt(req.query.recommendedItemsCount, 10);
 
-    recommender.getRecommendationsFor(artists, function (err, recommendedTracks) {
+    recommender.getRecommendationsFor(artists, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
         if(err) {
             res.status(500).end();
         } else {

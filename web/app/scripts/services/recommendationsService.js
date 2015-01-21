@@ -34,7 +34,11 @@ angular.module('pickMeASong')
         $http({
             url: '/recommendations',
             method: 'GET',
-            params: { artists: JSON.stringify(artists) }
+            params: {
+                artists: JSON.stringify(artists),
+                neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
+                recommendedItemsCount: $localStorage.get(KEY_RECOMMENDED_ITEMS_COUNT)
+            }
         }).success(function (data, status, headers, config) {
             that.saveUserId(data.id);
             if(_.isEmpty(data.recommendedTracks)) {
@@ -91,7 +95,6 @@ angular.module('pickMeASong')
                     score: SCORE_ARTIST_DEFAULT
                 };
             });
-            console.log('likes are ', likes);
             that.fetchRecommendations(likes).finally(recommendationsFetchedCallback);
         });
     };
