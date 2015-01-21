@@ -9,3 +9,12 @@ Pick me a song
 <p class="text-justify info-footer">
     The system is based on a <a href="http://en.wikipedia.org/wiki/Collaborative_filtering">Collaborative Filtering</a> algorithm that tries to find a list of users that have similar tastes to you and recommend you those of their favourite songs that you still haven't listened. The algorithm is using data from <a href="http://last.fm">last.fm</a> in order to find similar users.
 </p>
+<h3>Demo</h3>
+<p class="text-justify info-footer">
+    The most up-to-date version of the recommender is deployed at <strong>Heroku</strong>. You can see it alive <a href="http://powerful-citadel-9361.herokuapp.com/app/index.html" alt="Pick-me-a-song">HERE</a>.
+</p>
+
+<h3>Contact</h3>
+<p class="text-justify info-footer">
+    For any questions or comments, feel free to contact me at asenov.m@gmail.com.
+</p>
