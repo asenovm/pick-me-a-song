@@ -24,9 +24,9 @@
     <div class="container">
         <div class="header">
           <ul class="nav nav-pills pull-right">
-            <li class="active"><a ng-href="#" active-on-click="">Home <i class="fa fa-home"></i></a></li>
-            <li><a ng-href="#/about" active-on-click="">About <i class="fa fa-info"></i></a></li>
-            <li><a ng-href="#/settings" active-on-click="">Settings <i class="fa fa-gear"></i></a></li>
+            <li class="home" activate-on-init=""><a ng-href="#" active-on-click="">Home <i class="fa fa-home"></i></a></li>
+            <li class="about" activate-on-init=""><a ng-href="#/about" active-on-click="">About <i class="fa fa-info"></i></a></li>
+            <li class="settings" activate-on-init=""><a ng-href="#/settings" active-on-click="">Settings <i class="fa fa-gear"></i></a></li>
           </ul>
           <h3 class="text-header">Pick me a song</h3>
         </div>
@@ -68,6 +68,7 @@
     <script src="scripts/directives/starRatingInit.js"></script>
     <script src="scripts/directives/onRendered.js"></script>
     <script src="scripts/directives/activeOnClick.js"></script>
+    <script src="scripts/directives/activateOnInit.js"></script>
     <!-- endbuild -->
 </body>
 </html>
