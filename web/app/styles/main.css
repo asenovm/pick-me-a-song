@@ -315,7 +315,19 @@ button.lastfm-username {
     line-height: normal;   
 }
 
-button.btn-default {
+.data-source-options-container button.btn-default {
     font-weight: bold;
     font-size: 12px;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.settings-input {
+    width: 300px;
+}
+
+.settings-footer {
+    padding-bottom: 40px;
 }

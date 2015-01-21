@@ -2,3 +2,23 @@
 <p class="text-justify info-footer">
 You can controll the algorithm parameters that are used when making recommendations.
 </p>
+<div class="info-footer">
+    <h3 class="text-justify">Number of neighbours</h3>
+    Each time we make a recommendation we consider a number of users that are similar to you. Feel free to change this having in mind that lower count will result in a limited set of recommendations and considerably higher will result in broader, but less relevant ones. The default value is <strong>5</strong>.
+</div>
+<div class="input-group settings-input info-footer">
+  <input type="text" class="form-control" placeholder="Enter number of neighbours">
+  <span class="input-group-btn">
+    <button class="btn btn-default" type="button">Save</button>
+  </span>
+</div>
+<div class="info-footer">
+    <h3 class="text-justify">Neighbour recommendation contribution</h3>
+    After finding the users that have the most similar tastes to yours, we decide how many of their most listened songs to recommend to you. You can enter this count in the following input. The default value is <strong>2</strong> (number of items recommended from the user with the least similarity to you).
+</div>
+<div class="input-group settings-input settings-footer">
+  <input type="text" class="form-control" placeholder="Enter min number of items">
+  <span class="input-group-btn">
+    <button class="btn btn-default" type="button">Save</button>
+  </span>
+</div>
