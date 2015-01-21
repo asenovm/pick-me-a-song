@@ -7,6 +7,8 @@ angular.module('pickMeASong')
     var KEY_RECOMMENDED_ITEMS = "recommendedItems";
     var KEY_USER_ID = "userId";
     var KEY_TRACKS_TO_RATE = "tracksToRate";
+    var KEY_RECOMMENDED_ITEMS_COUNT = "recommendedItemsCount";
+    var KEY_NEIGHBOURS_COUNT = "neighboursCount";
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
     var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
@@ -147,6 +149,14 @@ angular.module('pickMeASong')
 
     this.getTracksToRate = function () {
         return tracksToRate;
+    };
+
+    this.setNeighboursCount = function (count) {
+        $localStorage.set(KEY_NEIGHBOURS_COUNT, count);
+    };
+
+    this.setRecommendedItemsCount = function (count) {
+        $localStorage.set(KEY_RECOMMENDED_ITEMS_COUNT, count);
     };
 
 }]);
