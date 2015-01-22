@@ -59,16 +59,13 @@ angular.module('pickMeASong')
         return deferred.promise;
     };
 
-    this.rateTrack = function (ratedTracks, recommendedTracks) {
-        console.log('rated tracks are ');
-        console.dir(ratedTracks);
-
+    this.rateTrack = function (likedTracks, recommendedTracks) {
         var likedTracksPositions = _.map(likedTracks, function (track) {
             return _.indexOf(recommendedTracks, track);
         });
 
         $http({
-            url: '/like',
+            url: '/rate',
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             data: {

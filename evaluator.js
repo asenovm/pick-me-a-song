@@ -13,6 +13,10 @@ exports.getNDCG = function (likedTracksPositions, recommendedTracksCount) {
         properOrderRelevances = _.sortBy(relevances, function (relevance) { return -relevance;}),
         idealDCG = getDCG(properOrderRelevances);
 
+    if(_.isEmpty(likedTracksPositions)) {
+        return 0;
+    }
+
     return dcg / idealDCG;
 };
 

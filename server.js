@@ -17,8 +17,6 @@ app.get('/recommendations', function (req, res) {
         recommendedItemsCount = parseInt(req.query.recommendedItemsCount, 10),
         userId = req.query.userId;
 
-    console.log('recommendations user id is ' + userId);
-
     recommender.getRecommendationsFor(artists, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
         if(err) {
             res.status(500).end();
@@ -41,7 +39,7 @@ app.get('/tracksToRate', function (req, res) {
     });
 });
 
-app.post('/like', function (req, res) {
+app.post('/rate', function (req, res) {
     var likedTracksPositions = req.body.likedTracksPositions,
         recommendedTracksCount = req.body.recommendedTracksCount,
         userId = req.body.userId,
