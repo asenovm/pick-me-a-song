@@ -8,7 +8,7 @@ angular.module('pickMeASong')
 
     var MIN_RATE_LIKED_ITEM = 3;
 
-    $scope.minNumberRatedTracks = 10;
+    $scope.minNumberRatedTracks = 5;
 
     $scope.showRecommendations = function () {
         $scope.isLoading = false;

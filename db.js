@@ -5,6 +5,7 @@ var mongo = require('mongodb'),
     ObjectID = mongo.BSONPure.ObjectID,
     MongoClient = mongo.MongoClient, db,
     COLLECTION_USERS = 'users',
+    COLLECTION_USER_ARTISTS = 'userArtists',
     COLLECTION_EVALUATION = 'evaluation',
     COLLECTION_TRACKS_TO_RATE = 'tracksToRate',
     FILE_TOP_TRACKS = 'topTracks.json',
@@ -41,6 +42,22 @@ exports.writeEvaluationMetric = function (userId, metricName, metricValue, callb
 exports.getTracksToRate = function (callback) {
     var tracksToRate = db.collection(COLLECTION_TRACKS_TO_RATE);
     tracksToRate.find({}).toArray(callback);
+};
+
+exports.updateUserArtists = function (userId, artists, callback) {
+    var userArtists = db.collection(COLLECTION_USER_ARTISTS);
+    userArtists.update({ userId: userId }, { $pushAll: { artists: artists }}, { upsert: true }, callback);
+};
+
+exports.retrieveUserArtists = function (userId, callback) {
+    var userArtists = db.collection(COLLECTION_USER_ARTISTS);
+    userArtists.findOne({ userId: userId }, function (err, result) {
+        if(err) {
+            callback(err, result);
+        } else {
+            callback(false, result.artists);
+        }
+    });
 };
 
 exports.findAndSaveTracksToRate = function () {

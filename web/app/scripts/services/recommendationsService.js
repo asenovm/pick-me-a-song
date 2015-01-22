@@ -41,7 +41,6 @@ angular.module('pickMeASong')
                 userId: userId
             }
         }).success(function (data, status, headers, config) {
-            that.saveUserId(data.id);
             if(_.isEmpty(data.recommendedTracks)) {
                 that.fetchDefaultRecommendations(function () {
                     deferred.resolve(recommendations);
@@ -128,8 +127,9 @@ angular.module('pickMeASong')
 
     this.fetchDefaultRecommendations = function (callback) {
         var that = this;
-        this.fetchTracksToRate(function (tracks) {
-            that.saveRecommendations(tracks);
+        this.fetchTracksToRate(function (result) {
+            that.saveUserId(result.userId);
+            that.saveRecommendations(result.tracks);
             callback();
         });
     };
@@ -139,13 +139,16 @@ angular.module('pickMeASong')
     };
 
     this.fetchTracksToRate = function (callback) {
+        var that = this;
+
         $http({
             url: '/tracksToRate',
             method: 'GET'
         }).success(function (data, status, headers, config) {
             callback(data);
-            tracksToRate = data;
+            tracksToRate = data.tracks;
             $localStorage.set(KEY_TRACKS_TO_RATE, tracksToRate);
+            that.saveUserId(data.userId);
         }).error(function (data, status, headers, config) {
             callback([]);
         });

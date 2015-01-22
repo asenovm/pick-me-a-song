@@ -13,18 +13,32 @@ app.use(bodyParser.json());
 
 app.get('/recommendations', function (req, res) {
     var artists = JSON.parse(req.query.artists),
+        userArtists = [],
         neighboursCount = parseInt(req.query.neighboursCount, 10),
         recommendedItemsCount = parseInt(req.query.recommendedItemsCount, 10),
         userId = req.query.userId;
 
-    recommender.getRecommendationsFor(artists, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
+    db.updateUserArtists(userId, artists, function (err, result) {
         if(err) {
-            res.status(500).end();
+            userArtists = artists;
         } else {
-            res.json({
-                id: uuid.v4(),
-                recommendedTracks: recommendedTracks
-            }).end();
+            db.retrieveUserArtists(userId, function (err, result) {
+                if(err) {
+                    userArtists = artists;
+                } else {
+                    userArtists = result;
+                }
+
+                recommender.getRecommendationsFor(userArtists, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
+                    if(err) {
+                        res.status(500).end();
+                    } else {
+                        res.json({
+                            recommendedTracks: recommendedTracks
+                        }).end();
+                    }
+                });
+            });
         }
     });
 });
@@ -34,7 +48,10 @@ app.get('/tracksToRate', function (req, res) {
         if(err) {
             res.status(500).end();
         } else {
-            res.json(result).end();
+            res.json({
+                userId: uuid.v4(),
+                tracks: result
+            }).end();
         }
     });
 });

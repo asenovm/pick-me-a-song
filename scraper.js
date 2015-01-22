@@ -17,7 +17,6 @@ function startCrawling() {
 }
 
 function crawl(user) {
-    console.log('crawling ' + user);
     visitNode(user, config.startPage, config.startPage);
     lastfm.user.getFriends({ user: user }, function (err, result) {
         if(err) {
@@ -40,8 +39,6 @@ function visitNode (user, page, totalPages) {
     if (page > totalPages || page > config.endPage) {
         return;
     }
-
-    console.log('visit node ' + user + ' ' + page);
 
     lastfm.user.getTopTracks({ user: user, page: page, limit: config.itemsPerPage}, function (err, result) {
         if (err) {
