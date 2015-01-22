@@ -1,22 +1,29 @@
 'use strict';
 
 angular.module('pickMeASong')
-  .controller('RecommenderController', ['$scope', '$location', 'recommendationsService', function ($scope, $location, recommendationsService) {
+  .controller('RecommenderController', ['$scope', '$location', '$route', 'recommendationsService', function ($scope, $location, $route, recommendationsService) {
 
     var PATH_RECOMMENDATIONS = 'recommendations';
     var PATH_RATE_ITEMS = 'rateItems';
 
     $scope.minNumberRatedTracks = 10;
-    $scope.tracksToRate = recommendationsService.getTracksToRate();
 
     $scope.showRecommendations = function () {
         $scope.isLoading = false;
         $location.path(PATH_RECOMMENDATIONS);
     };
 
+    if ($location.path().indexOf('rateItems') >= 0) {
+        $scope.tracksToRate = recommendationsService.getTracksToRate();
+        $scope.callback = $scope.showRecommendations;
+    } else {
+        $scope.tracksToRate = recommendationsService.getRecommendations();
+        $scope.callback = $route.reload;
+    }
+
     $scope.getRecommendations = function () {
         $scope.isLoading = true;
-        recommendationsService.fetchRecommendations($scope.artists).finally($scope.showRecommendations);
+        recommendationsService.fetchRecommendations($scope.artists).finally($scope.callback);
     };
 
     $scope.setLoading = function () {

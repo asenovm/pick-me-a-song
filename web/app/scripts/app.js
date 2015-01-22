@@ -23,7 +23,7 @@ angular.module('pickMeASong', [
       })
       .when('/recommendations', {
         templateUrl: 'views/recommendations.html',
-        controller: 'RecommendationsController'
+        controller: 'RecommenderController'
       })
       .when('/rateItems', {
         templateUrl: 'views/rate.html',
