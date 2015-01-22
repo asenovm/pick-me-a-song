@@ -9,6 +9,7 @@ angular.module('pickMeASong')
             $element.rating({ showClear: false, showCaption: false, size: 'sm', hoverEnabled: false });
             $element.on('rating.change', function (e, value) {
                 $scope.track.userValue = value;
+                $scope.$emit('trackRateChange');
             });
         }
     };

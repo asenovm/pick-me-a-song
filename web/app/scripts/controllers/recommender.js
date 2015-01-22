@@ -13,6 +13,10 @@ angular.module('pickMeASong')
         $location.path(PATH_RECOMMENDATIONS);
     };
 
+    $scope.$on('trackRateChange', function (e, data) {
+        console.log('scope on track rate change is fired');
+    });
+
     if ($location.path().indexOf('rateItems') >= 0) {
         $scope.tracksToRate = recommendationsService.getTracksToRate();
         $scope.callback = $scope.showRecommendations;

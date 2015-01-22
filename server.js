@@ -14,7 +14,10 @@ app.use(bodyParser.json());
 app.get('/recommendations', function (req, res) {
     var artists = JSON.parse(req.query.artists),
         neighboursCount = parseInt(req.query.neighboursCount, 10),
-        recommendedItemsCount = parseInt(req.query.recommendedItemsCount, 10);
+        recommendedItemsCount = parseInt(req.query.recommendedItemsCount, 10),
+        userId = req.query.userId;
+
+    console.log('recommendations user id is ' + userId);
 
     recommender.getRecommendationsFor(artists, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
         if(err) {

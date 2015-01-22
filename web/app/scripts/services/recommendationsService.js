@@ -37,7 +37,8 @@ angular.module('pickMeASong')
             params: {
                 artists: JSON.stringify(artists),
                 neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
-                recommendedItemsCount: $localStorage.get(KEY_RECOMMENDED_ITEMS_COUNT)
+                recommendedItemsCount: $localStorage.get(KEY_RECOMMENDED_ITEMS_COUNT),
+                userId: userId
             }
         }).success(function (data, status, headers, config) {
             that.saveUserId(data.id);
@@ -58,7 +59,10 @@ angular.module('pickMeASong')
         return deferred.promise;
     };
 
-    this.likeTrack = function (likedTracks, recommendedTracks) {
+    this.rateTrack = function (ratedTracks, recommendedTracks) {
+        console.log('rated tracks are ');
+        console.dir(ratedTracks);
+
         var likedTracksPositions = _.map(likedTracks, function (track) {
             return _.indexOf(recommendedTracks, track);
         });
