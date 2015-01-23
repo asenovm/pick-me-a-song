@@ -10,13 +10,13 @@ var fs = require('fs'),
         secret: config.secret
     });
 
-startCrawling();
+startCrawlingUsers();
 
-function startCrawling() {
-    crawl(config.crawlRoot);
+function startCrawlingUsers() {
+    crawlUser(config.crawlRoot);
 }
 
-function crawl(user) {
+function crawlUser(user) {
     visitNode(user, config.startPage, config.startPage);
     lastfm.user.getFriends({ user: user }, function (err, result) {
         if(err) {
@@ -27,7 +27,7 @@ function crawl(user) {
             _.each(friends, function (friend) {
                 db.hasUser(friend.name, function (err, result) {
                     if(!result && friend.name) {
-                        crawl(friend.name);
+                        crawlUser(friend.name);
                     }
                 });
             });
