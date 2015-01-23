@@ -77,6 +77,22 @@ exports.getInitialTags = function (callback) {
     });
 };
 
+exports.updateUserArtists = function (userId, artists, callback) {
+    var userArtists = db.collection(COLLECTION_USER_ARTISTS);
+    userArtists.update({ userId: userId }, { $pushAll: { artists: artists }}, { upsert: true }, callback);
+};
+
+exports.retrieveUserArtists = function (userId, callback) {
+    var userArtists = db.collection(COLLECTION_USER_ARTISTS);
+    userArtists.findOne({ userId: userId }, function (err, result) {
+        if(err) {
+            callback(err, result);
+        } else {
+            callback(false, result.artists);
+        }
+    });
+};
+
 exports.insertTrackTags = function (track, callback) {
     var taggedTracks = db.collection(COLLECTION_TAGGED_TRACKS);
     taggedTracks.insert(track, callback);

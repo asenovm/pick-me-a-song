@@ -16,7 +16,10 @@ app.get('/recommendations', function (req, res) {
         userArtists = [],
         neighboursCount = parseInt(req.query.neighboursCount, 10),
         recommendedItemsCount = parseInt(req.query.recommendedItemsCount, 10),
-        userId = req.query.userId;
+        userId = req.query.userId,
+        algorithmType = req.query.algorithmType;
+
+    console.log('algorithm type is ' + algorithmType);
 
     db.updateUserArtists(userId, artists, function (err, result) {
         if(err) {

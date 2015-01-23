@@ -39,6 +39,7 @@ angular.module('pickMeASong')
                 artists: JSON.stringify(artists),
                 neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
                 recommendedItemsCount: $localStorage.get(KEY_RECOMMENDED_ITEMS_COUNT),
+                algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering',
                 userId: userId
             }
         }).success(function (data, status, headers, config) {
@@ -172,7 +173,11 @@ angular.module('pickMeASong')
     };
 
     this.getCollaborativeFilteringUsed = function () {
-        return JSON.parse($localStorage.get(KEY_COLLABORATIVE_FILTERING_USED)) || false;
+        var localStorageInfo = $localStorage.get(KEY_COLLABORATIVE_FILTERING_USED);
+        if(_.isUndefined(localStorageInfo) || _.isNull(localStorageInfo)) {
+            return true;
+        }
+        return JSON.parse(localStorageInfo);
     };
 
 }]);
