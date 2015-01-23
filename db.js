@@ -8,6 +8,7 @@ var mongo = require('mongodb'),
     COLLECTION_USER_ARTISTS = 'userArtists',
     COLLECTION_EVALUATION = 'evaluation',
     COLLECTION_TRACKS_TO_RATE = 'tracksToRate',
+    COLLECTION_TAGGED_TRACKS = 'taggedTracks',
     FILE_TOP_TRACKS = 'topTracks.json',
     NUMBER_TRACKS_TO_RATE = 15;
 
@@ -44,22 +45,6 @@ exports.getTracksToRate = function (callback) {
     tracksToRate.find({}).toArray(callback);
 };
 
-exports.updateUserArtists = function (userId, artists, callback) {
-    var userArtists = db.collection(COLLECTION_USER_ARTISTS);
-    userArtists.update({ userId: userId }, { $pushAll: { artists: artists }}, { upsert: true }, callback);
-};
-
-exports.retrieveUserArtists = function (userId, callback) {
-    var userArtists = db.collection(COLLECTION_USER_ARTISTS);
-    userArtists.findOne({ userId: userId }, function (err, result) {
-        if(err) {
-            callback(err, result);
-        } else {
-            callback(false, result.artists);
-        }
-    });
-};
-
 exports.findAndSaveTracksToRate = function () {
     var topTracks = JSON.parse(fs.readFileSync(FILE_TOP_TRACKS)),
         tracksToRate = db.collection(COLLECTION_TRACKS_TO_RATE);
@@ -68,3 +53,31 @@ exports.findAndSaveTracksToRate = function () {
         tracksToRate.insert(topTracks, _.noop);
     });
 };
+
+exports.getInitialTags = function (callback) {
+    MongoClient.connect(config.dbURL, function (err, db) {
+        var tracksToRate = db.collection(COLLECTION_TRACKS_TO_RATE);
+        tracksToRate.find({}, { tags: 1 }).toArray(function (err, result) {
+            var tags = [];
+
+            if(result) {
+                var allTags = _.pluck(result, 'tags');
+
+                _.each(allTags, function (trackTags) {
+                    tags = _.union(tags, trackTags); 
+                });
+
+                tags = _.uniq(tags, false, function (tag) {
+                    return tag.name;
+                });
+            }
+
+            callback(err, tags);
+        });
+    });
+};
+
+exports.insertTrackTags = function (track, callback) {
+    var taggedTracks = db.collection(COLLECTION_TAGGED_TRACKS);
+    taggedTracks.insert(track, callback);
+}

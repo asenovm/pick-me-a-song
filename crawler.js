@@ -10,7 +10,33 @@ var fs = require('fs'),
         secret: config.secret
     });
 
-startCrawlingUsers();
+//startCrawlingUsers();
+startCrawlingTags();
+
+function startCrawlingTags() {
+    //only crawl 1 level down
+    db.getInitialTags(function (err, tags) {
+        _.each(tags, function (tag) {
+            lastfm.tag.getTopTracks({ tag: tag.name }, function (err, result) {
+                if (err || !result) {
+                    console.log('tag get top tracks err is ', err);
+                } else {
+                    var tracks = result.track;
+                    _.each(tracks, function (track) {
+                        lastfm.track.getTopTags({ track: track.name, artist: track.artist.name }, function (err, result) {
+                            if(err || !result) {
+                                console.log('track get top tags err is ', err);
+                            } else {
+                                track.tags = result.tag;
+                                db.insertTrackTags(track, _.noop);
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    });
+}
 
 function startCrawlingUsers() {
     crawlUser(config.crawlRoot);
