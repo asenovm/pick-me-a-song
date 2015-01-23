@@ -9,6 +9,7 @@ var mongo = require('mongodb'),
     COLLECTION_EVALUATION = 'evaluation',
     COLLECTION_TRACKS_TO_RATE = 'tracksToRate',
     COLLECTION_TAGGED_TRACKS = 'taggedTracks',
+    COLLECTION_TAGGED_ARTISTS = 'taggedArtists',
     FILE_TOP_TRACKS = 'topTracks.json',
     NUMBER_TRACKS_TO_RATE = 15;
 
@@ -77,6 +78,13 @@ exports.getInitialTags = function (callback) {
     });
 };
 
+exports.getInitialArtists = function (callback) {
+    MongoClient.connect(config.dbURL, function (err, db) {
+        var tracksToRate = db.collection(COLLECTION_TRACKS_TO_RATE);
+        tracksToRate.find({}, { artist: 1 }).toArray(callback);
+    });
+}
+
 exports.updateUserArtists = function (userId, artists, callback) {
     var userArtists = db.collection(COLLECTION_USER_ARTISTS);
     userArtists.update({ userId: userId }, { $pushAll: { artists: artists }}, { upsert: true }, callback);
@@ -96,4 +104,9 @@ exports.retrieveUserArtists = function (userId, callback) {
 exports.insertTrackTags = function (track, callback) {
     var taggedTracks = db.collection(COLLECTION_TAGGED_TRACKS);
     taggedTracks.insert(track, callback);
-}
+};
+
+exports.insertArtistTags = function (artist, callback) {
+    var taggedArtists = db.collection(COLLECTION_TAGGED_ARTISTS);
+    taggedArtists.insert(artist, callback);
+};

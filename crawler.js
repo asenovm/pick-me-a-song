@@ -11,9 +11,23 @@ var fs = require('fs'),
     });
 
 //startCrawlingUsers();
-startCrawlingTags();
+//startCrawlingSongTags();
+startCrawlingArtistTags();
 
-function startCrawlingTags() {
+function startCrawlingArtistTags() {
+    db.getInitialArtists(function (err, artists) {
+        _.each(artists, function (artist) {
+            lastfm.artist.getTopTags({ artist: artist.artist.name }, function (err, tags) {
+                artist.artist.tags = _.filter(tags.tag, function (tag) {
+                    return parseInt(tag.count, 10) > 0;
+                });
+                db.insertArtistTags(artist.artist, _.noop);
+            });
+        });
+    });
+}
+
+function startCrawlingSongTags() {
     //only crawl 1 level down
     db.getInitialTags(function (err, tags) {
         _.each(tags, function (tag) {
