@@ -8,20 +8,43 @@ var fs = require('fs'),
     lastfm = new LastfmAPI({
         api_key: config.apiKey,
         secret: config.secret
-    });
+    }),
+    NUMBER_TAGS_CRAWLED = 5;
 
 //startCrawlingUsers();
 //startCrawlingSongTags();
 startCrawlingArtistTags();
 
+function insertArtistWithTags(artist, tags) {
+    artist.tags = _.filter(tags, function (tag) {
+        return parseInt(tag.count, 10) > 0;
+    });
+    db.insertArtistTags(artist, _.noop);
+}
+
 function startCrawlingArtistTags() {
     db.getInitialArtists(function (err, artists) {
         _.each(artists, function (artist) {
             lastfm.artist.getTopTags({ artist: artist.artist.name }, function (err, tags) {
-                artist.artist.tags = _.filter(tags.tag, function (tag) {
-                    return parseInt(tag.count, 10) > 0;
+                insertArtistWithTags(artist.artist, tags.tag);
+                _.each(_.first(tags.tag, NUMBER_TAGS_CRAWLED), function (tag) {
+                    lastfm.tag.getTopArtists({ tag: tag.name }, function (err, tagArtists) {
+                        if(err || !tagArtists) {
+                            console.log('error retrieving top artists for tag');
+                        } else {
+                            var artists = tagArtists.artist;
+                            _.each(artists, function (artist) {
+                                lastfm.artist.getTopTags({ artist: artist.name }, function (err, tags) {
+                                    if(err || !tags) {
+                                        console.log('error retrieving top tags for artist');
+                                    } else {
+                                        insertArtistWithTags(artist, tags.tag);
+                                    }
+                                });
+                            });
+                        }
+                    });
                 });
-                db.insertArtistTags(artist.artist, _.noop);
             });
         });
     });
