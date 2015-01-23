@@ -29,11 +29,11 @@ You can controll the algorithm parameters that are used when making recommendati
 <div class="info-footer text-center">
     <strong>Used algorithm type:</strong>
     <div class="btn-group inline-block algorithm-toggle" data-toggle="buttons">
-      <label class="btn btn-primary">
-        <input type="radio" name="options" id="Collaborative filtering"> Collaborative filtering
+      <label class="btn btn-primary" radio-click="true">
+        <input type="radio" name="options" id="Collaborative filtering" ng-value="!isCollaborativeFilteringUsed" ng-checked="isCollaborativeFilteringUsed" /> Collaborative filtering
       </label>
-      <label class="btn btn-primary">
-        <input type="radio" name="options" id="Content-based filtering"> Content-based filtering
+      <label class="btn btn-primary" radio-click="false">
+        <input type="radio" name="options" id="Content-based filtering" ng-value="!isCollaborativeFilteringUsed" ng-checked="!isCollaborativeFilteringUsed" /> Content-based filtering
       </label>
     </div>
 </div>

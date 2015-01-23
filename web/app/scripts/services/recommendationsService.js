@@ -4,11 +4,12 @@ angular.module('pickMeASong')
     .service('recommendationsService', ['$http', '$q', 'localStorageService', function ($http, $q, $localStorage) {
 
     var SCORE_ARTIST_DEFAULT = 10;
-    var KEY_RECOMMENDED_ITEMS = "recommendedItems";
-    var KEY_USER_ID = "userId";
-    var KEY_TRACKS_TO_RATE = "tracksToRate";
-    var KEY_RECOMMENDED_ITEMS_COUNT = "recommendedItemsCount";
-    var KEY_NEIGHBOURS_COUNT = "neighboursCount";
+    var KEY_RECOMMENDED_ITEMS = 'recommendedItems';
+    var KEY_USER_ID = 'userId';
+    var KEY_TRACKS_TO_RATE = 'tracksToRate';
+    var KEY_RECOMMENDED_ITEMS_COUNT = 'recommendedItemsCount';
+    var KEY_NEIGHBOURS_COUNT = 'neighboursCount';
+    var KEY_COLLABORATIVE_FILTERING_USED = 'collaborativeFilteringUsed';
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
     var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
@@ -164,6 +165,14 @@ angular.module('pickMeASong')
 
     this.setRecommendedItemsCount = function (count) {
         $localStorage.set(KEY_RECOMMENDED_ITEMS_COUNT, count);
+    };
+
+    this.setCollaborativeFilteringUsed = function (value) {
+        $localStorage.set(KEY_COLLABORATIVE_FILTERING_USED, value);
+    };
+
+    this.getCollaborativeFilteringUsed = function () {
+        return JSON.parse($localStorage.get(KEY_COLLABORATIVE_FILTERING_USED)) || false;
     };
 
 }]);
