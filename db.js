@@ -110,3 +110,20 @@ exports.insertArtistTags = function (artist, callback) {
     var taggedArtists = db.collection(COLLECTION_TAGGED_ARTISTS);
     taggedArtists.insert(artist, callback);
 };
+
+exports.getTagsForArtists = function (artists, callback) {
+    var taggedArtists = db.collection(COLLECTION_TAGGED_ARTISTS),
+        artistNames = _.map(artists, function (artist) {
+            return artist.name;
+        });
+
+    taggedArtists.find({ name: {$in: artistNames }}).toArray(callback);
+};
+
+exports.getTracksForTags = function (tags, callback) {
+    var taggedTracks = db.collection(COLLECTION_TAGGED_TRACKS),
+        tagNames = _.map(tags, function (tag) {
+            return tag.name;
+        });
+    taggedTracks.find({ tags: { $elemMatch: { name: { $in: tagNames }}}}).toArray(callback);
+};

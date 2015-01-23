@@ -14,7 +14,17 @@ exports.getRecommendationsFor = function (artists, algorithmType, neighboursCoun
 };
 
 function getContentFilteringRecommendations(artists, callback) {
-    callback(false, []);
+    db.getTagsForArtists(artists, function (err, taggedArtists) {
+        var tags = [];
+        _.each(taggedArtists, function (artist) {
+            tags = _.union(tags, _.first(artist.tags, 3));
+        });
+
+        db.getTracksForTags(tags, function (err, tracks) {
+            console.log('tracks for tags are ');
+            console.log(JSON.stringify(tracks, null, 4));
+        });
+    });
 }
 
 function getCollaborativeRecommendation(artists, neighboursCount, recommendedItemsCount, callback) {
