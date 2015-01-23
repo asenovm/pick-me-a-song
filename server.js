@@ -19,8 +19,6 @@ app.get('/recommendations', function (req, res) {
         userId = req.query.userId,
         algorithmType = req.query.algorithmType;
 
-    console.log('algorithm type is ' + algorithmType);
-
     db.updateUserArtists(userId, artists, function (err, result) {
         if(err) {
             userArtists = artists;
@@ -32,7 +30,7 @@ app.get('/recommendations', function (req, res) {
                     userArtists = result;
                 }
 
-                recommender.getRecommendationsFor(userArtists, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
+                recommender.getRecommendationsFor(userArtists, algorithmType, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
                     if(err) {
                         res.status(500).end();
                     } else {
