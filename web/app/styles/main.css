@@ -331,3 +331,7 @@ button.lastfm-username {
 .settings-footer {
     padding-bottom: 40px;
 }
+
+.algorithm-toggle {
+    margin-left: 20px;
+}
