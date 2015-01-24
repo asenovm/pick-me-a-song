@@ -1,5 +1,8 @@
 var _ = require('underscore'),
-    db = require('./db');
+    db = require('./db'),
+    COUNT_RECOMMENDED_TRACKS = 20,
+    COUNT_TAGS_PER_TRACK = 6,
+    COUNT_TAGS_PER_ARTIST = 3;
 
 exports.getRecommendations = function (artists, callback) {
     db.getTagsForArtists(artists, function (err, taggedArtists) {
@@ -8,20 +11,18 @@ exports.getRecommendations = function (artists, callback) {
         } else {
             var tags = [],
                 userDocument = {},
-                differentTags = {},
                 artistsNames = _.map(artists, function (artist) {
                     return artist.name;
                 });
 
             _.each(taggedArtists, function (artist) {
-                var artistTags = _.first(artist.tags, 3),
+                var artistTags = _.first(artist.tags, COUNT_TAGS_PER_ARTIST),
                     scoredArtist = _.findWhere(artists, { name: artist.name }),
                     artistScore = parseInt(scoredArtist.score, 10);
 
                 _.each(artistTags, function (tag) {
                     userDocument[tag.name] = userDocument[tag.name] || 0;
                     userDocument[tag.name] += artistScore;
-                    differentTags[tag.name] = 1;
                 });
 
                 tags = _.union(tags, artistTags);
@@ -29,14 +30,13 @@ exports.getRecommendations = function (artists, callback) {
 
             db.getTracksForTags(tags, function (err, tracks) {
                 _.each(tracks, function (track) {
-                    var tags = _.first(track.tags, 6),
+                    var tags = _.first(track.tags, COUNT_TAGS_PER_TRACK),
                         trackDocument = {};
 
                     _.each(tags, function (tag) {
                         var count = parseInt(tag.count, 10);
                         trackDocument[tag.name] = trackDocument[tag.name] || 0;
                         trackDocument[tag.name] += count;
-                        differentTags[tag.name] = 1;
                     });
 
                     var nominator = 0,
@@ -64,7 +64,7 @@ exports.getRecommendations = function (artists, callback) {
                     return !_.contains(artistsNames, track.artist.name);
                 }), function (track) {
                     return -track.similarity;
-                }), 20);
+                }), COUNT_RECOMMENDED_TRACKS);
 
                 callback(false, recommendedTracks);
             });
