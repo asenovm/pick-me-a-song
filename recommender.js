@@ -1,6 +1,4 @@
 var _ = require('underscore'),
-    natural = require('natural'),
-    TfIdf = natural.TfIdf,
     db = require('./db'),
     MIN_COMMON_USERS = 5,
     MIN_RECOMMENDED_ITEMS_PER_USER = 2,
@@ -21,7 +19,6 @@ function getContentFilteringRecommendations(artists, callback) {
             callback(err, []);
         } else {
             var tags = [],
-                tfidf = new TfIdf(),
                 userDocument = {},
                 differentTags = {},
                 artistsNames = _.map(artists, function (artist) {
