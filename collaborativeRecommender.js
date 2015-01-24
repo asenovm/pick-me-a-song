@@ -2,7 +2,6 @@ var _ = require('underscore'),
     db = require('./db'),
     MIN_COMMON_USERS = 5,
     MIN_RECOMMENDED_ITEMS_PER_USER = 2,
-    ALGORITHM_TYPE_COLLABORATIVE_FILTERING = 'collaborativeFiltering',
     EPS = 0.001;
 
 exports.getRecommendations = function (artists, neighboursCount, recommendedItemsCount, callback) {
