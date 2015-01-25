@@ -3,7 +3,6 @@ var _ = require('underscore'),
     collaborativeRecommender = require('./collaborativeRecommender'),
     evaluator = require('./evaluator'),
     async = require('async'),
-    USER_RECOMMENDED_ITEMS = 20,
     LENGTH_SET_MIN = 50,
     LENGTH_TRAINING_SET = 30;
 
@@ -43,7 +42,7 @@ function startOfflineEvaluation(neighboursCount) {
                     return track.name;
                 }), intersection = _.intersection(recommendedTracksNames, validationTracksNames);
 
-                var precision = evaluator.getPrecision(intersection.length, Math.min(recommendedTracksNames.length, USER_RECOMMENDED_ITEMS)),
+                var precision = evaluator.getPrecision(intersection.length, recommendedTracksNames.length),
                     recall = evaluator.getRecall(intersection.length, validationTracksNames.length),
                     f1 = evaluator.getF1Measure(precision, recall) || 0;
 

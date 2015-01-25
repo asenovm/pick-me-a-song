@@ -2,6 +2,7 @@ var _ = require('underscore'),
     db = require('./db'),
     MIN_COMMON_USERS = 5,
     MIN_RECOMMENDED_ITEMS_PER_USER = 2,
+    COUNT_RECOMMENDED_TRACKS = 20,
     EPS = 0.001;
 
 exports.getRecommendations = function (artists, neighboursCount, recommendedItemsCount, callback) {
@@ -26,22 +27,30 @@ exports.getRecommendations = function (artists, neighboursCount, recommendedItem
                 return -user.similarity;
             }), neighboursCount || MIN_COMMON_USERS);
 
-            _.each(users, function (user) {
-                user.tracks = _.reject(_.uniq(_.sortBy(user.tracks, function (track) {
-                    return -track.playcount;
-                }), function (track) {
-                    return track.artist.name;
-                }), function (track) {
-                    return _.contains(artistNames, track.artist.name);
+            var trackScores = {};
+            _.each(users, function (user, index) {
+                _.each(user.tracks, function (track) {
+                    var key = track.name + track.artist.name;
+                    trackScores[key] = trackScores[key] || { totalPlaycount: 0, neighbours: [], track: track };
+                    trackScores[key].totalPlaycount += (users.length - index) * parseInt(track.playcount, 10);
+                    trackScores[key].neighbours.push(user);
                 });
             });
 
-            recommendedTracks = _.map(users, function (user, index) {
-                return _.first(user.tracks, (Math.min(users.length, neighboursCount || MIN_COMMON_USERS) - index) * (recommendedItemsCount || MIN_RECOMMENDED_ITEMS_PER_USER));
+            var predictedRatings = [];
+
+            _.each(trackScores, function (value, key) {
+                var track = trackScores[key].track;
+                track.score = trackScores[key].totalPlaycount / trackScores[key].neighboursPlayed;
+                predictedRatings.push(track);
             });
+
+            recommendedTracks = _.first(_.sortBy(predictedRatings, function (track) {
+                return -track.score;
+            }, COUNT_RECOMMENDED_TRACKS));
         }
 
-        callback(err, _.flatten(recommendedTracks));
+        callback(err, recommendedTracks);
     });
 }
 
