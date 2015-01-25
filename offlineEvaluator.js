@@ -6,7 +6,7 @@ var _ = require('underscore'),
     LENGTH_SET_MIN = 50,
     LENGTH_TRAINING_SET = 40;
 
-startOfflineEvaluation(50);
+startOfflineEvaluation(30);
 
 function startOfflineEvaluation(neighboursCount) {
     db.retrieveUsersForEvaluation(function (err, users) {
@@ -45,6 +45,8 @@ function startOfflineEvaluation(neighboursCount) {
                 var precision = evaluator.getPrecision(intersection.length, recommendedTracksNames.length),
                     recall = evaluator.getRecall(intersection.length, validationTracksNames.length),
                     f1 = evaluator.getF1Measure(precision, recall) || 0;
+
+                console.log(precision, recall, f1);
 
                 accumulatedPrecision += precision;
                 accumulatedRecall += recall;

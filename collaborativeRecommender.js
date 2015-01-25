@@ -1,10 +1,8 @@
 var _ = require('underscore'),
     db = require('./db'),
-    MIN_COMMON_USERS = 5,
-    MIN_RECOMMENDED_ITEMS_PER_USER = 2,
+    COUNT_NEIGHBOURS_DEFAULT = 5,
     COUNT_RECOMMENDED_TRACKS = 20,
-    THRESHOLD_COMMON_ARTISTS_COUNT = 3,
-    EPS = 0.001;
+    THRESHOLD_COMMON_ARTISTS_COUNT = 10;
 
 exports.getRecommendations = function (artists, neighboursCount, recommendedItemsCount, callback) {
     db.retrieveAllUsersForArtists(artists, function (err, users) {
@@ -29,7 +27,7 @@ exports.getRecommendations = function (artists, neighboursCount, recommendedItem
                 return user.similarity >= 0;
             }), function (user) {
                 return -user.similarity;
-            }), neighboursCount || MIN_COMMON_USERS);
+            }), neighboursCount || COUNT_NEIGHBOURS_DEFAULT);
 
             var trackScores = {};
             _.each(users, function (user, index) {
@@ -51,11 +49,14 @@ exports.getRecommendations = function (artists, neighboursCount, recommendedItem
             _.each(trackScores, function (value, key) {
                 var track = trackScores[key].track,
                     ratingNominator = 0,
-                    ratingDenominator = 0;
+                    ratingDenominator = 0,
+                    averageTrackValue = _.reduce(value.neighbours, function (memo, neighbour) {
+                        return memo + neighbour.playcount;
+                    }, 0) / value.neighbours.length;
 
                 _.each(value.neighbours, function (neighbour) {
                     ratingNominator += neighbour.user.similarity * (neighbour.playcount - neighbour.user.averagePlaycount);
-                    ratingDenominator += neighbour.user.similarity;
+                    ratingDenominator += Math.abs(neighbour.user.similarity);
                 });
 
                 track.score = userAverageScore + ratingNominator / ratingDenominator;
@@ -107,29 +108,28 @@ function getSimilarityForUser(user, artists) {
         return artist.name;
     }), commonArtistsNames = _.intersection(artistsNames, userArtistsNames);
 
-
     var nominator = _.reduce(commonArtistsNames, function (memo, name) {
         var userScore = playCountsPerArtist[name] - userAverageScore,
             artistScore = _.findWhere(artists, { name: name }).score - artistsAverageScore;
 
-        return memo + userScore * artistScore + EPS;
+        return memo + userScore * artistScore;
     }, 0);
 
     var userDenominator = Math.sqrt(_.reduce(commonArtistsNames, function (memo, name) {
         var userScore = playCountsPerArtist[name] - userAverageScore;
-        return memo + userScore * userScore + EPS;
+        return memo + userScore * userScore;
     }, 0));
 
     var artistsDenominator = Math.sqrt(_.reduce(commonArtistsNames, function (memo, name) {
         var artistScore = _.findWhere(artists, { name: name }).score - artistsAverageScore;
-        return memo + artistScore * artistScore + EPS;
+        return memo + artistScore * artistScore;
     }, 0));
 
     var denominator = userDenominator * artistsDenominator;
 
-    if(commonArtistsNames.length >= THRESHOLD_COMMON_ARTISTS_COUNT) {
-        return nominator / denominator;
+    if(denominator === 0) {
+        return 0;
     }
 
-    return nominator / (denominator * (THRESHOLD_COMMON_ARTISTS_COUNT + 1 - commonArtistsNames.length));
+    return (nominator / denominator) * Math.min(commonArtistsNames.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
 }
