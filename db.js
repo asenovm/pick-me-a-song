@@ -20,7 +20,7 @@ MongoClient.connect(config.dbURL, function (err, dbInstance) {
 exports.retrieveUsersForEvaluation = function (callback) {
     MongoClient.connect(config.dbURL, function (err, db) {
         var users = db.collection(COLLECTION_USERS);
-        users.find({}).limit(100).toArray(callback);
+        users.find({}).limit(150).toArray(callback);
     });
 };
 
