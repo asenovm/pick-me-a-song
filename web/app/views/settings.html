@@ -13,16 +13,6 @@ You can controll the algorithm parameters that are used when making recommendati
   </span>
 </div>
 <div class="info-footer">
-    <h3 class="text-justify">Neighbour recommendation contribution</h3>
-    After finding the users that have the most similar tastes to yours, we decide how many of their most listened songs to recommend to you. You can enter this count in the following input. The default value is <strong>2</strong> (number of items recommended from the user with the least similarity to you).
-</div>
-<div class="input-group settings-input settings-footer">
-  <input type="text" class="form-control" placeholder="Enter min number of items" ng-model="recommendedItemsCount">
-  <span class="input-group-btn">
-    <button class="btn btn-default" type="button" ng-click="saveRecommendedItemsCount();"><strong>Save</strong></button>
-  </span>
-</div>
-<div class="info-footer">
     <h3 class="text-justify">Recommendation algorithm type</h3>
     The work of the system can be based on 2 different algorithmic approaches - <a href="http://en.wikipedia.org/wiki/Collaborative_filtering">Collaborative filtering</a> and <a href="http://recommender-systems.org/content-based-filtering/">Content-based filtering</a>. The first one finds suitable music for you by comparing your taste to the one thousands of other users have and recommends you their favourite songs. The latter uses meta information about the music you like and the music we have information about in order to find tracks that match your taste.
 </div>
