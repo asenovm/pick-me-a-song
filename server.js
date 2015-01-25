@@ -61,7 +61,7 @@ app.post('/rate', function (req, res) {
     var likedTracksPositions = req.body.likedTracksPositions,
         recommendedTracksCount = req.body.recommendedTracksCount,
         userId = req.body.userId,
-        precision = evaluator.getPrecision(likedTracksPositions, recommendedTracksCount),
+        precision = evaluator.getPrecision(likedTracksPositions.length, recommendedTracksCount),
         nDCG = evaluator.getNDCG(likedTracksPositions, recommendedTracksCount);
 
     db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_PRECISION, precision, function (errPrecision, result) {

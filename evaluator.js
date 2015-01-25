@@ -3,26 +3,26 @@ var _ = require('underscore');
 exports.METRIC_NAME_PRECISION = "precision";
 exports.METRIC_NAME_NDCG = "ndcg";
 
-exports.getPrecision = function (likedTracksPositions, recommendedTracksCount) {
-    return likedTracksPositions.length / recommendedTracksCount;
+exports.getPrecision = function (likedItemsCount, recommendedItemsCount) {
+    return likedItemsCount / recommendedItemsCount;
 };
 
-exports.getNDCG = function (likedTracksPositions, recommendedTracksCount) {
-    var relevances = getTracksRelevance(likedTracksPositions, recommendedTracksCount),
+exports.getNDCG = function (likedItemsPositions, recommendedItemsCount) {
+    var relevances = getTracksRelevance(likedItemsPositions, recommendedItemsCount),
         dcg = getDCG(relevances),
         properOrderRelevances = _.sortBy(relevances, function (relevance) { return -relevance;}),
         idealDCG = getDCG(properOrderRelevances);
 
-    if(_.isEmpty(likedTracksPositions)) {
+    if(_.isEmpty(likedItemsPositions)) {
         return 0;
     }
 
     return dcg / idealDCG;
 };
 
-function getTracksRelevance(likedTracksPositions, recommendedTracksCount) {
-    return _.map(_.range(0, recommendedTracksCount), function (index) {
-        if(_.contains(likedTracksPositions, index)) {
+function getTracksRelevance(likedItemsPositions, recommendedItemsCount) {
+    return _.map(_.range(0, recommendedItemsCount), function (index) {
+        if(_.contains(likedItemsPositions, index)) {
             return 1;
         }
         return 0;
