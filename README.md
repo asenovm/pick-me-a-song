@@ -16,5 +16,5 @@ Pick me a song
 
 <h3>Contact</h3>
 <p class="text-justify info-footer">
-    For any questions or comments, feel free to contact me at asenov.m@gmail.com.
+    For any questions or comments, feel free to contact me at <strong>asenov.m@gmail.com</strong>.
 </p>
