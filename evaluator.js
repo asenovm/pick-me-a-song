@@ -7,6 +7,14 @@ exports.getPrecision = function (likedItemsCount, recommendedItemsCount) {
     return likedItemsCount / recommendedItemsCount;
 };
 
+exports.getRecall = function (recommendedRelevantItemsCount, totalRelevantItemsCount) {
+    return recommendedRelevantItemsCount / totalRelevantItemsCount;
+};
+
+exports.getF1Measure = function (precision, recall) {
+    return (2 * precision * recall) / (2 * precision + recall);
+};
+
 exports.getNDCG = function (likedItemsPositions, recommendedItemsCount) {
     var relevances = getTracksRelevance(likedItemsPositions, recommendedItemsCount),
         dcg = getDCG(relevances),

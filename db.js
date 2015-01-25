@@ -17,7 +17,14 @@ MongoClient.connect(config.dbURL, function (err, dbInstance) {
     db = dbInstance;
 });
 
-exports.retrieveAllUsers = function (artists, callback) {
+exports.retrieveUsersForEvaluation = function (callback) {
+    MongoClient.connect(config.dbURL, function (err, db) {
+        var users = db.collection(COLLECTION_USERS);
+        users.find({}).limit(100).toArray(callback);
+    });
+};
+
+exports.retrieveAllUsersForArtists = function (artists, callback) {
     var collection = db.collection(COLLECTION_USERS),
         names = _.map(artists, function (artist) {
             return artist.name;

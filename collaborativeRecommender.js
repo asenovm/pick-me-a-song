@@ -5,7 +5,7 @@ var _ = require('underscore'),
     EPS = 0.001;
 
 exports.getRecommendations = function (artists, neighboursCount, recommendedItemsCount, callback) {
-    db.retrieveAllUsers(artists, function (err, users) {
+    db.retrieveAllUsersForArtists(artists, function (err, users) {
         var recommendedTracks = [];
 
         if(err) {
