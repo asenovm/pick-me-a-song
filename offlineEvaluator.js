@@ -4,9 +4,9 @@ var _ = require('underscore'),
     evaluator = require('./evaluator'),
     async = require('async'),
     LENGTH_SET_MIN = 50,
-    LENGTH_TRAINING_SET = 30;
+    LENGTH_TRAINING_SET = 40;
 
-startOfflineEvaluation(35);
+startOfflineEvaluation(50);
 
 function startOfflineEvaluation(neighboursCount) {
     db.retrieveUsersForEvaluation(function (err, users) {
@@ -46,8 +46,6 @@ function startOfflineEvaluation(neighboursCount) {
                     recall = evaluator.getRecall(intersection.length, validationTracksNames.length),
                     f1 = evaluator.getF1Measure(precision, recall) || 0;
 
-                console.log('user values are ', precision, recall, f1);
-
                 accumulatedPrecision += precision;
                 accumulatedRecall += recall;
                 accumulatedF1 += f1;
@@ -58,7 +56,6 @@ function startOfflineEvaluation(neighboursCount) {
                 meanRecall = accumulatedRecall / users.length,
                 meanF1 = accumulatedF1 / users.length;
 
-            console.log(neighboursCount, meanPrecision, meanRecall, meanF1);
             startOfflineEvaluation(neighboursCount + 1);
         });
     });

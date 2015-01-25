@@ -3,6 +3,7 @@ var _ = require('underscore'),
     MIN_COMMON_USERS = 5,
     MIN_RECOMMENDED_ITEMS_PER_USER = 2,
     COUNT_RECOMMENDED_TRACKS = 20,
+    THRESHOLD_COMMON_ARTISTS_COUNT = 3,
     EPS = 0.001;
 
 exports.getRecommendations = function (artists, neighboursCount, recommendedItemsCount, callback) {
@@ -15,10 +16,13 @@ exports.getRecommendations = function (artists, neighboursCount, recommendedItem
         } else {
             var artistNames = _.map(artists, function (artist) {
                 return artist.name;
-            });
+            }), userAverageScore = _.reduce(artists, function (memo, artist) {
+                return memo + artist.score;
+            }, 0) / artists.length;
 
             _.each(users, function (user) {
                 user.similarity = getSimilarityForUser(user, artists);
+                user.averagePlaycount = getAveragePlaycountForUser(user);
             });
 
             users = _.first(_.sortBy(_.filter(users, function (user) {
@@ -30,28 +34,47 @@ exports.getRecommendations = function (artists, neighboursCount, recommendedItem
             var trackScores = {};
             _.each(users, function (user, index) {
                 _.each(user.tracks, function (track) {
-                    var key = track.name + track.artist.name;
+                    var key = track.name + track.artist.name,
+                        playcount = parseInt(track.playcount, 10);
+
                     trackScores[key] = trackScores[key] || { totalPlaycount: 0, neighbours: [], track: track };
-                    trackScores[key].totalPlaycount += (users.length - index) * parseInt(track.playcount, 10);
-                    trackScores[key].neighbours.push(user);
+                    trackScores[key].totalPlaycount += playcount;
+                    trackScores[key].neighbours.push({
+                        user: user,
+                        playcount: playcount
+                    });
                 });
             });
 
             var predictedRatings = [];
 
             _.each(trackScores, function (value, key) {
-                var track = trackScores[key].track;
-                track.score = trackScores[key].totalPlaycount / trackScores[key].neighboursPlayed;
+                var track = trackScores[key].track,
+                    ratingNominator = 0,
+                    ratingDenominator = 0;
+
+                _.each(value.neighbours, function (neighbour) {
+                    ratingNominator += neighbour.user.similarity * (neighbour.playcount - neighbour.user.averagePlaycount);
+                    ratingDenominator += neighbour.user.similarity;
+                });
+
+                track.score = userAverageScore + ratingNominator / ratingDenominator;
                 predictedRatings.push(track);
             });
 
             recommendedTracks = _.first(_.sortBy(predictedRatings, function (track) {
                 return -track.score;
-            }, COUNT_RECOMMENDED_TRACKS));
+            }), COUNT_RECOMMENDED_TRACKS);
         }
 
         callback(err, recommendedTracks);
     });
+}
+
+function getAveragePlaycountForUser(user) {
+    return _.reduce(user.tracks, function (memo, track) {
+        return memo + parseInt(track.playcount, 10);
+    }, 0) / user.tracks.length;
 }
 
 function getSimilarityForUser(user, artists) {
@@ -104,5 +127,9 @@ function getSimilarityForUser(user, artists) {
 
     var denominator = userDenominator * artistsDenominator;
 
-    return nominator / denominator;
+    if(commonArtistsNames.length >= THRESHOLD_COMMON_ARTISTS_COUNT) {
+        return nominator / denominator;
+    }
+
+    return nominator / (denominator * (THRESHOLD_COMMON_ARTISTS_COUNT + 1 - commonArtistsNames.length));
 }
