@@ -20,7 +20,6 @@ exports.getRecommendations = function (artists, neighboursCount, recommendedItem
 
             _.each(users, function (user) {
                 user.similarity = getSimilarityForUser(user, artists);
-                user.averagePlaycount = getAveragePlaycountForUser(user);
             });
 
             users = _.first(_.sortBy(_.filter(users, function (user) {
@@ -55,7 +54,7 @@ exports.getRecommendations = function (artists, neighboursCount, recommendedItem
                     }, 0) / value.neighbours.length;
 
                 _.each(value.neighbours, function (neighbour) {
-                    ratingNominator += neighbour.user.similarity * (neighbour.playcount - neighbour.user.averagePlaycount);
+                    ratingNominator += neighbour.user.similarity * (neighbour.playcount - parseInt(neighbour.user.averagePlaycount, 10));
                     ratingDenominator += Math.abs(neighbour.user.similarity);
                 });
 

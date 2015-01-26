@@ -35,7 +35,15 @@ exports.retrieveAllUsersForArtists = function (artists, callback) {
 
 exports.updateUserProfile = function (user, callback) {
     var users = db.collection(COLLECTION_USERS);
-    users.update({ user: user.name }, { $pushAll: { tracks: user.tracks }}, { upsert: true }, callback);
+    users.update({ user: user.name }, { $pushAll: { tracks: user.tracks }}, { upsert: true }, function (err, result) {
+        users.findOne({ user: user.name }, function (err, user) {
+            var averagePlaycount = _.reduce(user.tracks, function (memo, track) {
+                return memo + parseInt(track.playcount, 10);
+            }, 0) / user.tracks.length;
+
+            users.update({ user: user.user }, { $set: {averagePlaycount : averagePlaycount }}, callback);
+        });
+    });
 };
 
 exports.hasUser = function (user, callback) {

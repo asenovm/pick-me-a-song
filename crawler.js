@@ -13,7 +13,7 @@ var fs = require('fs'),
 
 //startCrawlingUsers();
 //startCrawlingSongTags();
-startCrawlingArtistTags();
+//startCrawlingArtistTags();
 
 function insertArtistWithTags(artist, tags) {
     artist.tags = _.filter(tags, function (tag) {
