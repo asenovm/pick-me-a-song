@@ -1,6 +1,6 @@
 var _ = require('underscore'),
     db = require('./db'),
-    COUNT_NEIGHBOURS_DEFAULT = 5,
+    COUNT_NEIGHBOURS_DEFAULT = 17,
     COUNT_RECOMMENDED_TRACKS = 20,
     THRESHOLD_COMMON_ARTISTS_COUNT = 10;
 
