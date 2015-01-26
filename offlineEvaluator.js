@@ -1,14 +1,25 @@
 var _ = require('underscore'),
     db = require('./db'),
     collaborativeRecommender = require('./collaborativeRecommender'),
+    contentBasedRecommender = require('./contentBasedRecommender'),
     evaluator = require('./evaluator'),
     async = require('async'),
     LENGTH_SET_MIN = 50,
     LENGTH_TRAINING_SET = 40;
 
-startOfflineEvaluation(30);
+startContentBasedEvaluation();
 
-function startOfflineEvaluation(neighboursCount) {
+function startCollaborativeEvaluation() {
+    startOfflineEvaluation(function (userProfile, callback) {
+        collaborativeRecommender.getRecommendations(userProfile, false, false, callback);
+    });
+}
+
+function startContentBasedEvaluation() {
+    startOfflineEvaluation(contentBasedRecommender.getRecommendations);
+}
+
+function startOfflineEvaluation(fetchRecommendationsFunc) {
     db.retrieveUsersForEvaluation(function (err, users) {
         var tracksByUser = _.filter(_.map(users, function (user) {
             return user.tracks;
@@ -35,7 +46,7 @@ function startOfflineEvaluation(neighboursCount) {
                 });
             });
 
-            collaborativeRecommender.getRecommendations(userProfile, neighboursCount, false, function (err, recommendations) {
+            fetchRecommendationsFunc(userProfile, function (err, recommendations) {
                 var recommendedTracksNames = _.map(recommendations, function (track) {
                     return track.name;
                 }), validationTracksNames = _.map(validationSet, function (track) {
@@ -58,7 +69,8 @@ function startOfflineEvaluation(neighboursCount) {
                 meanRecall = accumulatedRecall / users.length,
                 meanF1 = accumulatedF1 / users.length;
 
-            startOfflineEvaluation(neighboursCount + 1);
+            console.log('mean values');
+            console.log(meanPrecision, meanRecall, meanF1);
         });
     });
 }
