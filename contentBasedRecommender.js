@@ -4,31 +4,19 @@ var _ = require('underscore'),
     COUNT_TAGS_PER_TRACK = 6,
     COUNT_TAGS_PER_ARTIST = 3;
 
-exports.getRecommendations = function (userProfile, callback) {
-    db.getTagsForArtists(userProfile.artists, function (err, taggedArtists) {
+exports.getRecommendations = function (userInfo, callback) {
+    db.getTagsForArtists(userInfo.artists, function (err, taggedArtists) {
         if(err) {
             callback(err, []);
         } else {
             var tags = [],
                 userDocument = {},
-                artistsNames = _.map(userProfile.artists, function (artist) {
+                artistsNames = _.map(userInfo.artists, function (artist) {
                     return artist.name;
-                });
+                }), userProfile = getUserProfile(userInfo, taggedArtists);
 
-            _.each(taggedArtists, function (artist) {
-                var artistTags = _.first(artist.tags, COUNT_TAGS_PER_ARTIST),
-                    scoredArtist = _.findWhere(userProfile.artists, { name: artist.name }),
-                    artistScore = parseInt(scoredArtist.score, 10);
 
-                _.each(artistTags, function (tag) {
-                    userDocument[tag.name] = userDocument[tag.name] || 0;
-                    userDocument[tag.name] += artistScore;
-                });
-
-                tags = _.union(tags, artistTags);
-            });
-
-            db.getTracksForTags(tags, function (err, tracks) {
+            db.getTracksForTags(userProfile.tags, function (err, tracks) {
                 _.each(tracks, function (track) {
                     var tags = _.first(track.tags, COUNT_TAGS_PER_TRACK),
                         trackDocument = {};
@@ -43,7 +31,7 @@ exports.getRecommendations = function (userProfile, callback) {
                         userDenominator = 0,
                         trackDenominator = 0;
 
-                    _.each(userDocument, function (value, key) {
+                    _.each(userProfile.scores, function (value, key) {
                         if(trackDocument[key]) {
                             nominator += value * trackDocument[key];       
                         }
@@ -72,3 +60,25 @@ exports.getRecommendations = function (userProfile, callback) {
     });
 }
 
+function getUserProfile(userInfo, userArtists) {
+    var userProfile = {},
+        tags = [];
+
+    _.each(userArtists, function (artist) {
+        var artistTags = _.first(artist.tags, COUNT_TAGS_PER_ARTIST),
+            scoredArtist = _.findWhere(userInfo.artists, { name: artist.name }),
+            artistScore = parseInt(scoredArtist.score, 10);
+
+        _.each(artistTags, function (tag) {
+            userProfile[tag.name] = userProfile[tag.name] || 0;
+            userProfile[tag.name] += artistScore;
+        });
+
+        tags = _.union(tags, artistTags);
+    });
+
+    return {
+        scores: userProfile,
+        tags: tags
+    };
+}
