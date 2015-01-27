@@ -18,9 +18,10 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
         } else {
             var userAverageScore = _.reduce(userProfile.artists, function (memo, artist) {
                 return memo + artist.score;
-            }, 0) / userProfile.artists.length;
-
-            var artists = _.indexBy(userProfile.artists, 'name');
+            }, 0) / userProfile.artists.length,
+                artists = _.indexBy(userProfile.artists, 'name'),
+                trackScores = {},
+                predictedRatings = [];
 
             _.each(users, function (user) {
                 user.similarity = getSimilarityForUser(user, artists, userAverageScore, artistNames);
@@ -32,7 +33,6 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
                 return -user.similarity;
             }), neighboursCount || COUNT_NEIGHBOURS_DEFAULT);
 
-            var trackScores = {};
             _.each(users, function (user, index) {
                 _.each(user.tracks, function (track) {
                     var key = track.name + track.artist.name,
@@ -47,8 +47,6 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
                 });
             });
 
-            var predictedRatings = [];
-
             _.each(trackScores, function (value, key) {
                 var track = value.track,
                     ratingNominator = 0,
@@ -56,7 +54,7 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
                     averageTrackValue = value.totalPlaycount / value.neighbours.length;
 
                 _.each(value.neighbours, function (neighbour) {
-                    ratingNominator += neighbour.user.similarity * (neighbour.playcount - parseInt(neighbour.user.averagePlaycount, 10));
+                    ratingNominator += neighbour.user.similarity * (neighbour.playcount - neighbour.user.averagePlaycount);
                     ratingDenominator += Math.abs(neighbour.user.similarity);
                 });
 
