@@ -30,7 +30,10 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
             };
         }), function (userInfo) {
             return userInfo.tracks.length >= LENGTH_SET_MIN
-        }), accumulatedPrecision = 0, accumulatedRecall = 0, accumulatedF1 = 0, recommendationsCount = 0;
+        }), accumulatedPrecision = 0,
+            accumulatedRecall = 0,
+            accumulatedF1 = 0,
+            accumulatedNDCG = 0;
 
         async.eachSeries(userInfo, function (user, callback) {
             var tracks = user.tracks,
@@ -57,12 +60,15 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                     return track.artist.name;
                 }), validationArtistNames = _.map(validationSet, function (track) {
                     return track.artist.name;
-                }), intersection = _.intersection(recommendedArtistNames, validationArtistNames);
+                }), intersection = _.intersection(recommendedArtistNames, validationArtistNames),
+                    relevantItemsPositions = _.map(intersection, function (artistName) {
+                        return _.indexOf(recommendedArtistNames, artistName);
+                    });
 
                 var precision = evaluator.getPrecision(intersection.length, recommendedArtistNames.length),
                     recall = evaluator.getRecall(intersection.length, validationArtistNames.length),
                     f1 = evaluator.getF1Measure(precision, recall) || 0,
-                    averagePrecision = evaluator.getAveragePrecision(recommendedArtistNames, validationArtistNames);
+                    nDCG = evaluator.getNDCG(relevantItemsPositions, recommendedArtistNames.length);
 
                 var intersection_10 = _.intersection(_.first(recommendedArtistNames, 10), validationArtistNames),
                     precision_10 = evaluator.getPrecision(intersection_10.length, 10),
@@ -72,6 +78,7 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                     precision_5 = evaluator.getPrecision(intersection_5.length, 5),
                     f1_5 = evaluator.getF1Measure(precision_5, recall) || 0;
 
+                console.log('nDCG ', nDCG);
                 console.log('metrics @20 ', precision, recall, f1);
                 console.log('metrics @10 ', precision_10, recall, f1_10);
                 console.log('metrics @5 ', precision_5, recall, f1_5);
@@ -79,15 +86,17 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                 accumulatedPrecision += precision;
                 accumulatedRecall += recall;
                 accumulatedF1 += f1;
+                accumulatedNDCG += nDCG;
                 callback();
             });
         }, function (err) {
             var meanPrecision = accumulatedPrecision / users.length,
                 meanRecall = accumulatedRecall / users.length,
-                meanF1 = accumulatedF1 / users.length;
+                meanF1 = accumulatedF1 / users.length,
+                meanNDCG = accumulatedNDCG / users.length;
 
             console.log('mean values');
-            console.log(meanPrecision, meanRecall, meanF1);
+            console.log(meanPrecision, meanRecall, meanF1, meanNDCG);
         });
     });
 }
