@@ -4,20 +4,20 @@ var _ = require('underscore'),
     COUNT_TAGS_PER_TRACK = 6,
     COUNT_TAGS_PER_ARTIST = 3;
 
-exports.getRecommendations = function (artists, callback) {
-    db.getTagsForArtists(artists, function (err, taggedArtists) {
+exports.getRecommendations = function (userProfile, callback) {
+    db.getTagsForArtists(userProfile.artists, function (err, taggedArtists) {
         if(err) {
             callback(err, []);
         } else {
             var tags = [],
                 userDocument = {},
-                artistsNames = _.map(artists, function (artist) {
+                artistsNames = _.map(userProfile.artists, function (artist) {
                     return artist.name;
                 });
 
             _.each(taggedArtists, function (artist) {
                 var artistTags = _.first(artist.tags, COUNT_TAGS_PER_ARTIST),
-                    scoredArtist = _.findWhere(artists, { name: artist.name }),
+                    scoredArtist = _.findWhere(userProfile.artists, { name: artist.name }),
                     artistScore = parseInt(scoredArtist.score, 10);
 
                 _.each(artistTags, function (tag) {
