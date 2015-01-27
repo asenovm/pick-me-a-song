@@ -16,11 +16,8 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
             console.log('an error occurred');
             console.dir(err);
         } else {
-            var userAverageScore = _.reduce(userProfile.artists, function (memo, artist) {
-                return memo + artist.score;
-            }, 0) / userProfile.artists.length,
+            var userAverageScore = getUserAverageScore(userProfile),
                 artists = _.indexBy(userProfile.artists, 'name'),
-                trackScores = {},
                 predictedRatings = [],
                 activeUser = {
                     name: userProfile.name,
@@ -28,21 +25,8 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
                     artists: artists,
                     artistNames: artistNames,
                     neighboursCount: neighboursCount
-                }, neighbours = getUserNeighbours(activeUser, users);
-
-            _.each(neighbours, function (user, index) {
-                _.each(user.tracks, function (track) {
-                    var key = track.name + track.artist.name,
-                        playcount = parseInt(track.playcount, 10);
-
-                    trackScores[key] = trackScores[key] || { totalPlaycount: 0, neighbours: [], track: track };
-                    trackScores[key].totalPlaycount += playcount;
-                    trackScores[key].neighbours.push({
-                        user: user,
-                        playcount: playcount
-                    });
-                });
-            });
+                }, neighbours = getUserNeighbours(activeUser, users),
+                trackScores = getNeighboursTrackScores(neighbours);
 
             _.each(trackScores, function (value, key) {
                 var track = value.track,
@@ -78,6 +62,30 @@ function getUserNeighbours(activeUser, users) {
     }), function (user) {
         return -user.similarity;
     }), activeUser.neighboursCount || COUNT_NEIGHBOURS_DEFAULT);
+}
+
+function getUserAverageScore(user) {
+    return  _.reduce(user.artists, function (memo, artist) {
+        return memo + artist.score;
+    }, 0) / user.artists.length;
+}
+
+function getNeighboursTrackScores(neighbours) {
+    var trackScores = {};
+    _.each(neighbours, function (user, index) {
+        _.each(user.tracks, function (track) {
+            var key = track.name + track.artist.name,
+                playcount = parseInt(track.playcount, 10);
+
+            trackScores[key] = trackScores[key] || { totalPlaycount: 0, neighbours: [], track: track };
+            trackScores[key].totalPlaycount += playcount;
+            trackScores[key].neighbours.push({
+                user: user,
+                playcount: playcount
+            });
+        });
+    });
+    return trackScores;
 }
 
 function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
