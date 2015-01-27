@@ -19,7 +19,7 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
             }, 0) / userProfile.artists.length;
 
             _.each(users, function (user) {
-                user.similarity = getSimilarityForUser(user, userProfile.artists);
+                user.similarity = getSimilarityForUser(user, userProfile.artists, userAverageScore, artistNames);
             });
 
             users = _.first(_.sortBy(_.filter(users, function (user) {
@@ -77,7 +77,7 @@ function getAveragePlaycountForUser(user) {
     }, 0) / user.tracks.length;
 }
 
-function getSimilarityForUser(user, artists) {
+function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
     var tracksPerArtist = _.groupBy(user.tracks, function (track) {
         return track.artist.name;
     }), playCountsPerArtist = {};
@@ -97,15 +97,9 @@ function getSimilarityForUser(user, artists) {
     });
 
     var userAverageScore = userTotalScore / userScoreCount;
-    var artistsTotalScore = _.reduce(artists, function (memo, artist) {
-        return memo + parseInt(artist.score, 10);
-    }, 0);
-    var artistsAverageScore = artistsTotalScore / artists.length;
 
     var userArtistsNames = _.keys(playCountsPerArtist),
-        artistsNames = _.map(artists, function (artist) {
-        return artist.name;
-    }), commonArtistsNames = _.intersection(artistsNames, userArtistsNames);
+        commonArtistsNames = _.intersection(artistsNames, userArtistsNames);
 
     var nominator = _.reduce(commonArtistsNames, function (memo, name) {
         var userScore = playCountsPerArtist[name] - userAverageScore,
