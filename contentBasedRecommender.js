@@ -19,26 +19,19 @@ exports.getRecommendations = function (userInfo, callback) {
             db.getTracksForTags(userProfile.tags, function (err, tracks) {
                 _.each(tracks, function (track) {
                     var tags = _.first(track.tags, COUNT_TAGS_PER_TRACK),
-                        trackDocument = {};
-
-                    _.each(tags, function (tag) {
-                        var count = parseInt(tag.count, 10);
-                        trackDocument[tag.name] = trackDocument[tag.name] || 0;
-                        trackDocument[tag.name] += count;
-                    });
-
-                    var nominator = 0,
+                        trackProfile = getTrackProfile(tags),
+                        nominator = 0,
                         userDenominator = 0,
                         trackDenominator = 0;
 
                     _.each(userProfile.scores, function (value, key) {
-                        if(trackDocument[key]) {
-                            nominator += value * trackDocument[key];       
+                        if(trackProfile[key]) {
+                            nominator += value * trackProfile[key];
                         }
                         userDenominator += value * value;
                     });
 
-                    _.each(trackDocument, function (value, key) {
+                    _.each(trackProfile, function (value, key) {
                         trackDenominator += value * value;
                     });
 
@@ -81,4 +74,14 @@ function getUserProfile(userInfo, userArtists) {
         scores: userProfile,
         tags: tags
     };
+}
+
+function getTrackProfile(trackTags) {
+    var trackProfile = {};
+    _.each(trackTags, function (tag) {
+        var count = parseInt(tag.count, 10);
+        trackProfile[tag.name] = trackProfile[tag.name] || 0;
+        trackProfile[tag.name] += count;
+    });
+    return trackProfile;
 }
