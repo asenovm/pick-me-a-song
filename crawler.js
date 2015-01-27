@@ -12,8 +12,8 @@ var fs = require('fs'),
     }),
     NUMBER_TAGS_CRAWLED = 5;
 
-startCrawlingUsers();
-//startCrawlingSongTags();
+//startCrawlingUsers();
+startCrawlingSongTags();
 //startCrawlingArtistTags();
 
 function insertArtistWithTags(artist, tags) {
@@ -39,7 +39,6 @@ function startCrawlingArtistTags() {
                                     if(err || !tags) {
                                         console.log('error retrieving top tags for artist');
                                     } else {
-                                        console.log('inserting artist ' + artist.name);
                                         insertArtistWithTags(artist, tags.tag);
                                         tagCallback();
                                     }

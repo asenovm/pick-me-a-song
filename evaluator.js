@@ -3,11 +3,17 @@ var _ = require('underscore');
 exports.METRIC_NAME_PRECISION = "precision";
 exports.METRIC_NAME_NDCG = "ndcg";
 
-exports.getPrecision = function (likedItemsCount, recommendedItemsCount) {
-    return likedItemsCount / recommendedItemsCount;
+exports.getPrecision = function (relevantItemsCount, recommendedItemsCount) {
+    if(recommendedItemsCount === 0) {
+        return 0;
+    }
+    return relevantItemsCount / recommendedItemsCount;
 };
 
 exports.getRecall = function (recommendedRelevantItemsCount, totalRelevantItemsCount) {
+    if(totalRelevantItemsCount === 0) {
+        return 1;
+    }
     return recommendedRelevantItemsCount / totalRelevantItemsCount;
 };
 

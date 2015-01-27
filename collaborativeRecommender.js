@@ -4,7 +4,7 @@ var _ = require('underscore'),
     COUNT_RECOMMENDED_TRACKS = 20,
     THRESHOLD_COMMON_ARTISTS_COUNT = 10;
 
-exports.getRecommendations = function (userProfile, neighboursCount, recommendedItemsCount, callback) {
+exports.getRecommendations = function (userProfile, options, callback) {
     var artistNames = _.map(userProfile.artists, function (artist) {
         return artist.name;
     });
@@ -24,7 +24,7 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
                     averageScore: userAverageScore,
                     artists: artists,
                     artistNames: artistNames,
-                    neighboursCount: neighboursCount
+                    neighboursCount: options.neighboursCount
                 }, neighbours = getUserNeighbours(activeUser, users),
                 trackScores = getNeighboursTrackScores(neighbours);
 

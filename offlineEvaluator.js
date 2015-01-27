@@ -7,16 +7,18 @@ var _ = require('underscore'),
     LENGTH_SET_MIN = 20,
     LENGTH_TRAINING_SET = 12;
 
-startCollaborativeEvaluation();
+startContentBasedEvaluation();
 
 function startCollaborativeEvaluation() {
     startOfflineEvaluation(function (userProfile, callback) {
-        collaborativeRecommender.getRecommendations(userProfile, false, false, callback);
+        collaborativeRecommender.getRecommendations(userProfile, {}, callback);
     });
 }
 
 function startContentBasedEvaluation() {
-    startOfflineEvaluation(contentBasedRecommender.getRecommendations);
+    startOfflineEvaluation(function (userProfile, callback) {
+        contentBasedRecommender.getRecommendations(userProfile, {}, callback);
+    });
 }
 
 function startOfflineEvaluation(fetchRecommendationsFunc) {
@@ -59,7 +61,8 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
 
                 var precision = evaluator.getPrecision(intersection.length, recommendedArtistNames.length),
                     recall = evaluator.getRecall(intersection.length, validationArtistNames.length),
-                    f1 = evaluator.getF1Measure(precision, recall) || 0;
+                    f1 = evaluator.getF1Measure(precision, recall) || 0,
+                    averagePrecision = evaluator.getAveragePrecision(recommendedArtistNames, validationArtistNames);
 
                 var intersection_10 = _.intersection(_.first(recommendedArtistNames, 10), validationArtistNames),
                     precision_10 = evaluator.getPrecision(intersection_10.length, 10),

@@ -4,7 +4,7 @@ var _ = require('underscore'),
     COUNT_TAGS_PER_TRACK = 6,
     COUNT_TAGS_PER_ARTIST = 3;
 
-exports.getRecommendations = function (userInfo, callback) {
+exports.getRecommendations = function (userInfo, options, callback) {
     db.getTagsForArtists(userInfo.artists, function (err, taggedArtists) {
         if(err) {
             callback(err, []);

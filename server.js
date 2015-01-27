@@ -14,10 +14,11 @@ app.use(bodyParser.json());
 app.get('/recommendations', function (req, res) {
     var userProfile = JSON.parse(req.query.userProfile),
         userArtists = [],
-        neighboursCount = parseInt(req.query.neighboursCount, 10),
-        recommendedItemsCount = parseInt(req.query.recommendedItemsCount, 10),
         userId = req.query.userId,
-        algorithmType = req.query.algorithmType;
+        options: {
+            neighboursCount: neighboursCount,
+            algorithmType: algorithmType
+        };
 
     db.updateUserArtists(userId, userProfile.artists, function (err, result) {
         if(err) {
@@ -30,7 +31,7 @@ app.get('/recommendations', function (req, res) {
                     userArtists = result;
                 }
 
-                recommender.getRecommendationsFor(userProfile, algorithmType, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
+                recommender.getRecommendationsFor(userProfile, options, function (err, recommendedTracks) {
                     if(err) {
                         res.status(500).end();
                     } else {
