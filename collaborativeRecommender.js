@@ -22,7 +22,13 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
                 artists = _.indexBy(userProfile.artists, 'name'),
                 trackScores = {},
                 predictedRatings = [],
-                neighbours = getUserNeighbours(users, userProfile.name, userAverageScore, artists, artistNames, neighboursCount);
+                activeUser = {
+                    name: userProfile.name,
+                    averageScore: userAverageScore,
+                    artists: artists,
+                    artistNames: artistNames,
+                    neighboursCount: neighboursCount
+                }, neighbours = getUserNeighbours(activeUser, users);
 
             _.each(neighbours, function (user, index) {
                 _.each(user.tracks, function (track) {
@@ -62,16 +68,16 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
     });
 }
 
-function getUserNeighbours(users, userName, userAverageScore, artists, artistNames, neighboursCount) {
+function getUserNeighbours(activeUser, users) {
     _.each(users, function (user) {
-        user.similarity = getSimilarityForUser(user, artists, userAverageScore, artistNames);
+        user.similarity = getSimilarityForUser(user, activeUser.artists, activeUser.averageScore, activeUser.artistNames);
     });
 
     return _.first(_.sortBy(_.filter(users, function (user) {
-        return user.similarity >= 0 && user.user !== userName;
+        return user.similarity >= 0 && user.user !== activeUser.name;
     }), function (user) {
         return -user.similarity;
-    }), neighboursCount || COUNT_NEIGHBOURS_DEFAULT);
+    }), activeUser.neighboursCount || COUNT_NEIGHBOURS_DEFAULT);
 }
 
 function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
