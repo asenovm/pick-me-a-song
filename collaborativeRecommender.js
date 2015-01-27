@@ -50,12 +50,10 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
             var predictedRatings = [];
 
             _.each(trackScores, function (value, key) {
-                var track = trackScores[key].track,
+                var track = value.track,
                     ratingNominator = 0,
                     ratingDenominator = 0,
-                    averageTrackValue = _.reduce(value.neighbours, function (memo, neighbour) {
-                        return memo + neighbour.playcount;
-                    }, 0) / value.neighbours.length;
+                    averageTrackValue = value.totalPlaycount / value.neighbours.length;
 
                 _.each(value.neighbours, function (neighbour) {
                     ratingNominator += neighbour.user.similarity * (neighbour.playcount - parseInt(neighbour.user.averagePlaycount, 10));
@@ -73,12 +71,6 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
 
         callback(err, recommendedTracks);
     });
-}
-
-function getAveragePlaycountForUser(user) {
-    return _.reduce(user.tracks, function (memo, track) {
-        return memo + parseInt(track.playcount, 10);
-    }, 0) / user.tracks.length;
 }
 
 function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
