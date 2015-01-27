@@ -18,8 +18,10 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
                 return memo + artist.score;
             }, 0) / userProfile.artists.length;
 
+            var artists = _.indexBy(userProfile.artists, 'name');
+
             _.each(users, function (user) {
-                user.similarity = getSimilarityForUser(user, userProfile.artists, userAverageScore, artistNames);
+                user.similarity = getSimilarityForUser(user, artists, userAverageScore, artistNames);
             });
 
             users = _.first(_.sortBy(_.filter(users, function (user) {
@@ -96,7 +98,7 @@ function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) 
 
     var nominator = _.reduce(commonArtistsNames, function (memo, name) {
         var userScore = playCountsPerArtist[name] - userAverageScore,
-            artistScore = _.findWhere(artists, { name: name }).score - artistsAverageScore;
+            artistScore = artists[name].score - artistsAverageScore;
 
         return memo + userScore * artistScore;
     }, 0);
@@ -107,7 +109,7 @@ function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) 
     }, 0));
 
     var artistsDenominator = Math.sqrt(_.reduce(commonArtistsNames, function (memo, name) {
-        var artistScore = _.findWhere(artists, { name: name }).score - artistsAverageScore;
+        var artistScore = artists[name].score - artistsAverageScore;
         return memo + artistScore * artistScore;
     }, 0));
 
