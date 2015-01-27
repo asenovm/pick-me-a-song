@@ -4,6 +4,7 @@ var fs = require('fs'),
     config = JSON.parse(fs.readFileSync('config.json')),
     LastfmAPI = require('lastfmapi'),
     _ = require('underscore'),
+    async = require('async'),
     db = require('./db'),
     lastfm = new LastfmAPI({
         api_key: config.apiKey,
@@ -24,10 +25,10 @@ function insertArtistWithTags(artist, tags) {
 
 function startCrawlingArtistTags() {
     db.getInitialArtists(function (err, artists) {
-        _.each(artists, function (artist) {
+        async.eachLimit(artists, 5, function (artist, artistsCallback) {
             lastfm.artist.getTopTags({ artist: artist.artist.name }, function (err, tags) {
                 insertArtistWithTags(artist.artist, tags.tag);
-                _.each(_.first(tags.tag, NUMBER_TAGS_CRAWLED), function (tag) {
+                async.eachLimit(tags.tag, 5, function (tag, tagCallback) {
                     lastfm.tag.getTopArtists({ tag: tag.name }, function (err, tagArtists) {
                         if(err || !tagArtists) {
                             console.log('error retrieving top artists for tag');
@@ -38,14 +39,20 @@ function startCrawlingArtistTags() {
                                     if(err || !tags) {
                                         console.log('error retrieving top tags for artist');
                                     } else {
+                                        console.log('inserting artist ' + artist.name);
                                         insertArtistWithTags(artist, tags.tag);
+                                        tagCallback();
                                     }
                                 });
                             });
                         }
                     });
+                }, function (err) {
+                    artistsCallback(err);
                 });
             });
+        }, function (err) {
+            console.log('done');
         });
     });
 }
@@ -102,6 +109,8 @@ function visitNode (user, page, totalPages) {
     if (page > totalPages || page > config.endPage) {
         return;
     }
+
+    console.log('crawling ' + user + ' ' + page);
 
     lastfm.user.getTopTracks({ user: user, page: page, limit: config.itemsPerPage}, function (err, result) {
         if (err) {
