@@ -21,19 +21,10 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
             }, 0) / userProfile.artists.length,
                 artists = _.indexBy(userProfile.artists, 'name'),
                 trackScores = {},
-                predictedRatings = [];
+                predictedRatings = [],
+                neighbours = getUserNeighbours(users, userProfile.name, userAverageScore, artists, artistNames, neighboursCount);
 
-            _.each(users, function (user) {
-                user.similarity = getSimilarityForUser(user, artists, userAverageScore, artistNames);
-            });
-
-            users = _.first(_.sortBy(_.filter(users, function (user) {
-                return user.similarity >= 0 && user.user !== userProfile.name;
-            }), function (user) {
-                return -user.similarity;
-            }), neighboursCount || COUNT_NEIGHBOURS_DEFAULT);
-
-            _.each(users, function (user, index) {
+            _.each(neighbours, function (user, index) {
                 _.each(user.tracks, function (track) {
                     var key = track.name + track.artist.name,
                         playcount = parseInt(track.playcount, 10);
@@ -69,6 +60,18 @@ exports.getRecommendations = function (userProfile, neighboursCount, recommended
 
         callback(err, recommendedTracks);
     });
+}
+
+function getUserNeighbours(users, userName, userAverageScore, artists, artistNames, neighboursCount) {
+    _.each(users, function (user) {
+        user.similarity = getSimilarityForUser(user, artists, userAverageScore, artistNames);
+    });
+
+    return _.first(_.sortBy(_.filter(users, function (user) {
+        return user.similarity >= 0 && user.user !== userName;
+    }), function (user) {
+        return -user.similarity;
+    }), neighboursCount || COUNT_NEIGHBOURS_DEFAULT);
 }
 
 function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
