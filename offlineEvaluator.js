@@ -30,7 +30,7 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
             return userInfo.tracks.length >= LENGTH_SET_MIN
         }), accumulatedPrecision = 0, accumulatedRecall = 0, accumulatedF1 = 0, recommendationsCount = 0;
 
-        async.eachLimit(userInfo, 3, function (user, callback) {
+        async.eachSeries(userInfo, function (user, callback) {
             var tracks = user.tracks,
                 evaluationSet = _.first(tracks, LENGTH_SET_MIN),
                 trainingSet = _.first(evaluationSet, LENGTH_TRAINING_SET),

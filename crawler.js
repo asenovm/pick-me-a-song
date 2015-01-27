@@ -12,7 +12,7 @@ var fs = require('fs'),
     }),
     NUMBER_TAGS_CRAWLED = 5;
 
-//startCrawlingUsers();
+startCrawlingUsers();
 //startCrawlingSongTags();
 //startCrawlingArtistTags();
 

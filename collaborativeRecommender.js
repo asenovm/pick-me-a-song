@@ -5,16 +5,18 @@ var _ = require('underscore'),
     THRESHOLD_COMMON_ARTISTS_COUNT = 10;
 
 exports.getRecommendations = function (userProfile, neighboursCount, recommendedItemsCount, callback) {
-    db.retrieveAllUsersForArtists(userProfile.artists, function (err, users) {
+    var artistNames = _.map(userProfile.artists, function (artist) {
+        return artist.name;
+    });
+
+    db.retrieveAllUsersForArtists(artistNames, function (err, users) {
         var recommendedTracks = [];
 
         if(err) {
             console.log('an error occurred');
             console.dir(err);
         } else {
-            var artistNames = _.map(userProfile.artists, function (artist) {
-                return artist.name;
-            }), userAverageScore = _.reduce(userProfile.artists, function (memo, artist) {
+            var userAverageScore = _.reduce(userProfile.artists, function (memo, artist) {
                 return memo + artist.score;
             }, 0) / userProfile.artists.length;
 

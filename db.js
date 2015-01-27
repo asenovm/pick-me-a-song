@@ -20,17 +20,13 @@ MongoClient.connect(config.dbURL, function (err, dbInstance) {
 exports.retrieveUsersForEvaluation = function (callback) {
     MongoClient.connect(config.dbURL, function (err, db) {
         var users = db.collection(COLLECTION_USERS);
-        users.find({}).limit(150).toArray(callback);
+        users.find({}).limit(200).toArray(callback);
     });
 };
 
-exports.retrieveAllUsersForArtists = function (artists, callback) {
-    var collection = db.collection(COLLECTION_USERS),
-        names = _.map(artists, function (artist) {
-            return artist.name;
-        });
-
-    collection.find({ tracks: { $elemMatch: { "artist.name": { "$in": names }}}}).toArray(callback);
+exports.retrieveAllUsersForArtists = function (artistNames, callback) {
+    var collection = db.collection(COLLECTION_USERS);
+    collection.find({ "tracks.artist.name": { "$in": artistNames }}).toArray(callback);
 }
 
 exports.updateUserProfile = function (user, callback) {
