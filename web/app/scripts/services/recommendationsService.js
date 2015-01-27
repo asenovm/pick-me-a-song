@@ -36,7 +36,10 @@ angular.module('pickMeASong')
             url: '/recommendations',
             method: 'GET',
             params: {
-                artists: JSON.stringify(artists),
+                userProfile: {
+                    artists: artists,
+                    name: Date.now()
+                },
                 neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
                 recommendedItemsCount: $localStorage.get(KEY_RECOMMENDED_ITEMS_COUNT),
                 algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering',

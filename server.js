@@ -12,25 +12,25 @@ var express = require('express'),
 app.use(bodyParser.json());
 
 app.get('/recommendations', function (req, res) {
-    var artists = JSON.parse(req.query.artists),
+    var userProfile = JSON.parse(req.query.userProfile),
         userArtists = [],
         neighboursCount = parseInt(req.query.neighboursCount, 10),
         recommendedItemsCount = parseInt(req.query.recommendedItemsCount, 10),
         userId = req.query.userId,
         algorithmType = req.query.algorithmType;
 
-    db.updateUserArtists(userId, artists, function (err, result) {
+    db.updateUserArtists(userId, userProfile.artists, function (err, result) {
         if(err) {
-            userArtists = artists;
+            userArtists = userProfile.artists;
         } else {
             db.retrieveUserArtists(userId, function (err, result) {
                 if(err) {
-                    userArtists = artists;
+                    userArtists = userProfile.artists;
                 } else {
                     userArtists = result;
                 }
 
-                recommender.getRecommendationsFor(userArtists, algorithmType, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
+                recommender.getRecommendationsFor(userProfile, algorithmType, neighboursCount, recommendedItemsCount, function (err, recommendedTracks) {
                     if(err) {
                         res.status(500).end();
                     } else {
