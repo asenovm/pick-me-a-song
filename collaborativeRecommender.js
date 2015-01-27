@@ -78,28 +78,21 @@ function getAveragePlaycountForUser(user) {
 }
 
 function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
-    var tracksPerArtist = _.groupBy(user.tracks, function (track) {
-        return track.artist.name;
-    }), playCountsPerArtist = {};
-    
-    _.each(tracksPerArtist, function (value, key) {
-        playCountsPerArtist[key] = _.reduce(value, function (memo, track) {
-            return memo + parseInt(track.playcount, 10);
-        }, 0);
+    var playCountsPerArtist = {},
+        userTotalScore = 0,
+        userScoreCount = 0,
+        trackPlaycount = 0;
+
+    _.each(user.tracks, function (track) {
+        trackPlaycount = parseInt(track.playcount, 10);
+        playCountsPerArtist[track.artist.name] = playCountsPerArtist[track.artist.name] || 0;
+        playCountsPerArtist[track.artist.name] += trackPlaycount;
+        userTotalScore += trackPlaycount;
     });
-
-    var userTotalScore = 0,
-        userScoreCount = 0;
-
-    _.each(playCountsPerArtist, function (value, key) {
-        userTotalScore += value;
-        ++userScoreCount;
-    });
-
-    var userAverageScore = userTotalScore / userScoreCount;
 
     var userArtistsNames = _.keys(playCountsPerArtist),
-        commonArtistsNames = _.intersection(artistsNames, userArtistsNames);
+        commonArtistsNames = _.intersection(artistsNames, userArtistsNames),
+        userAverageScore = userTotalScore / userArtistsNames.length;
 
     var nominator = _.reduce(commonArtistsNames, function (memo, name) {
         var userScore = playCountsPerArtist[name] - userAverageScore,
