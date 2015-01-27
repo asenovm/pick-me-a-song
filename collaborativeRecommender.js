@@ -88,26 +88,22 @@ function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) 
 
     var userArtistsNames = _.keys(playCountsPerArtist),
         commonArtistsNames = _.intersection(artistsNames, userArtistsNames),
-        userAverageScore = userTotalScore / userArtistsNames.length;
+        userAverageScore = userTotalScore / userArtistsNames.length,
+        nominator = 0,
+        userDenominator = 0,
+        artistsDenominator = 0,
+        denominator;
 
-    var nominator = _.reduce(commonArtistsNames, function (memo, name) {
+    _.each(commonArtistsNames, function (name) {
         var userScore = playCountsPerArtist[name] - userAverageScore,
             artistScore = artists[name].score - artistsAverageScore;
 
-        return memo + userScore * artistScore;
-    }, 0);
+        nominator += userScore * artistScore;
+        userDenominator += userScore * userScore;
+        artistsDenominator += artistScore * artistScore;
+    });
 
-    var userDenominator = Math.sqrt(_.reduce(commonArtistsNames, function (memo, name) {
-        var userScore = playCountsPerArtist[name] - userAverageScore;
-        return memo + userScore * userScore;
-    }, 0));
-
-    var artistsDenominator = Math.sqrt(_.reduce(commonArtistsNames, function (memo, name) {
-        var artistScore = artists[name].score - artistsAverageScore;
-        return memo + artistScore * artistScore;
-    }, 0));
-
-    var denominator = userDenominator * artistsDenominator;
+    denominator = Math.sqrt(userDenominator * artistsDenominator);
 
     if(denominator === 0) {
         return 0;
