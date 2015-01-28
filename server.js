@@ -39,7 +39,7 @@ app.post('/recommendations', function (req, res) {
                     var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length;
                     userProfile.artists = _.first(userProfile.artists, LIMIT_COUNT_ARTISTS);
                     //userProfile.artists = _.union(userProfile.artists, _.first(result, openPositionsCount));
-                    fetchAndSendRecommendations(userProfile, previousRecommendations, options, res);
+                    fetchAndSendRecommendations(userProfile, previousRecommendations.tracks, options, res);
                 });
             });
         });
