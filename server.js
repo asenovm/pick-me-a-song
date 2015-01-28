@@ -13,12 +13,9 @@ app.use(bodyParser.json());
 
 app.get('/recommendations', function (req, res) {
     var userProfile = JSON.parse(req.query.userProfile),
+        options = JSON.parse(req.query.options),
         userArtists = [],
-        userId = req.query.userId,
-        options: {
-            neighboursCount: neighboursCount,
-            algorithmType: algorithmType
-        };
+        userId = req.query.userId;
 
     db.updateUserArtists(userId, userProfile.artists, function (err, result) {
         if(err) {
@@ -60,10 +57,20 @@ app.get('/tracksToRate', function (req, res) {
 
 app.post('/rate', function (req, res) {
     var likedTracksPositions = req.body.likedTracksPositions,
-        recommendedTracksCount = req.body.recommendedTracksCount,
+        likedTracksPositions_10 = _.filter(likedTracksPositions, function (position) {
+            return position <= 10;
+        }), likedTracksPositions_5 = _.filter(likedTracksPositions, function (position) {
+            return position <= 5;
+        }), recommendedTracksCount = req.body.recommendedTracksCount,
         userId = req.body.userId,
         precision = evaluator.getPrecision(likedTracksPositions.length, recommendedTracksCount),
+        precision_10 = evaluator.getPrecision(likedTracksPositions_10.length, 10),
+        precision_5 = evaluator.getPrecision(likedTracksPositions_5.length, 5),
         nDCG = evaluator.getNDCG(likedTracksPositions, recommendedTracksCount);
+
+    console.log('values @20 are ', precision, nDCG);
+    console.log('values @10 are ', precision_10, nDCG);
+    console.log('values @5 are ', precision_5, nDCG);
 
     db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_PRECISION, precision, function (errPrecision, result) {
         db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_NDCG, nDCG, function (errNDCG, result) {

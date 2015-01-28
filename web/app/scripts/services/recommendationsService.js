@@ -7,7 +7,6 @@ angular.module('pickMeASong')
     var KEY_RECOMMENDED_ITEMS = 'recommendedItems';
     var KEY_USER_ID = 'userId';
     var KEY_TRACKS_TO_RATE = 'tracksToRate';
-    var KEY_RECOMMENDED_ITEMS_COUNT = 'recommendedItemsCount';
     var KEY_NEIGHBOURS_COUNT = 'neighboursCount';
     var KEY_COLLABORATIVE_FILTERING_USED = 'collaborativeFilteringUsed';
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
@@ -40,9 +39,10 @@ angular.module('pickMeASong')
                     artists: artists,
                     name: Date.now()
                 },
-                neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
-                recommendedItemsCount: $localStorage.get(KEY_RECOMMENDED_ITEMS_COUNT),
-                algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering',
+                options: {
+                    neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
+                    algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering'
+                },
                 userId: userId
             }
         }).success(function (data, status, headers, config) {
@@ -165,10 +165,6 @@ angular.module('pickMeASong')
 
     this.setNeighboursCount = function (count) {
         $localStorage.set(KEY_NEIGHBOURS_COUNT, count);
-    };
-
-    this.setRecommendedItemsCount = function (count) {
-        $localStorage.set(KEY_RECOMMENDED_ITEMS_COUNT, count);
     };
 
     this.setCollaborativeFilteringUsed = function (value) {

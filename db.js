@@ -11,7 +11,8 @@ var mongo = require('mongodb'),
     COLLECTION_TAGGED_TRACKS = 'taggedTracks',
     COLLECTION_TAGGED_ARTISTS = 'taggedArtists',
     FILE_TOP_TRACKS = 'topTracks.json',
-    NUMBER_TRACKS_TO_RATE = 15;
+    NUMBER_TRACKS_TO_RATE = 15,
+    NUMBER_USERS_FOR_EVALUATION = 200;
 
 MongoClient.connect(config.dbURL, function (err, dbInstance) {
     db = dbInstance;
@@ -20,7 +21,7 @@ MongoClient.connect(config.dbURL, function (err, dbInstance) {
 exports.retrieveUsersForEvaluation = function (callback) {
     MongoClient.connect(config.dbURL, function (err, db) {
         var users = db.collection(COLLECTION_USERS);
-        users.find({}).limit(200).toArray(callback);
+        users.find({}).limit(NUMBER_USERS_FOR_EVALUATION).toArray(callback);
     });
 };
 
@@ -136,5 +137,5 @@ exports.getTracksForTags = function (tags, callback) {
         tagNames = _.map(tags, function (tag) {
             return tag.name;
         });
-    taggedTracks.find({ tags: { $elemMatch: { name: { $in: tagNames }}}}).toArray(callback);
+    taggedTracks.find({ "tags.name": { $in: tagNames }}).toArray(callback);
 };
