@@ -47,7 +47,7 @@ angular.module('pickMeASong')
                     algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering'
                 },
                 likedTracksPositions: JSON.stringify(likedTracksPositions),
-                recommendedTracksCount: JSON.stringify(recommendedTracks.length),
+                recommendedTracks: JSON.stringify(recommendedTracks),
                 userId: userId
             }
         }).success(function (data, status, headers, config) {

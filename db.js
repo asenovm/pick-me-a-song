@@ -10,6 +10,7 @@ var mongo = require('mongodb'),
     COLLECTION_TRACKS_TO_RATE = 'tracksToRate',
     COLLECTION_TAGGED_TRACKS = 'taggedTracks',
     COLLECTION_TAGGED_ARTISTS = 'taggedArtists',
+    COLLECTION_RECOMMENDATIONS = 'recommendations',
     FILE_TOP_TRACKS = 'topTracks.json',
     NUMBER_TRACKS_TO_RATE = 15,
     NUMBER_USERS_FOR_EVALUATION = 200;
@@ -29,6 +30,16 @@ exports.retrieveAllUsersForArtists = function (artistNames, callback) {
     var collection = db.collection(COLLECTION_USERS);
     collection.find({ "tracks.artist.name": { "$in": artistNames }}).toArray(callback);
 }
+
+exports.updateUserRecommendations = function (userId, recommendations, callback) {
+    var recommendations = db.collection(COLLECTION_RECOMMENDATIONS);
+    recommendations.update({ userId: userId }, { $pushAll: { tracks: recommendations }}, { upsert: true }, callback);
+});
+
+exports.retrieveRecommendations = function (userId, callback) {
+    var recommendations = db.collection(COLLECTION_RECOMMENDATIONS);
+    recommendations.find({ userId: userId }, callback);
+};
 
 exports.updateUserProfile = function (user, callback) {
     var users = db.collection(COLLECTION_USERS);

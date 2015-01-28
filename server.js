@@ -22,29 +22,28 @@ app.get('/recommendations', function (req, res) {
             return position <= 10;
         }), likedTracksPositions_5 = _.filter(likedTracksPositions, function (position) {
             return position <= 5;
-        }), recommendedTracksCount = parseInt(req.query.recommendedTracksCount, 10),
-        metrics = {}, previousRecommendations = [];
+        }), recommendedTracks = JSON.parse(req.query.recommendedTracks),
+        metrics = {};
 
-    if(recommendedTracksCount > 0) {
-        metrics[evaluator.METRIC_NAME_PRECISION_20] = evaluator.getPrecision(likedTracksPositions.length, recommendedTracksCount);
+    if(recommendedTracks.length > 0) {
+        metrics[evaluator.METRIC_NAME_PRECISION_20] = evaluator.getPrecision(likedTracksPositions.length, recommendedTracks.length);
         metrics[evaluator.METRIC_NAME_PRECISION_10] = evaluator.getPrecision(likedTracksPositions_10.length, 10);
         metrics[evaluator.METRIC_NAME_PRECISION_5] = evaluator.getPrecision(likedTracksPositions_5.length, 5);
-        metrics[evaluator.METRIC_NAME_NDCG] = evaluator.getNDCG(likedTracksPositions, recommendedTracksCount);
+        metrics[evaluator.METRIC_NAME_NDCG] = evaluator.getNDCG(likedTracksPositions, recommendedTracks.length);
     }
 
-    db.updateUserArtists(userId, userProfile.artists, function (err, result) {
-        if(!err) {
-            db.retrieveUserArtists(userId, function (err, result) {
-                var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length;
-                if(!err) {
-                    previousRecommendations = result;
-                    userProfile.artists = _.union(userProfile.artists, _.first(result, openPositionsCount));
-                }
-                fetchAndSendRecommendations(userProfile, previousRecommendations, options, res);
+    db.updateUserRecommendations(userId, recommendedTracks, function (err, result) {
+        db.retrieveRecommendations(userId, function (err, previousRecommendations) {
+            db.updateUserArtists(userId, userProfile.artists, function (err, result) {
+                db.retrieveUserArtists(userId, function (err, result) {
+                    var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length;
+                    if(!err) {
+                        userProfile.artists = _.union(userProfile.artists, _.first(result, openPositionsCount));
+                    }
+                    fetchAndSendRecommendations(userProfile, previousRecommendations, options, res);
+                });
             });
-        } else {
-            fetchAndSendRecommendations(userProfile, previousRecommendations, options, res);   
-        }
+        });
     });
 });
 
