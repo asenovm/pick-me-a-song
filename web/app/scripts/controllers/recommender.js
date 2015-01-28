@@ -15,13 +15,6 @@ angular.module('pickMeASong')
         $location.path(PATH_RECOMMENDATIONS);
     };
 
-    $scope.$on('trackRateChange', function (e, data) {
-        var likedTracks = _.filter($scope.tracksToRate, function (track) {
-            return track.userValue && track.userValue >= MIN_RATE_LIKED_ITEM;
-        });
-        recommendationsService.rateTrack(likedTracks, $scope.tracksToRate);
-    });
-
     if ($location.path().indexOf('rateItems') >= 0) {
         $scope.tracksToRate = recommendationsService.getTracksToRate();
         $scope.callback = $scope.showRecommendations;
@@ -32,7 +25,7 @@ angular.module('pickMeASong')
 
     $scope.getRecommendations = function () {
         $scope.isLoading = true;
-        recommendationsService.fetchRecommendations($scope.artists).finally($scope.callback);
+        recommendationsService.fetchRecommendations($scope.artists, $scope.likedTracks, $scope.tracksToRate).finally($scope.callback);
     };
 
     $scope.setLoading = function () {
@@ -65,6 +58,10 @@ angular.module('pickMeASong')
             return track.artist.name;
         });
 
+        $scope.likedTracks = _.filter(ratedTracks, function (track) {
+            return track.userValue >= MIN_RATE_LIKED_ITEM;
+        });
+
         if(ratedTracks.length >= $scope.minNumberRatedTracks) {
             $scope.artists = _.map(ratedTracksUniqueArtists, function (track) {
                 var artistTotalValue = 0,
@@ -82,6 +79,7 @@ angular.module('pickMeASong')
                     score: artistTotalValue / artistTotalRatings
                 };
             });
+
             $scope.submitError = false;
             $scope.getRecommendations();
         } else {

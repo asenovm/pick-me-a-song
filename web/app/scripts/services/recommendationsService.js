@@ -27,8 +27,10 @@ angular.module('pickMeASong')
         $localStorage.set(KEY_USER_ID, id);
     };
 
-    this.fetchRecommendations = function (artists) {
-        var deferred = $q.defer(),
+    this.fetchRecommendations = function (artists, likedTracks, recommendedTracks) {
+        var likedTracksPositions = _.map(likedTracks, function (track) {
+            return _.indexOf(recommendedTracks, track);
+        }), deferred = $q.defer(),
             that = this;
 
         $http({
@@ -43,6 +45,8 @@ angular.module('pickMeASong')
                     neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
                     algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering'
                 },
+                likedTracksPositions: JSON.stringify(likedTracksPositions),
+                recommendedTracksCount: JSON.stringify(recommendedTracks.length),
                 userId: userId
             }
         }).success(function (data, status, headers, config) {
@@ -63,23 +67,6 @@ angular.module('pickMeASong')
         return deferred.promise;
     };
 
-    this.rateTrack = function (likedTracks, recommendedTracks) {
-        var likedTracksPositions = _.map(likedTracks, function (track) {
-            return _.indexOf(recommendedTracks, track);
-        });
-
-        $http({
-            url: '/rate',
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            data: {
-                likedTracksPositions: likedTracksPositions,
-                recommendedTracksCount: recommendedTracks.length,
-                userId: userId
-            }
-        });
-    };
-
     this.onFacebookLogin = function (loginSuccessfulCallback, recommendationsFetchedCallback) {
         var that = this;
         return function (response) {
@@ -93,14 +80,14 @@ angular.module('pickMeASong')
 
     this.fetchInfoFromFacebook = function (recommendationsFetchedCallback) {
         var that = this;
-        FB.api('/me/music', function (response) {
+        FB.api('/me/music?limit=10', function (response) {
             var likes = _.map(response.data, function (artist) {
                 return {
                     name: artist.name,
                     score: SCORE_ARTIST_DEFAULT
                 };
             });
-            that.fetchRecommendations(likes).finally(recommendationsFetchedCallback);
+            that.fetchRecommendations(likes, [], []).finally(recommendationsFetchedCallback);
         });
     };
 
@@ -109,23 +96,24 @@ angular.module('pickMeASong')
         lastFm.user.getInfo({ user: user }, {
             success: function (data) {
                 that.saveUserId(data.user.id);
-                lastFm.user.getTopArtists({ user: user}, {
+                lastFm.user.getTopArtists({ user: user, limit: 10 }, {
                     success: function (data) {
+                        console.log('data top artists len is ' + data.topartists.artist.length);
                         var artists = _.map(data.topartists.artist, function (artist) {
                             return {
                                 name: artist.name,
                                 score: artist.playcount
                             };
                         });
-                        that.fetchRecommendations(artists).finally(recommendationsFetchedCallback);
+                        that.fetchRecommendations(artists, [], []).finally(recommendationsFetchedCallback);
                     }, error: function (code, message) {
-                        that.fetchRecommendations([]).finally(recommendationsFetchedCallback);
+                        that.fetchRecommendations([], [], []).finally(recommendationsFetchedCallback);
                     }
                 });
             },
             error: function (code, message) {
                 that.saveUserId("client-generated-" + Date.now());
-                that.fetchRecommendations([]).finally(recommendationsFetchedCallback);
+                that.fetchRecommendations([], [], []).finally(recommendationsFetchedCallback);
             }
         });
     };
