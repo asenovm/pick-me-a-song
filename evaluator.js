@@ -1,7 +1,9 @@
 var _ = require('underscore');
 
-exports.METRIC_NAME_PRECISION = "precision";
-exports.METRIC_NAME_NDCG = "ndcg";
+exports.METRIC_NAME_PRECISION_20 = 'precision@20';
+exports.METRIC_NAME_PRECISION_10 = 'precision@10';
+exports.METRIC_NAME_PRECISION_5 = 'precision@5';
+exports.METRIC_NAME_NDCG = 'ndcg';
 
 exports.getPrecision = function (relevantItemsCount, recommendedItemsCount) {
     if(recommendedItemsCount === 0) {

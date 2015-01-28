@@ -48,9 +48,9 @@ exports.hasUser = function (user, callback) {
     users.findOne({ user: user }, callback);
 };
 
-exports.writeEvaluationMetric = function (userId, metricName, metricValue, callback) {
+exports.writeEvaluationMetrics = function (userId, metrics, callback) {
     var evaluation = db.collection(COLLECTION_EVALUATION);
-    evaluation.update({ userId: userId }, { metricName: metricName, metricValue: metricValue }, { upsert: true }, callback);
+    evaluation.update({ userId: userId }, { $set: metrics }, { upsert: true }, callback);
 };
 
 exports.getTracksToRate = function (callback) {

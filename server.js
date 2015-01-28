@@ -63,23 +63,19 @@ app.post('/rate', function (req, res) {
             return position <= 5;
         }), recommendedTracksCount = req.body.recommendedTracksCount,
         userId = req.body.userId,
-        precision = evaluator.getPrecision(likedTracksPositions.length, recommendedTracksCount),
-        precision_10 = evaluator.getPrecision(likedTracksPositions_10.length, 10),
-        precision_5 = evaluator.getPrecision(likedTracksPositions_5.length, 5),
-        nDCG = evaluator.getNDCG(likedTracksPositions, recommendedTracksCount);
+        metrics = {};
 
-    console.log('values @20 are ', precision, nDCG);
-    console.log('values @10 are ', precision_10, nDCG);
-    console.log('values @5 are ', precision_5, nDCG);
+    metrics[evaluator.METRIC_NAME_PRECISION_20] = evaluator.getPrecision(likedTracksPositions.length, recommendedTracksCount);
+    metrics[evaluator.METRIC_NAME_PRECISION_10] = evaluator.getPrecision(likedTracksPositions_10.length, 10);
+    metrics[evaluator.METRIC_NAME_PRECISION_5] = evaluator.getPrecision(likedTracksPositions_5.length, 5);
+    metrics[evaluator.METRIC_NAME_NDCG] = evaluator.getNDCG(likedTracksPositions, recommendedTracksCount);
 
-    db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_PRECISION, precision, function (errPrecision, result) {
-        db.writeEvaluationMetric(userId, evaluator.METRIC_NAME_NDCG, nDCG, function (errNDCG, result) {
-            if(errPrecision || errNDCG) {
-                res.status(500).end();
-            } else {
-                res.end();
-            }
-        });
+    db.writeEvaluationMetrics(userId, metrics, function (err, result) {
+        if(err) {
+            res.status(500).end();
+        } else {
+            res.end();
+        }
     });
 
 });
