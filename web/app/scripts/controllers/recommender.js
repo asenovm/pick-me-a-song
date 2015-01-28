@@ -6,7 +6,7 @@ angular.module('pickMeASong')
     var PATH_RECOMMENDATIONS = 'recommendations';
     var PATH_RATE_ITEMS = 'rateItems';
 
-    var MIN_RATE_LIKED_ITEM = 3;
+    var MIN_RATE_LIKED_ITEM = 2.5;
 
     $scope.minNumberRatedTracks = 5;
 
