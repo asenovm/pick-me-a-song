@@ -8,21 +8,21 @@ var express = require('express'),
     evaluator = require('./evaluator'),
     db = require('./db'),
     app = express(),
-    LIMIT_COUNT_ARTISTS = 12;
+    LIMIT_COUNT_ARTISTS = 10;
 
 app.use(bodyParser.json());
 
-app.get('/recommendations', function (req, res) {
-    var userProfile = JSON.parse(req.query.userProfile),
-        options = JSON.parse(req.query.options),
+app.post('/recommendations', function (req, res) {
+    var userProfile = req.body.userProfile,
+        options = req.body.options,
         userArtists = [],
-        userId = req.query.userId,
-        likedTracksPositions = JSON.parse(req.query.likedTracksPositions),
+        userId = req.body.userId,
+        likedTracksPositions = req.body.likedTracksPositions,
         likedTracksPositions_10 = _.filter(likedTracksPositions, function (position) {
             return position <= 10;
         }), likedTracksPositions_5 = _.filter(likedTracksPositions, function (position) {
             return position <= 5;
-        }), recommendedTracks = JSON.parse(req.query.recommendedTracks),
+        }), recommendedTracks = req.body.recommendedTracks,
         metrics = {};
 
     if(recommendedTracks.length > 0) {
@@ -37,9 +37,8 @@ app.get('/recommendations', function (req, res) {
             db.updateUserArtists(userId, userProfile.artists, function (err, result) {
                 db.retrieveUserArtists(userId, function (err, result) {
                     var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length;
-                    if(!err) {
-                        userProfile.artists = _.union(userProfile.artists, _.first(result, openPositionsCount));
-                    }
+                    userProfile.artists = _.first(userProfile.artists, LIMIT_COUNT_ARTISTS);
+                    //userProfile.artists = _.union(userProfile.artists, _.first(result, openPositionsCount));
                     fetchAndSendRecommendations(userProfile, previousRecommendations, options, res);
                 });
             });

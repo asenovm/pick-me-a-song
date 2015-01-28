@@ -1,4 +1,5 @@
-var COUNT_RECOMMENDED_TRACKS = 20;
+var _ = require('underscore'),
+    COUNT_RECOMMENDED_TRACKS = 20;
 
 exports.getRecommendationsFromPredictions = function (predictedRatings, previousRecommendations) {
     return _.first(_.sortBy(_.filter(predictedRatings, function (track) {

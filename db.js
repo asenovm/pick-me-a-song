@@ -33,12 +33,12 @@ exports.retrieveAllUsersForArtists = function (artistNames, callback) {
 
 exports.updateUserRecommendations = function (userId, recommendations, callback) {
     var recommendations = db.collection(COLLECTION_RECOMMENDATIONS);
-    recommendations.update({ userId: userId }, { $pushAll: { tracks: recommendations }}, { upsert: true }, callback);
-});
+    recommendations.insert({ userId: userId, tracks: recommendations }, callback);
+};
 
 exports.retrieveRecommendations = function (userId, callback) {
     var recommendations = db.collection(COLLECTION_RECOMMENDATIONS);
-    recommendations.find({ userId: userId }, callback);
+    recommendations.find({ userId: userId }).toArray(callback);
 };
 
 exports.updateUserProfile = function (user, callback) {

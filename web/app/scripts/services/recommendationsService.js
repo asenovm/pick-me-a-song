@@ -12,7 +12,7 @@ angular.module('pickMeASong')
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
     var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
-    var LIMIT_COUNT_ARTISTS = 12;
+    var LIMIT_COUNT_ARTISTS = 10;
 
     this.getRecommendations = function () {
         return recommendations;
@@ -36,8 +36,8 @@ angular.module('pickMeASong')
 
         $http({
             url: '/recommendations',
-            method: 'GET',
-            params: {
+            method: 'POST',
+            data: {
                 userProfile: {
                     artists: artists,
                     name: Date.now()
@@ -46,8 +46,8 @@ angular.module('pickMeASong')
                     neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
                     algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering'
                 },
-                likedTracksPositions: JSON.stringify(likedTracksPositions),
-                recommendedTracks: JSON.stringify(recommendedTracks),
+                likedTracksPositions: likedTracksPositions,
+                recommendedTracks: recommendedTracks,
                 userId: userId
             }
         }).success(function (data, status, headers, config) {
@@ -99,7 +99,6 @@ angular.module('pickMeASong')
                 that.saveUserId(data.user.id);
                 lastFm.user.getTopArtists({ user: user, limit: LIMIT_COUNT_ARTISTS }, {
                     success: function (data) {
-                        console.log('data top artists len is ' + data.topartists.artist.length);
                         var artists = _.map(data.topartists.artist, function (artist) {
                             return {
                                 name: artist.name,
