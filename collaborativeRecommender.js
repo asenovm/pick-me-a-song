@@ -4,7 +4,7 @@ var _ = require('underscore'),
     COUNT_RECOMMENDED_TRACKS = 20,
     THRESHOLD_COMMON_ARTISTS_COUNT = 10;
 
-exports.getRecommendations = function (userProfile, options, callback) {
+exports.getRecommendations = function (userProfile, previousRecommendations, options, callback) {
     var artistNames = _.map(userProfile.artists, function (artist) {
         return artist.name;
     });

@@ -12,8 +12,8 @@ var fs = require('fs'),
     }),
     NUMBER_TAGS_CRAWLED = 5;
 
-//startCrawlingUsers();
-startCrawlingSongTags();
+startCrawlingUsers();
+//startCrawlingSongTags();
 //startCrawlingArtistTags();
 
 function insertArtistWithTags(artist, tags) {

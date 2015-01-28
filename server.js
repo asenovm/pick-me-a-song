@@ -49,7 +49,7 @@ app.get('/recommendations', function (req, res) {
 });
 
 function fetchAndSendRecommendations(userProfile, previousRecommendations, options, res) {
-    recommender.getRecommendationsFor(userProfile, options, function (err, recommendedTracks) {
+    recommender.getRecommendationsFor(userProfile, previousRecommendations, options, function (err, recommendedTracks) {
         if(err) {
             res.status(500).end();
         } else {
