@@ -7,7 +7,7 @@ var _ = require('underscore'),
     LENGTH_SET_MIN = 20,
     LENGTH_TRAINING_SET = 12;
 
-startContentBasedEvaluation();
+startCollaborativeEvaluation();
 
 function startCollaborativeEvaluation() {
     startOfflineEvaluation(function (userProfile, callback) {
@@ -33,6 +33,10 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
         }), accumulatedPrecision = 0,
             accumulatedRecall = 0,
             accumulatedF1 = 0,
+            accumulatedPrecision_10 = 0,
+            accumulatedF1_10 = 0,
+            accumulatedPrecision_5 = 0,
+            accumulatedF1_5 = 0,
             accumulatedNDCG = 0;
 
         async.eachSeries(userInfo, function (user, callback) {
@@ -86,17 +90,31 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                 accumulatedPrecision += precision;
                 accumulatedRecall += recall;
                 accumulatedF1 += f1;
+
+                accumulatedPrecision_10 += precision_10;
+                accumulatedF1_10 += f1_10;
+
+                accumulatedPrecision_5 += precision_5;
+                accumulatedF1_5 += f1_5;
+
                 accumulatedNDCG += nDCG;
+
                 callback();
             });
         }, function (err) {
             var meanPrecision = accumulatedPrecision / users.length,
+                meanPrecision_10 = accumulatedPrecision_10 / users.length,
+                meanPrecision_5 = accumulatedPrecision_5 / users.length,
                 meanRecall = accumulatedRecall / users.length,
                 meanF1 = accumulatedF1 / users.length,
+                meanF1_10 = accumulatedF1_10 / users.length,
+                meanF1_5 = accumulatedF1_5 / users.length,
                 meanNDCG = accumulatedNDCG / users.length;
 
-            console.log('mean values');
-            console.log(meanPrecision, meanRecall, meanF1, meanNDCG);
+            console.log('mean nDCG ', meanNDCG);
+            console.log('mean values @ 20 ', meanPrecision, meanRecall, meanF1, meanNDCG);
+            console.log('mean values @ 10 ', meanPrecision_10, meanRecall, meanF1_10, meanNDCG);
+            console.log('mean values @ 5 ', meanPrecision_5, meanRecall, meanF1_5, meanNDCG);
         });
     });
 }
