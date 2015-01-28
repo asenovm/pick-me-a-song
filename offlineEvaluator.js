@@ -11,13 +11,13 @@ startCollaborativeEvaluation();
 
 function startCollaborativeEvaluation() {
     startOfflineEvaluation(function (userProfile, callback) {
-        collaborativeRecommender.getRecommendations(userProfile, {}, callback);
+        collaborativeRecommender.getRecommendations(userProfile, [], {}, callback);
     });
 }
 
 function startContentBasedEvaluation() {
     startOfflineEvaluation(function (userProfile, callback) {
-        contentBasedRecommender.getRecommendations(userProfile, {}, callback);
+        contentBasedRecommender.getRecommendations(userProfile, [], {}, callback);
     });
 }
 
