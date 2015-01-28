@@ -1,6 +1,6 @@
 var _ = require('underscore'),
     db = require('./db'),
-    COUNT_RECOMMENDED_TRACKS = 20,
+    recommenderUtil = require('./recommenderUtil'),
     COUNT_TAGS_PER_TRACK = 6,
     COUNT_TAGS_PER_ARTIST = 3;
 
@@ -11,10 +11,7 @@ exports.getRecommendations = function (userInfo, previousRecommendations, option
         } else {
             var tags = [],
                 userDocument = {},
-                artistsNames = _.map(userInfo.artists, function (artist) {
-                    return artist.name;
-                }), userProfile = getUserProfile(userInfo, taggedArtists);
-
+                userProfile = getUserProfile(userInfo, taggedArtists);
 
             db.getTracksForTags(userProfile.tags, function (err, tracks) {
                 _.each(tracks, function (track) {
@@ -38,16 +35,10 @@ exports.getRecommendations = function (userInfo, previousRecommendations, option
                     userDenominator = Math.sqrt(userDenominator);
                     trackDenominator = Math.sqrt(trackDenominator);
 
-                    track.similarity = nominator / (userDenominator * trackDenominator);
+                    track.score = nominator / (userDenominator * trackDenominator);
                 });
 
-                var recommendedTracks = _.first(_.sortBy(_.filter(tracks, function (track) {
-                    return !_.contains(artistsNames, track.artist.name);
-                }), function (track) {
-                    return -track.similarity;
-                }), COUNT_RECOMMENDED_TRACKS);
-
-                callback(false, recommendedTracks);
+                callback(false, recommenderUtil.getRecommendationsFromPredictions(tracks, previousRecommendations));
             });
         }
     });

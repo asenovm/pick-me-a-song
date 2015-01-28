@@ -1,7 +1,7 @@
 var _ = require('underscore'),
     db = require('./db'),
+    recommenderUtil = require('./recommenderUtil'),
     COUNT_NEIGHBOURS_DEFAULT = 22,
-    COUNT_RECOMMENDED_TRACKS = 20,
     THRESHOLD_COMMON_ARTISTS_COUNT = 10;
 
 exports.getRecommendations = function (userProfile, previousRecommendations, options, callback) {
@@ -43,9 +43,7 @@ exports.getRecommendations = function (userProfile, previousRecommendations, opt
                 predictedRatings.push(track);
             });
 
-            recommendedTracks = _.first(_.sortBy(predictedRatings, function (track) {
-                return -track.score;
-            }), COUNT_RECOMMENDED_TRACKS);
+            recommendedTracks = recommenderUtil.getRecommendationsFromPredictions(predictedRatings, previousRecommendations);
         }
 
         callback(err, recommendedTracks);
