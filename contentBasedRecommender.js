@@ -55,11 +55,12 @@ exports.getRecommendations = function (userInfo, options, callback) {
 
 function getUserProfile(userInfo, userArtists) {
     var userProfile = {},
-        tags = [];
+        tags = [],
+        scoredArtists = _.indexBy(userInfo.artists, 'name');
 
     _.each(userArtists, function (artist) {
         var artistTags = _.first(artist.tags, COUNT_TAGS_PER_ARTIST),
-            scoredArtist = _.findWhere(userInfo.artists, { name: artist.name }),
+            scoredArtist = scoredArtists[artist.name],
             artistScore = parseInt(scoredArtist.score, 10);
 
         _.each(artistTags, function (tag) {
