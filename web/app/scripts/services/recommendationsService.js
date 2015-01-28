@@ -3,7 +3,7 @@
 angular.module('pickMeASong')
     .service('recommendationsService', ['$http', '$q', 'localStorageService', function ($http, $q, $localStorage) {
 
-    var SCORE_ARTIST_DEFAULT = 10;
+    var SCORE_ARTIST_DEFAULT = 5;
     var KEY_RECOMMENDED_ITEMS = 'recommendedItems';
     var KEY_USER_ID = 'userId';
     var KEY_TRACKS_TO_RATE = 'tracksToRate';
@@ -12,6 +12,7 @@ angular.module('pickMeASong')
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
     var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
+    var LIMIT_COUNT_ARTISTS = 12;
 
     this.getRecommendations = function () {
         return recommendations;
@@ -80,7 +81,7 @@ angular.module('pickMeASong')
 
     this.fetchInfoFromFacebook = function (recommendationsFetchedCallback) {
         var that = this;
-        FB.api('/me/music?limit=10', function (response) {
+        FB.api('/me/music?limit=' + LIMIT_COUNT_ARTISTS, function (response) {
             var likes = _.map(response.data, function (artist) {
                 return {
                     name: artist.name,
@@ -96,7 +97,7 @@ angular.module('pickMeASong')
         lastFm.user.getInfo({ user: user }, {
             success: function (data) {
                 that.saveUserId(data.user.id);
-                lastFm.user.getTopArtists({ user: user, limit: 10 }, {
+                lastFm.user.getTopArtists({ user: user, limit: LIMIT_COUNT_ARTISTS }, {
                     success: function (data) {
                         console.log('data top artists len is ' + data.topartists.artist.length);
                         var artists = _.map(data.topartists.artist, function (artist) {

@@ -7,7 +7,8 @@ var express = require('express'),
     recommender = require('./recommender'),
     evaluator = require('./evaluator'),
     db = require('./db'),
-    app = express();
+    app = express(),
+    LIMIT_COUNT_ARTISTS = 12;
 
 app.use(bodyParser.json());
 
@@ -22,7 +23,7 @@ app.get('/recommendations', function (req, res) {
         }), likedTracksPositions_5 = _.filter(likedTracksPositions, function (position) {
             return position <= 5;
         }), recommendedTracksCount = parseInt(req.query.recommendedTracksCount, 10),
-        metrics = {};
+        metrics = {}, previousRecommendations = [];
 
     if(recommendedTracksCount > 0) {
         metrics[evaluator.METRIC_NAME_PRECISION_20] = evaluator.getPrecision(likedTracksPositions.length, recommendedTracksCount);
@@ -34,18 +35,20 @@ app.get('/recommendations', function (req, res) {
     db.updateUserArtists(userId, userProfile.artists, function (err, result) {
         if(!err) {
             db.retrieveUserArtists(userId, function (err, result) {
+                var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length;
                 if(!err) {
-                    userProfile.artists = result;
+                    previousRecommendations = result;
+                    userProfile.artists = _.union(userProfile.artists, _.first(result, openPositionsCount));
                 }
-                fetchAndSendRecommendations(userProfile, options, res);
+                fetchAndSendRecommendations(userProfile, previousRecommendations, options, res);
             });
         } else {
-            fetchAndSendRecommendations(userProfile, options, res);   
+            fetchAndSendRecommendations(userProfile, previousRecommendations, options, res);   
         }
     });
 });
 
-function fetchAndSendRecommendations(userProfile, options, res) {
+function fetchAndSendRecommendations(userProfile, previousRecommendations, options, res) {
     recommender.getRecommendationsFor(userProfile, options, function (err, recommendedTracks) {
         if(err) {
             res.status(500).end();
