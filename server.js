@@ -36,9 +36,20 @@ app.post('/recommendations', function (req, res) {
         db.retrieveRecommendations(userId, function (err, previousRecommendations) {
             db.updateUserArtists(userId, userProfile.artists, function (err, result) {
                 db.retrieveUserArtists(userId, function (err, result) {
-                    var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length;
                     userProfile.artists = _.first(userProfile.artists, LIMIT_COUNT_ARTISTS);
-                    //userProfile.artists = _.union(userProfile.artists, _.first(result, openPositionsCount));
+                    var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length,
+                        userProfileArtistNames = _.map(userProfile.artists, function (artist) {
+                            return artist.name;
+                        });
+
+                    if(openPositionsCount > 0) {
+                        _.each(result, function (artist) {
+                            if(openPositionsCount > 0 && !_.contains(userProfileArtistNames, artist.name)) {
+                                --openPositionsCount;
+                                userProfile.artists.push(artist);
+                            }
+                        });
+                    }
                     fetchAndSendRecommendations(userProfile, previousRecommendations.tracks, options, res);
                 });
             });
