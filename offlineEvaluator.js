@@ -7,7 +7,7 @@ var _ = require('underscore'),
     LENGTH_SET_MIN = 20,
     LENGTH_TRAINING_SET = 12;
 
-startCollaborativeEvaluation();
+startContentBasedEvaluation();
 
 function startCollaborativeEvaluation() {
     startOfflineEvaluation(function (userProfile, previousRecommendations, callback) {
