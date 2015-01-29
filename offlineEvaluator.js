@@ -10,14 +10,14 @@ var _ = require('underscore'),
 startCollaborativeEvaluation();
 
 function startCollaborativeEvaluation() {
-    startOfflineEvaluation(function (userProfile, callback) {
-        collaborativeRecommender.getRecommendations(userProfile, [], {}, callback);
+    startOfflineEvaluation(function (userProfile, previousRecommendations, callback) {
+        collaborativeRecommender.getRecommendations(userProfile, previousRecommendations, {}, callback);
     });
 }
 
 function startContentBasedEvaluation() {
-    startOfflineEvaluation(function (userProfile, callback) {
-        contentBasedRecommender.getRecommendations(userProfile, [], {}, callback);
+    startOfflineEvaluation(function (userProfile, previousRecommendations, callback) {
+        contentBasedRecommender.getRecommendations(userProfile, previousRecommendations, {}, callback);
     });
 }
 
@@ -59,7 +59,7 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                 });
             });
 
-            fetchRecommendationsFunc(userProfile, function (err, recommendations) {
+            fetchRecommendationsFunc(userProfile, trainingSet, function (err, recommendations) {
                 var recommendedArtistNames = _.map(recommendations, function (track) {
                     return track.artist.name;
                 }), validationArtistNames = _.map(validationSet, function (track) {

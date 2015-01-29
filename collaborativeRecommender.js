@@ -31,8 +31,7 @@ exports.getRecommendations = function (userProfile, previousRecommendations, opt
             _.each(trackScores, function (value, key) {
                 var track = value.track,
                     ratingNominator = 0,
-                    ratingDenominator = 0,
-                    averageTrackValue = value.totalPlaycount / value.neighbours.length;
+                    ratingDenominator = 0;
 
                 _.each(value.neighbours, function (neighbour) {
                     ratingNominator += neighbour.user.similarity * (neighbour.playcount - neighbour.user.averagePlaycount);
