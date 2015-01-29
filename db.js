@@ -61,7 +61,7 @@ exports.hasUser = function (user, callback) {
 
 exports.writeEvaluationMetrics = function (userId, metrics, callback) {
     var evaluation = db.collection(COLLECTION_EVALUATION);
-    evaluation.update({ userId: userId }, { $set: metrics }, { upsert: true }, callback);
+    evaluation.insert({ userId: userId, metrics: metrics }, callback);
 };
 
 exports.getTracksToRate = function (callback) {

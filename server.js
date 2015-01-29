@@ -30,6 +30,7 @@ app.post('/recommendations', function (req, res) {
         metrics[evaluator.METRIC_NAME_PRECISION_10] = evaluator.getPrecision(likedTracksPositions_10.length, 10);
         metrics[evaluator.METRIC_NAME_PRECISION_5] = evaluator.getPrecision(likedTracksPositions_5.length, 5);
         metrics[evaluator.METRIC_NAME_NDCG] = evaluator.getNDCG(likedTracksPositions, recommendedTracks.length);
+        db.writeEvaluationMetrics(userId, metrics, _.noop);
     }
 
     db.updateUserRecommendations(userId, recommendedTracks, function (err, result) {
@@ -80,18 +81,6 @@ app.get('/tracksToRate', function (req, res) {
             }).end();
         }
     });
-});
-
-app.post('/rate', function (req, res) {
-
-    db.writeEvaluationMetrics(userId, metrics, function (err, result) {
-        if(err) {
-            res.status(500).end();
-        } else {
-            res.end();
-        }
-    });
-
 });
 
 app.get('*', function (req, res) {
