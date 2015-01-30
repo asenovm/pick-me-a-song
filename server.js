@@ -8,7 +8,8 @@ var express = require('express'),
     evaluator = require('./evaluator'),
     db = require('./db'),
     app = express(),
-    LIMIT_COUNT_ARTISTS = 9;
+    LIMIT_COUNT_ARTISTS = 9,
+    METHOD_HEAD = "HEAD";
 
 app.use(bodyParser.json());
 
@@ -84,7 +85,11 @@ app.get('/tracksToRate', function (req, res) {
 });
 
 app.get('*', function (req, res) {
-    fileServer.serve(req, res);
+    if(req.method === METHOD_HEAD) {
+        res.end();
+    } else {
+        fileServer.serve(req, res);
+    }
 });
 
 app.listen(process.env.PORT || 3000);
