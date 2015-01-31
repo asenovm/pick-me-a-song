@@ -341,10 +341,16 @@ button.lastfm-username {
 
 #scroll-to-top {
     background-image: url('../images/scroll_to_top.png');
-    width: 48px;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 90px;
     height: 57px;
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    right: 5px;
     display: none;
+    padding-top: 57px; 
+    text-align: center;
+    font-weight: bold;
+    font-size: 11px;
 }
