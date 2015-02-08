@@ -11,6 +11,8 @@ var mongo = require('mongodb'),
     COLLECTION_TAGGED_TRACKS = 'taggedTracks',
     COLLECTION_TAGGED_ARTISTS = 'taggedArtists',
     COLLECTION_RECOMMENDATIONS = 'recommendations',
+    COLLECTION_ARTISTS_INDEX = 'artistsIndex',
+    COLLECTION_TRACKS_INDEX = 'tracksIndex',
     FILE_TOP_TRACKS = 'topTracks.json',
     NUMBER_TRACKS_TO_RATE = 15,
     NUMBER_USERS_FOR_EVALUATION = 200;
@@ -42,7 +44,15 @@ exports.retrieveRecommendations = function (userId, callback) {
 };
 
 exports.updateUserProfile = function (user, callback) {
-    var users = db.collection(COLLECTION_USERS);
+    var users = db.collection(COLLECTION_USERS),
+        artistsIndex = db.collection(COLLECTION_ARTISTS_INDEX),
+        tracksIndex = db.collection(COLLECTION_TRACKS_INDEX);
+
+    _.each(user.tracks, function (track) {
+        artistsIndex.update({ artist: track.artist.name }, { $addToSet: { users: user.name }}, { upsert: true }, _.noop);
+        tracksIndex.update({ track: track.name }, { $addToSet: { users: user.name }}, { upsert: true }, _.noop);
+    });
+
     users.update({ user: user.name }, { $pushAll: { tracks: user.tracks }}, { upsert: true }, function (err, result) {
         users.findOne({ user: user.name }, function (err, user) {
             var averagePlaycount = _.reduce(user.tracks, function (memo, track) {
