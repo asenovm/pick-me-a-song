@@ -29,9 +29,18 @@ exports.retrieveUsersForEvaluation = function (callback) {
 };
 
 exports.retrieveAllUsersForArtists = function (artistNames, callback) {
-    var collection = db.collection(COLLECTION_USERS);
-    collection.find({ "tracks.artist.name": { "$in": artistNames }}).toArray(callback);
-}
+    var users = db.collection(COLLECTION_USERS),
+        artistsIndex = db.collection(COLLECTION_ARTISTS_INDEX),
+        start = Date.now();
+
+    artistsIndex.find({ artist: { $in: artistNames }}).toArray(function (err, result) {
+        var userIds = _.reduce(result, function (memo, artistInfo) {
+            return _.union(memo, artistInfo.users);
+        }, []);
+
+        users.find({ _id: { $in: userIds }}).toArray(callback);
+    });
+};
 
 exports.updateUserRecommendations = function (userId, recommendations, callback) {
     var collection = db.collection(COLLECTION_RECOMMENDATIONS);
