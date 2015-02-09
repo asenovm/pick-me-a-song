@@ -28,17 +28,17 @@ You can controll the algorithm parameters that are used when making recommendati
     </div>
 </div>
 <div class="info-footer" ng-show="isCollaborativeFilteringUsed">
-    <h3 class="text-justify">Recommendation algorithm type</h3>
-    The work of the system can be based on 2 different algorithmic approaches - <a href="http://en.wikipedia.org/wiki/Collaborative_filtering">Collaborative filtering</a> and <a href="http://recommender-systems.org/content-based-filtering/">Content-based filtering</a>. The first one finds suitable music for you by comparing your taste to the one thousands of other users have and recommends you their favourite songs. The latter uses meta information about the music you like and the music we have information about in order to find tracks that match your taste.
+    <h3 class="text-justify">Similarity type</h3>
+    The collaborative algorithm can find similar users to you based either on the tracks you have rated, or on the artists you think are good. Feel free to pick which method should be used by selecting the respective option below.
 </div>
 <div class="info-footer text-center" ng-show="isCollaborativeFilteringUsed">
-    <strong>Used algorithm type:</strong>
+    <strong>Recommendations type:</strong>
     <div class="btn-group inline-block algorithm-toggle" data-toggle="buttons">
       <label class="btn btn-primary" radio-click="true">
-        <input type="radio" name="options" id="Collaborative filtering" ng-value="!isCollaborativeFilteringUsed" ng-checked="isCollaborativeFilteringUsed" /> Collaborative filtering
+        <input type="radio" name="options" id="Artists" ng-value="!areArtistsUsed" ng-checked="areArtistsUsed" /> Artists
       </label>
       <label class="btn btn-primary" radio-click="false">
-        <input type="radio" name="options" id="Content-based filtering" ng-value="!isCollaborativeFilteringUsed" ng-checked="!isCollaborativeFilteringUsed" /> Content-based filtering
+        <input type="radio" name="options" id="Tracks" ng-value="!areArtistsUsed" ng-checked="!areArtistsUsed" /> Tracks
       </label>
     </div>
 </div>
