@@ -9,6 +9,7 @@ angular.module('pickMeASong')
     var KEY_TRACKS_TO_RATE = 'tracksToRate';
     var KEY_NEIGHBOURS_COUNT = 'neighboursCount';
     var KEY_COLLABORATIVE_FILTERING_USED = 'collaborativeFilteringUsed';
+    var KEY_ARTISTS_USED = 'artistsUsed';
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
     var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
@@ -159,12 +160,24 @@ angular.module('pickMeASong')
         $localStorage.set(KEY_COLLABORATIVE_FILTERING_USED, value);
     };
 
+    this.setArtistsUsed = function (value) {
+        $localStorage.set(KEY_ARTISTS_USED, value);
+    };
+
     this.getCollaborativeFilteringUsed = function () {
-        var localStorageInfo = $localStorage.get(KEY_COLLABORATIVE_FILTERING_USED);
+        return this._getFromLocalStorage(KEY_COLLABORATIVE_FILTERING_USED);
+    };
+
+    this.getArtistsUsed = function () {
+        return this._getFromLocalStorage(KEY_ARTISTS_USED);
+    };
+
+    this._getFromLocalStorage = function (key) {
+        var localStorageInfo = $localStorage.get(key);
         if(_.isUndefined(localStorageInfo) || _.isNull(localStorageInfo)) {
             return true;
         }
         return JSON.parse(localStorageInfo);
-    };
+    }
 
 }]);

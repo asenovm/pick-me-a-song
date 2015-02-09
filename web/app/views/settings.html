@@ -19,10 +19,10 @@ You can controll the algorithm parameters that are used when making recommendati
 <div class="info-footer text-center">
     <strong>Used algorithm type:</strong>
     <div class="btn-group inline-block algorithm-toggle" data-toggle="buttons">
-      <label class="btn btn-primary" radio-click="true">
+      <label class="btn btn-primary" radio-click="true" data-key="isCollaborativeFilteringUsed">
         <input type="radio" name="options" id="Collaborative filtering" ng-value="!isCollaborativeFilteringUsed" ng-checked="isCollaborativeFilteringUsed" /> Collaborative filtering
       </label>
-      <label class="btn btn-primary" radio-click="false">
+      <label class="btn btn-primary" radio-click="false" data-key="isCollaborativeFilteringUsed">
         <input type="radio" name="options" id="Content-based filtering" ng-value="!isCollaborativeFilteringUsed" ng-checked="!isCollaborativeFilteringUsed" /> Content-based filtering
       </label>
     </div>
@@ -34,10 +34,10 @@ You can controll the algorithm parameters that are used when making recommendati
 <div class="info-footer text-center" ng-show="isCollaborativeFilteringUsed">
     <strong>Recommendations type:</strong>
     <div class="btn-group inline-block algorithm-toggle" data-toggle="buttons">
-      <label class="btn btn-primary" radio-click="true">
+      <label class="btn btn-primary" radio-click="true" data-key="areArtistsUsed">
         <input type="radio" name="options" id="Artists" ng-value="!areArtistsUsed" ng-checked="areArtistsUsed" /> Artists
       </label>
-      <label class="btn btn-primary" radio-click="false">
+      <label class="btn btn-primary" radio-click="false" data-key="areArtistsUsed">
         <input type="radio" name="options" id="Tracks" ng-value="!areArtistsUsed" ng-checked="!areArtistsUsed" /> Tracks
       </label>
     </div>

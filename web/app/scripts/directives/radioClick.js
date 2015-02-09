@@ -7,15 +7,16 @@ angular.module('pickMeASong')
         link: function ($scope, element, attrs) {
             var $element = $(element),
                 $others = $element.siblings(),
+                key = attrs.key,
                 value = JSON.parse(attrs.radioClick);
 
-            if($scope.isCollaborativeFilteringUsed === value) {
+            if($scope[key] === value) {
                 $element.addClass('active');
                 $others.removeClass('active');
             }
 
             $element.on('touchstart click', function () {
-                $scope.setCollaborativeFilteringUsed(value);
+                $scope.setValue(key, value);
             });
         }
     };
