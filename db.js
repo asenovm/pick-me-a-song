@@ -48,11 +48,6 @@ exports.updateUserProfile = function (user, callback) {
         artistsIndex = db.collection(COLLECTION_ARTISTS_INDEX),
         tracksIndex = db.collection(COLLECTION_TRACKS_INDEX);
 
-    _.each(user.tracks, function (track) {
-        artistsIndex.update({ artist: track.artist.name }, { $addToSet: { users: user.name }}, { upsert: true }, _.noop);
-        tracksIndex.update({ track: track.name }, { $addToSet: { users: user.name }}, { upsert: true }, _.noop);
-    });
-
     users.update({ user: user.name }, { $pushAll: { tracks: user.tracks }}, { upsert: true }, function (err, result) {
         users.findOne({ user: user.name }, function (err, user) {
             var averagePlaycount = _.reduce(user.tracks, function (memo, track) {
@@ -60,6 +55,11 @@ exports.updateUserProfile = function (user, callback) {
             }, 0) / user.tracks.length;
 
             users.update({ user: user.user }, { $set: {averagePlaycount : averagePlaycount }}, callback);
+
+            _.each(user.tracks, function (track) {
+                artistsIndex.update({ artist: track.artist.name }, { $addToSet: { users: user._id }}, { upsert: true }, _.noop);
+                tracksIndex.update({ track: track.name }, { $addToSet: { users: user._id }}, { upsert: true }, _.noop);
+            });
         });
     });
 };
