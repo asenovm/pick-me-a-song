@@ -2,7 +2,7 @@
     "apiKey": "5a566b0690f3dcf4958d5bc8bd329e75",
     "secret": "dd065bd63db2120407e869d2641fc693",
     "userAgent": "pick-me-a-song",
-    "crawlRoot": "DwarfeD_NL",
+    "crawlRoot": "TheArtistBox",
     "startPage": 1,
     "endPage": 2,
     "itemsPerPage": 50

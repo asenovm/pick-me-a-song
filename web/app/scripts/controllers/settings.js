@@ -10,6 +10,9 @@ angular.module('pickMeASong')
     };
 
     $scope.setCollaborativeFilteringUsed = function (value) {
+        $scope.$apply(function () {
+            $scope.isCollaborativeFilteringUsed = value;
+        });
         recommendationsService.setCollaborativeFilteringUsed(value);
     };
 
