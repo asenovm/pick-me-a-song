@@ -45,7 +45,8 @@ angular.module('pickMeASong')
                 },
                 options: {
                     neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
-                    algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering'
+                    algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering',
+                    metricType: that.getArtistsUsed() ? 'artists' : 'tracks'
                 },
                 likedTracksPositions: likedTracksPositions,
                 recommendedTracks: recommendedTracks,
