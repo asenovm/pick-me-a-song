@@ -11,7 +11,7 @@ var express = require('express'),
     LIMIT_COUNT_ARTISTS = 15,
     METHOD_HEAD = "HEAD";
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '25mb'}));
 
 app.post('/recommendations', function (req, res) {
     var userProfile = req.body.userProfile,

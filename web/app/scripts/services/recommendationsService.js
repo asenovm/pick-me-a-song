@@ -29,10 +29,16 @@ angular.module('pickMeASong')
         $localStorage.set(KEY_USER_ID, id);
     };
 
-    this.fetchRecommendations = function (artists, likedTracks, recommendedTracks) {
+    this.fetchRecommendations = function (artists, ratedTracks, likedTracks, recommendedTracks) {
         var likedTracksPositions = _.map(likedTracks, function (track) {
-            return _.indexOf(recommendedTracks, track);
-        }), deferred = $q.defer(),
+                return _.indexOf(recommendedTracks, track);
+            }), deferred = $q.defer(),
+            tracks = _.map(ratedTracks, function (track) {
+                return {
+                    name: track.name,
+                    score: track.userValue
+                };
+            }),
             that = this;
 
         $http({
@@ -41,6 +47,7 @@ angular.module('pickMeASong')
             data: {
                 userProfile: {
                     artists: artists,
+                    tracks: tracks,
                     name: Date.now()
                 },
                 options: {

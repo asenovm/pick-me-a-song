@@ -25,7 +25,7 @@ angular.module('pickMeASong')
 
     $scope.getRecommendations = function () {
         $scope.isLoading = true;
-        recommendationsService.fetchRecommendations($scope.artists, $scope.likedTracks, $scope.tracksToRate).finally($scope.callback);
+        recommendationsService.fetchRecommendations($scope.artists, getRatedTracks($scope.tracksToRate), $scope.likedTracks, $scope.tracksToRate).finally($scope.callback);
     };
 
     $scope.setLoading = function () {
@@ -52,11 +52,10 @@ angular.module('pickMeASong')
     };
 
     $scope.submitRatedTracks = function () {
-        var ratedTracks = _.filter($scope.tracksToRate, function (track) {
-            return track.userValue;
-        }), ratedTracksUniqueArtists = _.uniq(ratedTracks, false, function (track) {
-            return track.artist.name;
-        });
+        var ratedTracks = getRatedTracks($scope.tracksToRate),
+            ratedTracksUniqueArtists = _.uniq(ratedTracks, false, function (track) {
+                return track.artist.name;
+            });
 
         $scope.likedTracks = _.filter(ratedTracks, function (track) {
             return track.userValue >= MIN_RATE_LIKED_ITEM;
@@ -87,6 +86,12 @@ angular.module('pickMeASong')
         }
 
     };
+
+    function getRatedTracks(tracks) {
+        return _.filter(tracks, function (track) {
+            return track.userValue;
+        });
+    }
 
     window.onFacebookLogin = recommendationsService.onFacebookLogin($scope.setLoading, $scope.showRecommendations);
 

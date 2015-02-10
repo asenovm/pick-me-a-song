@@ -169,3 +169,17 @@ exports.getTracksForTags = function (tags, callback) {
         });
     taggedTracks.find({ "tags.name": { $in: tagNames }}).toArray(callback);
 };
+
+exports.retrieveAllUsersForTracks = function (trackNames, callback) {
+    var tracksIndex = db.collection(COLLECTION_TRACKS_INDEX),
+        users = db.collection(COLLECTION_USERS);
+
+    tracksIndex.find({ track: { $in: trackNames }}, { users: 1}).toArray(function (err, tracks) {
+        var userIds = _.reduce(tracks, function (memo, track) {
+            return _.union(memo, track.users);
+        }, []);
+        users.find({ _id: { $in: userIds }}).toArray(function (err, users) {
+            callback(err, users);
+        });
+    });
+};

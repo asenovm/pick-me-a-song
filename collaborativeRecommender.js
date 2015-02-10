@@ -2,9 +2,35 @@ var _ = require('underscore'),
     db = require('./db'),
     recommenderUtil = require('./recommenderUtil'),
     COUNT_NEIGHBOURS_DEFAULT = 22,
-    THRESHOLD_COMMON_ARTISTS_COUNT = 10;
+    THRESHOLD_COMMON_ARTISTS_COUNT = 10,
+    METRIC_TYPE_ARTISTS = 'artists';
 
 exports.getRecommendations = function (userProfile, previousRecommendations, options, callback) {
+    if(options.metricType === METRIC_TYPE_ARTISTS) {
+        getRecommendationsFromArtists(userProfile, previousRecommendations, options, callback);
+    } else {
+        getRecommendationsFromTracks(userProfile, previousRecommendations, options, callback);
+    }
+
+}
+
+function getRecommendationsFromTracks(userProfile, previousRecommendations, options, callback) {
+    var trackNames = _.map(userProfile.tracks, function (track) {
+        return track.name;
+    });
+
+    db.retrieveAllUsersForTracks(trackNames, function (err, users) {
+        var averageScore = _.reduce(userProfile.tracks, function (memo, track) {
+            return memo + track.score;
+        }, 0) / userProfile.tracks.length;
+        _.each(users, function (user) {
+            var similarity = getTrackSimilarityForUser(user, userProfile.tracks, averageScore);
+            console.log('track similarity is ', similarity);
+        });
+    });
+}
+
+function getRecommendationsFromArtists(userProfile, previousRecommendations, options, callback) {
     var artistNames = _.map(userProfile.artists, function (artist) {
         return artist.name;
     });
@@ -83,6 +109,37 @@ function getNeighboursTrackScores(neighbours) {
         });
     });
     return trackScores;
+}
+
+function getTrackSimilarityForUser(user, tracks, tracksAverageScore) {
+    var userTrackNames = _.map(user.tracks, function (track) {
+            return track.name;
+        }), trackNames = _.map(tracks, function (track) {
+            return track.name;
+        }), commonTracks = _.intersection(userTrackNames, trackNames),
+        userTracks = _.indexBy(user.tracks, 'name'),
+        activeUserTracks = _.indexBy(tracks, 'name');
+
+    var nominator = 0,
+        userDenominator = 0,
+        activeUserDenominator = 0;
+    
+    _.each(commonTracks, function (track) {
+        var userPlaycount = parseInt(userTracks[track].playcount, 10);
+        console.log(userPlaycount, user.averagePlaycount, activeUserTracks, tracksAverageScore);
+        nominator += (userPlaycount - user.averagePlaycount) * (activeUserTracks[track].score - tracksAverageScore);
+        userDenominator += (userPlaycount - user.averagePlaycount) * (userPlaycount - user.averagePlaycount);
+        activeUserDenominator += (activeUserTracks[track].score - tracksAverageScore) * (activeUserTracks[track].score - tracksAverageScore);
+    });
+
+    userDenominator = Math.sqrt(userDenominator);
+    activeUserDenominator = Math.sqrt(activeUserDenominator);
+
+    if(userDenominator === 0 || activeUserDenominator === 0) {
+        return 0;
+    }
+
+    return nominator / (userDenominator * activeUserDenominator);
 }
 
 function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
