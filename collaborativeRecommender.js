@@ -131,30 +131,30 @@ function getNeighboursTrackScores(neighbours) {
 }
 
 function getTrackSimilarityForUser(user, tracks, tracksAverageScore) {
-    var userTrackNames = _.map(user.tracks, function (track) {
+    var currentUserTrackNames = _.map(user.tracks, function (track) {
             return track.name;
-        }), trackNames = _.map(tracks, function (track) {
+        }), activeUserTrackNames = _.map(tracks, function (track) {
             return track.name;
-        }), commonTracks = _.intersection(userTrackNames, trackNames),
-        userTracks = _.indexBy(user.tracks, 'name'),
+        }), commonTrackNames = _.intersection(currentUserTrackNames, activeUserTrackNames),
+        currentUserTracks = _.indexBy(user.tracks, 'name'),
         activeUserTracks = _.indexBy(tracks, 'name');
 
     var nominator = 0,
-        userDenominator = 0,
+        currentUserDenominator = 0,
         activeUserDenominator = 0;
     
-    _.each(commonTracks, function (track) {
-        var userPlaycount = parseInt(userTracks[track].playcount, 10);
-        nominator += (userPlaycount - user.averagePlaycount) * (activeUserTracks[track].score - tracksAverageScore);
-        userDenominator += (userPlaycount - user.averagePlaycount) * (userPlaycount - user.averagePlaycount);
-        activeUserDenominator += (activeUserTracks[track].score - tracksAverageScore) * (activeUserTracks[track].score - tracksAverageScore);
+    _.each(commonTrackNames, function (name) {
+        var currentUserPlaycount = parseInt(currentUserTracks[name].playcount, 10);
+        nominator += (currentUserPlaycount - user.averagePlaycount) * (activeUserTracks[name].score - tracksAverageScore);
+        currentUserDenominator += (currentUserPlaycount - user.averagePlaycount) * (currentUserPlaycount - user.averagePlaycount);
+        activeUserDenominator += (activeUserTracks[name].score - tracksAverageScore) * (activeUserTracks[name].score - tracksAverageScore);
     });
 
-    if(userDenominator === 0 || activeUserDenominator === 0) {
+    if(currentUserDenominator === 0 || activeUserDenominator === 0) {
         return 0;
     }
 
-    return (nominator / Math.sqrt(userDenominator * activeUserDenominator)) * Math.min(commonTracks.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
+    return (nominator / Math.sqrt(currentUserDenominator * activeUserDenominator)) * Math.min(commonTrackNames.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
 }
 
 function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
