@@ -97,7 +97,7 @@ angular.module('pickMeASong')
                     score: SCORE_ARTIST_DEFAULT
                 };
             });
-            that.fetchRecommendations(likes, [], []).finally(recommendationsFetchedCallback);
+            that.fetchRecommendations(likes, [], [], []).finally(recommendationsFetchedCallback);
         });
     };
 
@@ -114,15 +114,21 @@ angular.module('pickMeASong')
                                 score: artist.playcount
                             };
                         });
-                        that.fetchRecommendations(artists, [], []).finally(recommendationsFetchedCallback);
+                        lastFm.user.getTopTracks({ user: user, limit: LIMIT_COUNT_ARTISTS }, {
+                            success: function (data) {
+                                that.fetchRecommendations(artists, data.toptracks.track, [], []).finally(recommendationsFetchedCallback);
+                            }, error: function (code, message) {
+                                that.fetchRecommendations(artists, [], [], []).finally(recommendationsFetchedCallback);
+                            }
+                        });
                     }, error: function (code, message) {
-                        that.fetchRecommendations([], [], []).finally(recommendationsFetchedCallback);
+                        that.fetchRecommendations([], [], [], []).finally(recommendationsFetchedCallback);
                     }
                 });
             },
             error: function (code, message) {
                 that.saveUserId("client-generated-" + Date.now());
-                that.fetchRecommendations([], [], []).finally(recommendationsFetchedCallback);
+                that.fetchRecommendations([], [], [], []).finally(recommendationsFetchedCallback);
             }
         });
     };
