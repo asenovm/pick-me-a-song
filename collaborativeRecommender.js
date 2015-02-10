@@ -31,12 +31,13 @@ function getRecommendationsFromTracks(userProfile, previousRecommendations, opti
                 user.similarity = getTrackSimilarityForUser(user, userProfile.tracks, averageScore);
             });
 
-            var recommendedTracks = getRecommendedTracks({ 
+            var activeUser = { 
                     neighboursCount: options.neighboursCount,
                     name: userProfile.name,
                     averageScore: averageScore
-                }, users, previousRecommendations);
-            callback(err, recommendedTracks);
+                };
+
+            callback(err, getRecommendedTracks(activeUser, users, previousRecommendations));
         }
     });
 }
@@ -144,20 +145,16 @@ function getTrackSimilarityForUser(user, tracks, tracksAverageScore) {
     
     _.each(commonTracks, function (track) {
         var userPlaycount = parseInt(userTracks[track].playcount, 10);
-        console.log(userPlaycount, user.averagePlaycount, activeUserTracks, tracksAverageScore);
         nominator += (userPlaycount - user.averagePlaycount) * (activeUserTracks[track].score - tracksAverageScore);
         userDenominator += (userPlaycount - user.averagePlaycount) * (userPlaycount - user.averagePlaycount);
         activeUserDenominator += (activeUserTracks[track].score - tracksAverageScore) * (activeUserTracks[track].score - tracksAverageScore);
     });
 
-    userDenominator = Math.sqrt(userDenominator);
-    activeUserDenominator = Math.sqrt(activeUserDenominator);
-
     if(userDenominator === 0 || activeUserDenominator === 0) {
         return 0;
     }
 
-    return (nominator / (userDenominator * activeUserDenominator)) * Math.min(commonTracks.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
+    return (nominator / Math.sqrt(userDenominator * activeUserDenominator)) * Math.min(commonTracks.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
 }
 
 function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
