@@ -15,7 +15,7 @@ var mongo = require('mongodb'),
     COLLECTION_TRACKS_INDEX = 'tracksIndex',
     FILE_TOP_TRACKS = 'topTracks.json',
     NUMBER_TRACKS_TO_RATE = 15,
-    NUMBER_USERS_FOR_EVALUATION = 200;
+    NUMBER_USERS_FOR_EVALUATION = 2500;
 
 MongoClient.connect(config.dbURL, function (err, dbInstance) {
     db = dbInstance;

@@ -13,7 +13,7 @@ angular.module('pickMeASong')
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
     var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
-    var LIMIT_COUNT_ARTISTS = 8;
+    var LIMIT_COUNT_ARTISTS = 15;
 
     this.getRecommendations = function () {
         return recommendations;
