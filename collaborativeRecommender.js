@@ -3,13 +3,14 @@ var _ = require('underscore'),
     recommenderUtil = require('./recommenderUtil'),
     COUNT_NEIGHBOURS_DEFAULT = 22,
     THRESHOLD_COMMON_ARTISTS_COUNT = 10,
-    METRIC_TYPE_ARTISTS = 'artists';
+    METRIC_TYPE_ARTISTS = 'artists',
+    METRIC_TYPE_TRACKS = 'tracks';
 
 exports.getRecommendations = function (userProfile, previousRecommendations, options, callback) {
-    if(options.metricType === METRIC_TYPE_ARTISTS) {
-        getRecommendationsFromArtists(userProfile, previousRecommendations, options, callback);
-    } else {
+    if(options.metricType === METRIC_TYPE_TRACKS) {
         getRecommendationsFromTracks(userProfile, previousRecommendations, options, callback);
+    } else {
+        getRecommendationsFromArtists(userProfile, previousRecommendations, options, callback);
     }
 
 };

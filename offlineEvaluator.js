@@ -4,14 +4,14 @@ var _ = require('underscore'),
     contentBasedRecommender = require('./contentBasedRecommender'),
     evaluator = require('./evaluator'),
     async = require('async'),
-    LENGTH_SET_MIN = 20,
-    LENGTH_TRAINING_SET = 12;
+    LENGTH_SET_MIN = 50,
+    LENGTH_TRAINING_SET = 30;
 
-startContentBasedEvaluation();
+startCollaborativeEvaluation();
 
 function startCollaborativeEvaluation() {
     startOfflineEvaluation(function (userProfile, previousRecommendations, callback) {
-        collaborativeRecommender.getRecommendations(userProfile, previousRecommendations, {}, callback);
+        collaborativeRecommender.getRecommendations(userProfile, previousRecommendations, { metricType: 'tracks', neighboursCount: 32 }, callback);
     });
 }
 
@@ -45,7 +45,7 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                 trainingSet = _.first(evaluationSet, LENGTH_TRAINING_SET),
                 validationSet = _.last(evaluationSet, evaluationSet.length - trainingSet.length),
                 artists = {},
-                userProfile = { name: user.name, artists: [] };
+                userProfile = { name: user.name, artists: [], tracks: trainingSet };
 
             _.each(trainingSet, function (track) {
                 artists[track.artist.name] = artists[track.artist.name] || 0;
