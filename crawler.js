@@ -10,9 +10,9 @@ var fs = require('fs'),
     }),
     NUMBER_TAGS_CRAWLED = 5;
 
-startCrawlingUsers();
+//startCrawlingUsers();
 //startCrawlingSongTags();
-//startCrawlingArtistTags();
+startCrawlingArtistTags();
 
 function insertArtistWithTags(artist, tags) {
     artist.tags = _.filter(tags, function (tag) {
@@ -28,6 +28,7 @@ function startCrawlingArtistTags() {
 }
 
 function crawlArtistTags(artists) {
+    var nextArtists = [];
     async.eachLimit(artists, 5, function (artist, artistsCallback) {
         lastfm.artist.getTopTags({ artist: artist.artist.name }, function (err, tags) {
             insertArtistWithTags(artist.artist, tags.tag);
@@ -47,11 +48,11 @@ function crawlArtistTags(artists) {
                                             insertArtistWithTags(artist, tags.tag);
                                         }
                                     });
-                                    tagCallback();
                                 }
+                                tagCallback();
                             });
                         });
-                        crawlArtistTags(artists);
+                        nextArtists = _.union(nextArtists, artists);
                     }
                 });
             }, function (err) {
@@ -59,7 +60,7 @@ function crawlArtistTags(artists) {
             });
         });
     }, function (err) {
-        console.log('done');
+        crawlArtistTags(nextArtists);
     });
 }
 
@@ -70,29 +71,34 @@ function startCrawlingSongTags() {
 }
 
 function crawlTracksForTags(tags) {
-    _.each(tags, function (tag) {
+    var nextTags = [];
+    async.eachSeries(tags, function (tag, callback) {
         lastfm.tag.getTopTracks({ tag: tag.name }, function (err, result) {
             if (err || !result) {
                 console.log('tag get top tracks err is ', err);
             } else {
                 var tracks = result.track;
+
                 _.each(tracks, function (track) {
                     lastfm.track.getTopTags({ track: track.name, artist: track.artist.name }, function (err, result) {
                         if(err || !result) {
                             console.log('track get top tags err is ', err);
                         } else {
                             track.tags = result.tag;
-                            crawlTracksForTags(track.tags);
                             db.hasTrack(track, function (err, result) {
                                 if(err || !result) {
                                     db.insertTrackTags(track, _.noop);
                                 }
                             });
+                            nextTags = _.union(nextTags, track.tags);
                         }
+                        callback(err, result);
                     });
                 });
             }
         });
+    }, function (err) {
+        crawlTracksForTags(nextTags);
     });
 }
 
