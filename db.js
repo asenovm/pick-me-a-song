@@ -78,6 +78,16 @@ exports.hasUser = function (user, callback) {
     users.findOne({ user: user }, callback);
 };
 
+exports.hasTrack = function (track, callback) {
+    var taggedTracks = db.collection(COLLECTION_TAGGED_TRACKS);
+    taggedTracks.findOne({ name: track.name}, callback);
+};
+
+exports.hasArtist = function (artist, callback) {
+    var taggedArtists = db.collection(COLLECTION_TAGGED_ARTISTS);
+    taggedArtists.findOne({ name: artist.name }, callback);
+};
+
 exports.writeEvaluationMetrics = function (userId, metrics, callback) {
     var evaluation = db.collection(COLLECTION_EVALUATION);
     evaluation.insert({ userId: userId, metrics: metrics }, callback);

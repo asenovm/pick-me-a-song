@@ -1,6 +1,4 @@
 var fs = require('fs'),
-    express = require('express'),
-    app = express(),
     config = JSON.parse(fs.readFileSync('config.json')),
     LastfmAPI = require('lastfmapi'),
     _ = require('underscore'),
@@ -25,58 +23,75 @@ function insertArtistWithTags(artist, tags) {
 
 function startCrawlingArtistTags() {
     db.getInitialArtists(function (err, artists) {
-        async.eachLimit(artists, 5, function (artist, artistsCallback) {
-            lastfm.artist.getTopTags({ artist: artist.artist.name }, function (err, tags) {
-                insertArtistWithTags(artist.artist, tags.tag);
-                async.eachLimit(tags.tag, 5, function (tag, tagCallback) {
-                    lastfm.tag.getTopArtists({ tag: tag.name }, function (err, tagArtists) {
-                        if(err || !tagArtists) {
-                            console.log('error retrieving top artists for tag');
-                        } else {
-                            var artists = tagArtists.artist;
-                            _.each(artists, function (artist) {
-                                lastfm.artist.getTopTags({ artist: artist.name }, function (err, tags) {
-                                    if(err || !tags) {
-                                        console.log('error retrieving top tags for artist');
-                                    } else {
-                                        insertArtistWithTags(artist, tags.tag);
-                                        tagCallback();
-                                    }
-                                });
+        crawlArtistTags(artists);
+    });
+}
+
+function crawlArtistTags(artists) {
+    async.eachLimit(artists, 5, function (artist, artistsCallback) {
+        lastfm.artist.getTopTags({ artist: artist.artist.name }, function (err, tags) {
+            insertArtistWithTags(artist.artist, tags.tag);
+            async.eachLimit(tags.tag, 5, function (tag, tagCallback) {
+                lastfm.tag.getTopArtists({ tag: tag.name }, function (err, tagArtists) {
+                    if(err || !tagArtists) {
+                        console.log('error retrieving top artists for tag');
+                    } else {
+                        var artists = tagArtists.artist;
+                        _.each(artists, function (artist) {
+                            lastfm.artist.getTopTags({ artist: artist.name }, function (err, tags) {
+                                if(err || !tags) {
+                                    console.log('error retrieving top tags for artist');
+                                } else {
+                                    db.hasArtist(artist, function (err, result) {
+                                        if(err || !result) {
+                                            insertArtistWithTags(artist, tags.tag);
+                                        }
+                                    });
+                                    tagCallback();
+                                }
                             });
-                        }
-                    });
-                }, function (err) {
-                    artistsCallback(err);
+                        });
+                        crawlArtistTags(artists);
+                    }
                 });
+            }, function (err) {
+                artistsCallback(err);
             });
-        }, function (err) {
-            console.log('done');
         });
+    }, function (err) {
+        console.log('done');
     });
 }
 
 function startCrawlingSongTags() {
-    //only crawl 1 level down
     db.getInitialTags(function (err, tags) {
-        _.each(tags, function (tag) {
-            lastfm.tag.getTopTracks({ tag: tag.name }, function (err, result) {
-                if (err || !result) {
-                    console.log('tag get top tracks err is ', err);
-                } else {
-                    var tracks = result.track;
-                    _.each(tracks, function (track) {
-                        lastfm.track.getTopTags({ track: track.name, artist: track.artist.name }, function (err, result) {
-                            if(err || !result) {
-                                console.log('track get top tags err is ', err);
-                            } else {
-                                track.tags = result.tag;
-                                db.insertTrackTags(track, _.noop);
-                            }
-                        });
+        crawlTracksForTags(tags);
+    });
+}
+
+function crawlTracksForTags(tags) {
+    _.each(tags, function (tag) {
+        lastfm.tag.getTopTracks({ tag: tag.name }, function (err, result) {
+            if (err || !result) {
+                console.log('tag get top tracks err is ', err);
+            } else {
+                var tracks = result.track;
+                _.each(tracks, function (track) {
+                    lastfm.track.getTopTags({ track: track.name, artist: track.artist.name }, function (err, result) {
+                        if(err || !result) {
+                            console.log('track get top tags err is ', err);
+                        } else {
+                            track.tags = result.tag;
+                            crawlTracksForTags(track.tags);
+                            db.hasTrack(track, function (err, result) {
+                                if(err || !result) {
+                                    db.insertTrackTags(track, _.noop);
+                                }
+                            });
+                        }
                     });
-                }
-            });
+                });
+            }
         });
     });
 }
@@ -126,5 +141,3 @@ function visitNode (user, page, totalPages) {
         }
     });
 }
-
-app.listen(process.env.PORT || 3067);
