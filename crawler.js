@@ -144,7 +144,7 @@ function crawlUser(user) {
 }
 
 function visitNode (user, page, totalPages) {
-    if (page > totalPages || page > config.endPage) {
+    if (page > totalPages || page >= config.endPage) {
         return;
     }
 
