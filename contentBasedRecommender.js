@@ -9,9 +9,7 @@ exports.getRecommendations = function (userInfo, previousRecommendations, option
         if(err) {
             callback(err, []);
         } else {
-            var tags = [],
-                userDocument = {},
-                userProfile = getUserProfile(userInfo, taggedArtists);
+            var userProfile = getUserProfile(userInfo, taggedArtists);
 
             db.getTracksForTags(userProfile.tags, function (err, tracks) {
                 _.each(tracks, function (track) {
