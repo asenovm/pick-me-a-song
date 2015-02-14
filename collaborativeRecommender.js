@@ -18,36 +18,26 @@ exports.getRecommendations = function (userProfile, previousRecommendations, opt
 function getRecommendationsFromTracks(userProfile, previousRecommendations, options, callback) {
     var trackNames = _.map(userProfile.tracks, function (track) {
         return track.name;
-    });
-
-    db.retrieveAllUsersForTracks(trackNames, function (err, users) {
-        if(err) {
-            callback(err, []);
-        } else {
-            var activeUser = getUserProfile(userProfile, options, 'tracks');
-            callback(err, getRecommendations(users, activeUser, previousRecommendations, getTrackSimilarityForUser));
-        }
-    });
-}
+    }), activeUser = getUserProfile(userProfile, options, 'tracks');
+    db.retrieveAllUsersForTracks(trackNames, fetchAndSendRecommendations(activeUser, previousRecommendations, getTrackSimilarityForUser, callback));
+};
 
 function getRecommendationsFromArtists(userProfile, previousRecommendations, options, callback) {
     var artistNames = _.map(userProfile.artists, function (artist) {
         return artist.name;
-    });
+    }), activeUser = getUserProfile(userProfile, options, 'artists');
 
-    db.retrieveAllUsersForArtists(artistNames, function (err, users) {
-        var recommendedTracks = [];
+    db.retrieveAllUsersForArtists(artistNames, fetchAndSendRecommendations(activeUser, previousRecommendations, getArtistSimilarityForUser, callback));
+}
 
+function fetchAndSendRecommendations(activeUser, previousRecommendations, similarityFunc, callback) {
+    return function (err, users) {
         if(err) {
-            console.log('an error occurred');
-            console.dir(err);
+            callback(err, []);
         } else {
-            var activeUser = getUserProfile(userProfile, options, 'artists');
-            recommendedTracks = getRecommendations(users, activeUser, previousRecommendations, getArtistSimilarityForUser);
+            callback(err, getRecommendations(users, activeUser, previousRecommendations, similarityFunc));
         }
-
-        callback(err, recommendedTracks);
-    });
+    };
 }
 
 function getUserProfile(user, options, model) {
