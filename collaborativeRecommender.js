@@ -24,13 +24,7 @@ function getRecommendationsFromTracks(userProfile, previousRecommendations, opti
         if(err) {
             callback(err, []);
         } else {
-            var activeUser = {
-                    neighboursCount: options.neighboursCount,
-                    name: userProfile.name,
-                    tracks: userProfile.tracks,
-                    averageScore: getAverageScore(userProfile, 'tracks')
-                };
-
+            var activeUser = getUserProfile(userProfile, options, 'tracks');
             callback(err, getRecommendations(users, activeUser, previousRecommendations, getTrackSimilarityForUser));
         }
     });
@@ -48,19 +42,27 @@ function getRecommendationsFromArtists(userProfile, previousRecommendations, opt
             console.log('an error occurred');
             console.dir(err);
         } else {
-            var activeUser = {
-                    name: userProfile.name,
-                    averageScore: getAverageScore(userProfile, 'artists'),
-                    artists: _.indexBy(userProfile.artists, 'name'),
-                    artistNames: artistNames,
-                    neighboursCount: options.neighboursCount
-                };
-                
+            var activeUser = getUserProfile(userProfile, options, 'artists');
             recommendedTracks = getRecommendations(users, activeUser, previousRecommendations, getArtistSimilarityForUser);
         }
 
         callback(err, recommendedTracks);
     });
+}
+
+function getUserProfile(user, options, model) {
+    var artistNames = _.map(user.artists, function (artist) {
+        return artist.name;
+    });
+
+    return {
+        name: user.name,
+        averageScore: getAverageScore(user, model),
+        artists: _.indexBy(user.artists, 'name'),
+        tracks: user.tracks,
+        artistNames: artistNames,
+        neighboursCount: options.neighboursCount
+    };
 }
 
 function getRecommendations(users, activeUser, previousRecommendations, similarityFunc) {
