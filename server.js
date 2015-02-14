@@ -8,7 +8,7 @@ var express = require('express'),
     evaluator = require('./evaluator'),
     db = require('./db'),
     app = express(),
-    LIMIT_COUNT_ARTISTS = 15,
+    LIMIT_COUNT_ARTISTS = 70,
     METHOD_HEAD = "HEAD";
 
 app.use(bodyParser.json({ limit: '25mb'}));

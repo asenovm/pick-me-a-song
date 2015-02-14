@@ -75,7 +75,8 @@ angular.module('pickMeASong')
 
                 return {
                     name: track.artist.name,
-                    score: artistTotalValue / artistTotalRatings
+                    score: artistTotalValue / artistTotalRatings,
+                    count: artistTotalRatings
                 };
             });
 

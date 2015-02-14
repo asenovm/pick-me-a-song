@@ -94,7 +94,8 @@ angular.module('pickMeASong')
             var likes = _.map(response.data, function (artist) {
                 return {
                     name: artist.name,
-                    score: SCORE_ARTIST_DEFAULT
+                    score: SCORE_ARTIST_DEFAULT,
+                    count: 1
                 };
             });
             that.fetchRecommendations(likes, [], [], []).finally(recommendationsFetchedCallback);
@@ -111,7 +112,8 @@ angular.module('pickMeASong')
                         var artists = _.map(data.topartists.artist, function (artist) {
                             return {
                                 name: artist.name,
-                                score: artist.playcount
+                                score: artist.playcount,
+                                count: 1
                             };
                         });
                         lastFm.user.getTopTracks({ user: user, limit: LIMIT_COUNT_ARTISTS }, {

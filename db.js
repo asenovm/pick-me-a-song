@@ -139,7 +139,38 @@ exports.getInitialArtists = function (callback) {
 
 exports.updateUserArtists = function (userId, artists, callback) {
     var userArtists = db.collection(COLLECTION_USER_ARTISTS);
-    userArtists.update({ userId: userId }, { $pushAll: { artists: artists }}, { upsert: true }, callback);
+    userArtists.findOne({ userId: userId }, function (err, result) {
+        if(err || !result) {
+            userArtists.update({ userId: userId }, { $set: { artists: artists }}, { upsert: true }, callback);
+        } else {
+            var uniqueArtists = _.union(artists, result.artists || []),
+                resultIndex = _.indexBy(result.artists, 'name'),
+                artistsIndex = _.indexBy(artists, 'name');
+
+            uniqueArtists = _.uniq(uniqueArtists, false, function (artist) {
+                return artist.name;
+            });
+
+            _.each(uniqueArtists, function (artist) {
+                var score = 0,
+                    count = 0;
+
+                if(resultIndex[artist.name]) {
+                    score += resultIndex[artist.name].score * resultIndex[artist.name].count;
+                    count += resultIndex[artist.name].count;
+                }
+                if(artistsIndex[artist.name]) {
+                    score += artistsIndex[artist.name].score * artistsIndex[artist.name].count;
+                    count += artistsIndex[artist.name].count;
+                }
+
+                artist.score = score / count;
+                artist.count = count;
+            });
+
+            userArtists.update({ userId: userId }, { $set: { artists: uniqueArtists }}, { upsert: true }, callback);
+        }
+    });
 };
 
 exports.retrieveUserArtists = function (userId, callback) {
