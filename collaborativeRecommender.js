@@ -24,19 +24,16 @@ function getRecommendationsFromTracks(userProfile, previousRecommendations, opti
         if(err) {
             callback(err, []);
         } else {
-            var averageScore = _.reduce(userProfile.tracks, function (memo, track) {
-                return memo + track.score;
-            }, 0) / userProfile.tracks.length;
-
-            _.each(users, function (user) {
-                user.similarity = getTrackSimilarityForUser(user, userProfile.tracks, averageScore);
-            });
-
-            var activeUser = { 
+            var activeUser = {
                     neighboursCount: options.neighboursCount,
                     name: userProfile.name,
-                    averageScore: averageScore
+                    tracks: userProfile.tracks,
+                    averageScore: getAverageScore(userProfile, 'tracks')
                 };
+
+            _.each(users, function (user) {
+                user.similarity = getTrackSimilarityForUser(user, activeUser);
+            });
 
             callback(err, getRecommendedTracks(activeUser, users, previousRecommendations));
         }
@@ -55,19 +52,16 @@ function getRecommendationsFromArtists(userProfile, previousRecommendations, opt
             console.log('an error occurred');
             console.dir(err);
         } else {
-            var userAverageScore = getUserAverageScore(userProfile),
-                artists = _.indexBy(userProfile.artists, 'name'),
-                predictedRatings = [],
-                activeUser = {
+            var activeUser = {
                     name: userProfile.name,
-                    averageScore: userAverageScore,
-                    artists: artists,
+                    averageScore: getAverageScore(userProfile, 'artists'),
+                    artists: _.indexBy(userProfile.artists, 'name'),
                     artistNames: artistNames,
                     neighboursCount: options.neighboursCount
                 };
                 
             _.each(users, function (user) {
-                user.similarity = getSimilarityForUser(user, activeUser.artists, activeUser.averageScore, activeUser.artistNames);
+                user.similarity = getArtistSimilarityForUser(user, activeUser);
             });
 
             recommendedTracks = getRecommendedTracks(activeUser, users, previousRecommendations);
@@ -75,6 +69,12 @@ function getRecommendationsFromArtists(userProfile, previousRecommendations, opt
 
         callback(err, recommendedTracks);
     });
+}
+
+function getAverageScore(userProfile, model) {
+    return _.reduce(userProfile[model], function (memo, item) {
+        return memo + item.score;
+    }, 0) / userProfile[model].length;
 }
 
 function getRecommendedTracks(activeUser, users, previousRecommendations) {
@@ -107,12 +107,6 @@ function getUserNeighbours(activeUser, users) {
     }), activeUser.neighboursCount || COUNT_NEIGHBOURS_DEFAULT);
 }
 
-function getUserAverageScore(user) {
-    return  _.reduce(user.artists, function (memo, artist) {
-        return memo + artist.score;
-    }, 0) / user.artists.length;
-}
-
 function getNeighboursTrackScores(neighbours) {
     var trackScores = {};
     _.each(neighbours, function (user, index) {
@@ -131,14 +125,14 @@ function getNeighboursTrackScores(neighbours) {
     return trackScores;
 }
 
-function getTrackSimilarityForUser(user, tracks, tracksAverageScore) {
+function getTrackSimilarityForUser(user, activeUser) {
     var currentUserTrackNames = _.map(user.tracks, function (track) {
             return track.name;
-        }), activeUserTrackNames = _.map(tracks, function (track) {
+        }), activeUserTrackNames = _.map(activeUser.tracks, function (track) {
             return track.name;
         }), commonTrackNames = _.intersection(currentUserTrackNames, activeUserTrackNames),
         currentUserTracks = _.indexBy(user.tracks, 'name'),
-        activeUserTracks = _.indexBy(tracks, 'name');
+        activeUserTracks = _.indexBy(activeUser.tracks, 'name');
 
     var nominator = 0,
         currentUserDenominator = 0,
@@ -146,9 +140,9 @@ function getTrackSimilarityForUser(user, tracks, tracksAverageScore) {
     
     _.each(commonTrackNames, function (name) {
         var currentUserPlaycount = parseInt(currentUserTracks[name].playcount, 10);
-        nominator += (currentUserPlaycount - user.averagePlaycount) * (activeUserTracks[name].score - tracksAverageScore);
+        nominator += (currentUserPlaycount - user.averagePlaycount) * (activeUserTracks[name].score - activeUser.averageScore);
         currentUserDenominator += (currentUserPlaycount - user.averagePlaycount) * (currentUserPlaycount - user.averagePlaycount);
-        activeUserDenominator += (activeUserTracks[name].score - tracksAverageScore) * (activeUserTracks[name].score - tracksAverageScore);
+        activeUserDenominator += (activeUserTracks[name].score - activeUser.averageScore) * (activeUserTracks[name].score - activeUser.averageScore);
     });
 
     if(currentUserDenominator === 0 || activeUserDenominator === 0) {
@@ -158,7 +152,7 @@ function getTrackSimilarityForUser(user, tracks, tracksAverageScore) {
     return (nominator / Math.sqrt(currentUserDenominator * activeUserDenominator)) * Math.min(commonTrackNames.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
 }
 
-function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) {
+function getArtistSimilarityForUser(user, activeUser) {
     var playCountsPerArtist = {},
         userTotalScore = 0,
         userScoreCount = 0,
@@ -172,7 +166,7 @@ function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) 
     });
 
     var userArtistsNames = _.keys(playCountsPerArtist),
-        commonArtistsNames = _.intersection(artistsNames, userArtistsNames),
+        commonArtistsNames = _.intersection(activeUser.artistNames, userArtistsNames),
         userAverageScore = userTotalScore / userArtistsNames.length,
         nominator = 0,
         userDenominator = 0,
@@ -181,7 +175,7 @@ function getSimilarityForUser(user, artists, artistsAverageScore, artistsNames) 
 
     _.each(commonArtistsNames, function (name) {
         var userScore = playCountsPerArtist[name] - userAverageScore,
-            artistScore = artists[name].score - artistsAverageScore;
+            artistScore = activeUser.artists[name].score - activeUser.averageScore;
 
         nominator += userScore * artistScore;
         userDenominator += userScore * userScore;
