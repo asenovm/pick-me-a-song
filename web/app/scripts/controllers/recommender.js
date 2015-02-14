@@ -17,16 +17,16 @@ angular.module('pickMeASong')
     };
 
     if ($location.path().indexOf(PATH_RATE_ITEMS) >= 0) {
-        $scope.tracksToRate = recommendationsService.getTracksToRate();
+        $scope.recommendations = recommendationsService.getTracksToRate();
         $scope.callback = $scope.showRecommendations;
     } else {
-        $scope.tracksToRate = recommendationsService.getRecommendations();
+        $scope.recommendations = recommendationsService.getRecommendations();
         $scope.callback = $route.reload;
     }
 
     $scope.getRecommendations = function () {
         $scope.isLoading = true;
-        recommendationsService.fetchRecommendations($scope.artists, getRatedTracks($scope.tracksToRate), $scope.likedTracks, $scope.tracksToRate).finally($scope.callback);
+        recommendationsService.fetchRecommendations($scope.artists, getRatedTracks($scope.recommendations), $scope.likedTracks, $scope.recommendations).finally($scope.callback);
     };
 
     $scope.setLoading = function () {
@@ -48,12 +48,12 @@ angular.module('pickMeASong')
     $scope.rateItems = function () {
         recommendationsService.fetchTracksToRate(function (tracks) {
             $location.path(PATH_RATE_ITEMS);
-            $scope.tracksToRate = tracks;
+            $scope.recommendations = tracks;
         });
     };
 
     $scope.submitRatedTracks = function () {
-        var ratedTracks = getRatedTracks($scope.tracksToRate),
+        var ratedTracks = getRatedTracks($scope.recommendations),
             ratedTracksUniqueArtists = _.uniq(ratedTracks, false, function (track) {
                 return track.artist.name;
             });
