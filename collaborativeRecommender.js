@@ -6,26 +6,26 @@ var _ = require('underscore'),
     METRIC_TYPE_ARTISTS = 'artists',
     METRIC_TYPE_TRACKS = 'tracks';
 
-exports.getRecommendations = function (userProfile, previousRecommendations, options, callback) {
+exports.getRecommendations = function (user, previousRecommendations, options, callback) {
     if(options.metricType === METRIC_TYPE_TRACKS) {
-        getRecommendationsFromTracks(userProfile, previousRecommendations, options, callback);
+        getRecommendationsFromTracks(user, previousRecommendations, options, callback);
     } else {
-        getRecommendationsFromArtists(userProfile, previousRecommendations, options, callback);
+        getRecommendationsFromArtists(user, previousRecommendations, options, callback);
     }
 
 };
 
-function getRecommendationsFromTracks(userProfile, previousRecommendations, options, callback) {
-    var trackNames = _.map(userProfile.tracks, function (track) {
+function getRecommendationsFromTracks(user, previousRecommendations, options, callback) {
+    var trackNames = _.map(user.tracks, function (track) {
         return track.name;
-    }), activeUser = getUserProfile(userProfile, options, 'tracks');
+    }), activeUser = getUserProfile(user, options, 'tracks');
     db.retrieveAllUsersForTracks(trackNames, fetchAndSendRecommendations(activeUser, previousRecommendations, getTrackSimilarityForUser, callback));
 };
 
-function getRecommendationsFromArtists(userProfile, previousRecommendations, options, callback) {
-    var artistNames = _.map(userProfile.artists, function (artist) {
+function getRecommendationsFromArtists(user, previousRecommendations, options, callback) {
+    var artistNames = _.map(user.artists, function (artist) {
         return artist.name;
-    }), activeUser = getUserProfile(userProfile, options, 'artists');
+    }), activeUser = getUserProfile(user, options, 'artists');
 
     db.retrieveAllUsersForArtists(artistNames, fetchAndSendRecommendations(activeUser, previousRecommendations, getArtistSimilarityForUser, callback));
 }
@@ -85,10 +85,10 @@ function getRecommendedTracks(activeUser, users, previousRecommendations) {
     return recommenderUtil.getRecommendationsFromPredictions(predictedRatings, previousRecommendations);
 }
 
-function getAverageScore(userProfile, model) {
-    return _.reduce(userProfile[model], function (memo, item) {
+function getAverageScore(user, model) {
+    return _.reduce(user[model], function (memo, item) {
         return memo + item.score;
-    }, 0) / userProfile[model].length;
+    }, 0) / user[model].length;
 }
 
 function getUserNeighbours(activeUser, users) {
