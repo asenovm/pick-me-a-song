@@ -18,10 +18,19 @@ angular.module('pickMeASong')
     var METRIC_TYPE_ARTISTS = 'artists';
     var METRIC_TYPE_TRACKS = 'tracks';
 
+    var ENDPOINT_TRACKS_TO_RATE = '/tracksToRate';
+    var ENDPOINT_RECOMMENDATIONS = '/recommendations';
+    var ENDPOINT_FACEBOOK_MUSIC = '/me/music?limit=';
+
+    var METHOD_TYPE_GET = 'GET';
+    var METHOD_TYPE_POST = 'POST';
+
+    var STATUS_CONNECTED = 'connected';
+    var LIMIT_COUNT_ARTISTS = 15;
+
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
     var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
-    var LIMIT_COUNT_ARTISTS = 15;
 
     this.getRecommendations = function () {
         return recommendations;
@@ -50,8 +59,8 @@ angular.module('pickMeASong')
             that = this;
 
         $http({
-            url: '/recommendations',
-            method: 'POST',
+            url: ENDPOINT_RECOMMENDATIONS,
+            method: METHOD_TYPE_POST,
             data: {
                 userProfile: {
                     artists: artists,
@@ -88,7 +97,7 @@ angular.module('pickMeASong')
     this.onFacebookLogin = function (loginSuccessfulCallback, recommendationsFetchedCallback) {
         var that = this;
         return function (response) {
-            if(response.status === "connected") {
+            if(response.status === STATUS_CONNECTED) {
                 loginSuccessfulCallback();
                 that.saveUserId(response.authResponse.userID);
                 that.fetchInfoFromFacebook(recommendationsFetchedCallback);
@@ -98,7 +107,7 @@ angular.module('pickMeASong')
 
     this.fetchInfoFromFacebook = function (recommendationsFetchedCallback) {
         var that = this;
-        FB.api('/me/music?limit=' + LIMIT_COUNT_ARTISTS, function (response) {
+        FB.api(ENDPOINT_FACEBOOK_MUSIC + LIMIT_COUNT_ARTISTS, function (response) {
             var likes = _.map(response.data, function (artist) {
                 return {
                     name: artist.name,
@@ -160,8 +169,8 @@ angular.module('pickMeASong')
         var that = this;
 
         $http({
-            url: '/tracksToRate',
-            method: 'GET'
+            url: ENDPOINT_TRACKS_TO_RATE,
+            method: METHOD_TYPE_GET
         }).success(function (data, status, headers, config) {
             callback(data);
             tracksToRate = data.tracks;
