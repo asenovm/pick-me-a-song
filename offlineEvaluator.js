@@ -4,6 +4,7 @@ var _ = require('underscore'),
     contentBasedRecommender = require('./contentBasedRecommender'),
     evaluator = require('./evaluator'),
     async = require('async'),
+    fs = require('fs'),
     LENGTH_SET_MIN = 50,
     LENGTH_TRAINING_SET = 30;
 
@@ -22,6 +23,7 @@ function startContentBasedEvaluation() {
 }
 
 function startOfflineEvaluation(fetchRecommendationsFunc) {
+    var resultFile = "evaluation_" + Date.now();
     db.retrieveUsersForEvaluation(function (err, users) {
         var userInfo = _.filter(_.map(users, function (user) {
             return {
@@ -82,10 +84,11 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                     precision_5 = evaluator.getPrecision(intersection_5.length, 5),
                     f1_5 = evaluator.getF1Measure(precision_5, recall) || 0;
 
-                console.log('nDCG ', nDCG);
-                console.log('metrics @20 ', precision, recall, f1);
-                console.log('metrics @10 ', precision_10, recall, f1_10);
-                console.log('metrics @5 ', precision_5, recall, f1_5);
+                fs.appendFileSync(resultFile, 'nDCG: ' + nDCG);
+                fs.appendFileSync(resultFile, 'recall: ' + recall);
+                fs.appendFileSync(resultFile, 'metrics @20 ' + precision +  ' ' + f1);
+                fs.appendFileSync(resultFile, 'metrics @10 ' + precision_10 + ' ' + f1_10);
+                fs.appendFileSync(resultFile, 'metrics @5 ' + precision_5 + ' ' + f1_5);
 
                 accumulatedPrecision += precision;
                 accumulatedRecall += recall;
@@ -111,10 +114,11 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                 meanF1_5 = accumulatedF1_5 / users.length,
                 meanNDCG = accumulatedNDCG / users.length;
 
-            console.log('mean nDCG ', meanNDCG);
-            console.log('mean values @ 20 ', meanPrecision, meanRecall, meanF1, meanNDCG);
-            console.log('mean values @ 10 ', meanPrecision_10, meanRecall, meanF1_10, meanNDCG);
-            console.log('mean values @ 5 ', meanPrecision_5, meanRecall, meanF1_5, meanNDCG);
+            fs.appendFileSync(resultFile, 'mean nDCG: ' + meanNDCG);
+            fs.appendFileSync(resultFile, 'mean recall: ' + meanRecall);
+            fs.appendFileSync(resultFile, 'mean values @20: ' + meanPrecision + ' ' + meanF1);
+            fs.appendFileSync(resultFile, 'mean values @10: ' + meanPrecision_10 + ' ' + meanF1_10);
+            fs.appendFileSync(resultFile, 'mean values @5: ' + meanPrecision_5 + ' ' + meanF1_5);
         });
     });
 }
