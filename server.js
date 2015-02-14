@@ -9,7 +9,7 @@ var express = require('express'),
     db = require('./db'),
     app = express(),
     async = require('async'),
-    LIMIT_COUNT_ARTISTS = 70,
+    LIMIT_COUNT_ITEMS = 70,
     METHOD_HEAD = "HEAD";
 
 app.use(bodyParser.json({ limit: '25mb'}));
@@ -53,20 +53,11 @@ app.post('/recommendations', function (req, res) {
             });
         },
         function (previousRecommendations, artists, callback) {
-            userProfile.artists = _.first(userProfile.artists, LIMIT_COUNT_ARTISTS);
-            var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length,
-                userProfileArtistNames = _.map(userProfile.artists, function (artist) {
-                    return artist.name;
-                });
+            userProfile.artists = _.first(artists, LIMIT_COUNT_ITEMS);
+            userProfile.tracks = _.first(_.filter(previousRecommendations, function (recommendation) {
+                return recommendation.userValue;
+            }), LIMIT_COUNT_ITEMS);
 
-            if(openPositionsCount > 0) {
-                _.each(artists, function (artist) {
-                    if(openPositionsCount > 0 && !_.contains(userProfileArtistNames, artist.name)) {
-                        --openPositionsCount;
-                        userProfile.artists.push(artist);
-                    }
-                });
-            }
             recommender.getRecommendationsFor(userProfile, previousRecommendations, options, callback);
         }
     ], function (err, recommendedTracks) {
