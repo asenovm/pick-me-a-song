@@ -9,7 +9,7 @@ var express = require('express'),
     db = require('./db'),
     app = express(),
     async = require('async'),
-    LIMIT_COUNT_ITEMS = 70,
+    LIMIT_COUNT_ITEMS = 40,
     METHOD_HEAD = "HEAD";
 
 app.use(bodyParser.json({ limit: '25mb'}));
