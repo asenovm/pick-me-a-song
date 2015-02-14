@@ -26,8 +26,6 @@ if(args.collaborative) {
     startContentBasedEvaluation();
 }
 
-startCollaborativeEvaluation();
-
 function startCollaborativeEvaluation(metricType, neighboursCount) {
     startOfflineEvaluation(function (userProfile, previousRecommendations, callback) {
         collaborativeRecommender.getRecommendations(userProfile, previousRecommendations, { metricType: metricType, neighboursCount: neighboursCount }, callback);
@@ -68,8 +66,9 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                 userProfile = { name: user.name, artists: [], tracks: trainingSet };
 
             _.each(trainingSet, function (track) {
+                var playcount = parseInt(track.playcount, 10);
                 artists[track.artist.name] = artists[track.artist.name] || 0;
-                artists[track.artist.name] += parseInt(track.playcount, 10);
+                artists[track.artist.name] += playcount;
             });
 
             _.each(artists, function (value, key) {

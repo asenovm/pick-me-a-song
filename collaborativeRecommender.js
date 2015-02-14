@@ -87,7 +87,7 @@ function getRecommendedTracks(activeUser, users, previousRecommendations) {
 
 function getAverageScore(user, model) {
     return _.reduce(user[model], function (memo, item) {
-        return memo + parseFloat(item.userValue || item.score, 10);
+        return memo + parseFloat(item.userValue || item.playcount ||  item.score, 10);
     }, 0) / user[model].length;
 }
 
