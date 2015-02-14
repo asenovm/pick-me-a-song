@@ -55,7 +55,9 @@ exports.retrieveRecommendations = function (userId, callback) {
         if(err || !result) {
             callback(err, result);
         } else {
-            callback(err, result.tracks);
+            callback(err, _.sortBy(result.tracks, function (track) {
+                return -track.timestamp;
+            }));
         }
     });
 };
@@ -187,7 +189,9 @@ exports.retrieveUserArtists = function (userId, callback) {
         if(err) {
             callback(err, result);
         } else {
-            callback(false, result.artists);
+            callback(false, _.sortBy(result.artists, function (artist) {
+                return -artist.timestamp;
+            }));
         }
     });
 };
