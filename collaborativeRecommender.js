@@ -87,7 +87,7 @@ function getRecommendedTracks(activeUser, users, previousRecommendations) {
 
 function getAverageScore(user, model) {
     return _.reduce(user[model], function (memo, item) {
-        return memo + item.score;
+        return memo + (item.score || parseInt(item.userValue, 10));
     }, 0) / user[model].length;
 }
 
@@ -129,15 +129,17 @@ function getTrackSimilarityForUser(user, activeUser) {
     var nominator = 0,
         currentUserDenominator = 0,
         activeUserDenominator = 0;
-    
+
     _.each(commonTrackNames, function (name) {
-        var currentUserPlaycount = parseInt(currentUserTracks[name].playcount, 10);
-        nominator += (currentUserPlaycount - user.averagePlaycount) * (activeUserTracks[name].score - activeUser.averageScore);
+        var currentUserPlaycount = parseInt(currentUserTracks[name].playcount, 10),
+            activeUserScore = parseInt(activeUserTracks[name].userValue, 10);
+
+        nominator += (currentUserPlaycount - user.averagePlaycount) * (activeUserScore - activeUser.averageScore);
         currentUserDenominator += (currentUserPlaycount - user.averagePlaycount) * (currentUserPlaycount - user.averagePlaycount);
-        activeUserDenominator += (activeUserTracks[name].score - activeUser.averageScore) * (activeUserTracks[name].score - activeUser.averageScore);
+        activeUserDenominator += (activeUserScore - activeUser.averageScore) * (activeUserScore - activeUser.averageScore);
     });
 
-    return getSimilatiy(nominator, Math.sqrt(currentUserDenominator * activeUserDenominator), commonTrackNames);
+    return getSimilarity(nominator, Math.sqrt(currentUserDenominator * activeUserDenominator), commonTrackNames);
 }
 
 function getArtistSimilarityForUser(user, activeUser) {
@@ -169,10 +171,10 @@ function getArtistSimilarityForUser(user, activeUser) {
         artistsDenominator += artistScore * artistScore;
     });
 
-    return getSimilatiy(nominator, Math.sqrt(userDenominator * artistsDenominator), commonArtistsNames);
+    return getSimilarity(nominator, Math.sqrt(userDenominator * artistsDenominator), commonArtistsNames);
 }
 
-function getSimilatiy(nominator, denominator, commonItems) {
+function getSimilarity(nominator, denominator, commonItems) {
     if(denominator === 0) {
         return 0;
     }
