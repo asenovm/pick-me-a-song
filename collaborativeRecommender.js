@@ -31,11 +31,7 @@ function getRecommendationsFromTracks(userProfile, previousRecommendations, opti
                     averageScore: getAverageScore(userProfile, 'tracks')
                 };
 
-            _.each(users, function (user) {
-                user.similarity = getTrackSimilarityForUser(user, activeUser);
-            });
-
-            callback(err, getRecommendedTracks(activeUser, users, previousRecommendations));
+            callback(err, getRecommendations(users, activeUser, previousRecommendations, getTrackSimilarityForUser));
         }
     });
 }
@@ -60,21 +56,19 @@ function getRecommendationsFromArtists(userProfile, previousRecommendations, opt
                     neighboursCount: options.neighboursCount
                 };
                 
-            _.each(users, function (user) {
-                user.similarity = getArtistSimilarityForUser(user, activeUser);
-            });
-
-            recommendedTracks = getRecommendedTracks(activeUser, users, previousRecommendations);
+            recommendedTracks = getRecommendations(users, activeUser, previousRecommendations, getArtistSimilarityForUser);
         }
 
         callback(err, recommendedTracks);
     });
 }
 
-function getAverageScore(userProfile, model) {
-    return _.reduce(userProfile[model], function (memo, item) {
-        return memo + item.score;
-    }, 0) / userProfile[model].length;
+function getRecommendations(users, activeUser, previousRecommendations, similarityFunc) {
+    _.each(users, function (user) {
+        user.similarity = similarityFunc(user, activeUser);
+    });
+
+    return getRecommendedTracks(activeUser, users, previousRecommendations);
 }
 
 function getRecommendedTracks(activeUser, users, previousRecommendations) {
@@ -97,6 +91,12 @@ function getRecommendedTracks(activeUser, users, previousRecommendations) {
     });
 
     return recommenderUtil.getRecommendationsFromPredictions(predictedRatings, previousRecommendations);
+}
+
+function getAverageScore(userProfile, model) {
+    return _.reduce(userProfile[model], function (memo, item) {
+        return memo + item.score;
+    }, 0) / userProfile[model].length;
 }
 
 function getUserNeighbours(activeUser, users) {
