@@ -17,15 +17,22 @@ app.use(bodyParser.json({ limit: '25mb'}));
 app.post('/recommendations', function (req, res) {
     var userProfile = req.body.userProfile,
         options = req.body.options,
-        userArtists = [],
         userId = req.body.userId,
         likedTracksPositions = req.body.likedTracksPositions,
         likedTracksPositions_10 = _.filter(likedTracksPositions, function (position) {
             return position <= 10;
         }), likedTracksPositions_5 = _.filter(likedTracksPositions, function (position) {
             return position <= 5;
-        }), recommendedTracks = req.body.recommendedTracks,
+        }), recommendedTracks = _.map(req.body.recommendedTracks, function (track) {
+            track.timestamp = Date.now();
+            return track;
+        }),
         metrics = {};
+
+    userProfile.artists = _.map(userProfile.artists, function (artist) {
+        artist.timestamp = Date.now();
+        return artist;
+    });
 
     if(recommendedTracks.length > 0) {
         metrics[evaluator.METRIC_NAME_PRECISION_20] = evaluator.getPrecision(likedTracksPositions.length, recommendedTracks.length);
