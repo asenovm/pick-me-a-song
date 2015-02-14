@@ -5,14 +5,33 @@ var _ = require('underscore'),
     evaluator = require('./evaluator'),
     async = require('async'),
     fs = require('fs'),
+    ArgumentParser = require('argparse').ArgumentParser,
+    parser = new ArgumentParser({ version: '0.0.1', addHelp: true, description: 'last.fm crawler' }),
+    NEW_LINE = '\n',
     LENGTH_SET_MIN = 50,
     LENGTH_TRAINING_SET = 30;
 
+parser.addArgument(['-cl', '--collaborative'], { help: 'evaluates the performance of the system when collaborative filtering is used', action: 'storeTrue' });
+parser.addArgument(['-cb', '--content-based'], { help: 'evaluates the performance of the system when content-based filtering is used', action: 'storeTrue' });
+parser.addArgument(['-t', '--tracks'], { help: 'evaluates the performance of the system when similarity is computed using tracks', action: 'storeTrue' });
+parser.addArgument(['-n', '--neighbours'], { help: 'set the number of neighbours to be taken into account', type: 'int' });
+
+var args = parser.parseArgs();
+
+if(args.collaborative) {
+    var metricType = args.tracks ? 'tracks' : 'artists',
+        neighboursCount = args.neighbours;
+
+    startCollaborativeEvaluation(metricType, neighboursCount);
+} else {
+    startContentBasedEvaluation();
+}
+
 startCollaborativeEvaluation();
 
-function startCollaborativeEvaluation() {
+function startCollaborativeEvaluation(metricType, neighboursCount) {
     startOfflineEvaluation(function (userProfile, previousRecommendations, callback) {
-        collaborativeRecommender.getRecommendations(userProfile, previousRecommendations, { metricType: 'tracks', neighboursCount: 32 }, callback);
+        collaborativeRecommender.getRecommendations(userProfile, previousRecommendations, { metricType: metricType, neighboursCount: neighboursCount }, callback);
     });
 }
 
@@ -84,11 +103,11 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                     precision_5 = evaluator.getPrecision(intersection_5.length, 5),
                     f1_5 = evaluator.getF1Measure(precision_5, recall) || 0;
 
-                fs.appendFileSync(resultFile, 'nDCG: ' + nDCG);
-                fs.appendFileSync(resultFile, 'recall: ' + recall);
-                fs.appendFileSync(resultFile, 'metrics @20 ' + precision +  ' ' + f1);
-                fs.appendFileSync(resultFile, 'metrics @10 ' + precision_10 + ' ' + f1_10);
-                fs.appendFileSync(resultFile, 'metrics @5 ' + precision_5 + ' ' + f1_5);
+                fs.appendFileSync(resultFile, 'nDCG: ' + nDCG + NEW_LINE);
+                fs.appendFileSync(resultFile, 'recall: ' + recall + NEW_LINE);
+                fs.appendFileSync(resultFile, 'metrics @20 ' + precision +  ' ' + f1 + NEW_LINE);
+                fs.appendFileSync(resultFile, 'metrics @10 ' + precision_10 + ' ' + f1_10 + NEW_LINE);
+                fs.appendFileSync(resultFile, 'metrics @5 ' + precision_5 + ' ' + f1_5 + NEW_LINE);
 
                 accumulatedPrecision += precision;
                 accumulatedRecall += recall;
@@ -114,11 +133,11 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                 meanF1_5 = accumulatedF1_5 / users.length,
                 meanNDCG = accumulatedNDCG / users.length;
 
-            fs.appendFileSync(resultFile, 'mean nDCG: ' + meanNDCG);
-            fs.appendFileSync(resultFile, 'mean recall: ' + meanRecall);
-            fs.appendFileSync(resultFile, 'mean values @20: ' + meanPrecision + ' ' + meanF1);
-            fs.appendFileSync(resultFile, 'mean values @10: ' + meanPrecision_10 + ' ' + meanF1_10);
-            fs.appendFileSync(resultFile, 'mean values @5: ' + meanPrecision_5 + ' ' + meanF1_5);
+            fs.appendFileSync(resultFile, 'mean nDCG: ' + meanNDCG + NEW_LINE);
+            fs.appendFileSync(resultFile, 'mean recall: ' + meanRecall + NEW_LINE);
+            fs.appendFileSync(resultFile, 'mean values @20: ' + meanPrecision + ' ' + meanF1 + NEW_LINE);
+            fs.appendFileSync(resultFile, 'mean values @10: ' + meanPrecision_10 + ' ' + meanF1_10 + NEW_LINE);
+            fs.appendFileSync(resultFile, 'mean values @5: ' + meanPrecision_5 + ' ' + meanF1_5 + NEW_LINE);
         });
     });
 }
