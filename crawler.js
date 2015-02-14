@@ -4,15 +4,27 @@ var fs = require('fs'),
     _ = require('underscore'),
     async = require('async'),
     db = require('./db'),
+    ArgumentParser = require('argparse').ArgumentParser,
+    parser = new ArgumentParser({ version: '0.0.1', addHelp: true, description: 'last.fm crawler' }),
     lastfm = new LastfmAPI({
         api_key: config.apiKey,
         secret: config.secret
     }),
-    NUMBER_TAGS_CRAWLED = 5;
+    LIMIT_PARALLEL_TASKS = 5;
 
-//startCrawlingUsers();
-//startCrawlingSongTags();
-startCrawlingArtistTags();
+parser.addArgument(['-u', '--users'], { help: 'crawl last.fm users', action: 'storeTrue' });
+parser.addArgument(['-t', '--tracks'], { help: 'crawl last.fm annotated tracks', action: 'storeTrue' });
+parser.addArgument(['-a', '--artists'], { help: 'crawl last.fm annotated artists', action: 'storeTrue' });
+
+var args = parser.parseArgs();
+
+if (args.tracks) {
+    startCrawlingTrackTags();
+} else if (args.artists) {
+    startCrawlingArtistTags();
+} else {
+    startCrawlingUsers();
+}
 
 function insertArtistWithTags(artist, tags) {
     artist.tags = _.filter(tags, function (tag) {
@@ -29,10 +41,10 @@ function startCrawlingArtistTags() {
 
 function crawlArtistTags(artists) {
     var nextArtists = [];
-    async.eachLimit(artists, 5, function (artist, artistsCallback) {
+    async.eachLimit(artists, LIMIT_PARALLEL_TASKS, function (artist, artistsCallback) {
         lastfm.artist.getTopTags({ artist: artist.artist.name }, function (err, tags) {
             insertArtistWithTags(artist.artist, tags.tag);
-            async.eachLimit(tags.tag, 5, function (tag, tagCallback) {
+            async.eachLimit(tags.tag, LIMIT_PARALLEL_TASKS, function (tag, tagCallback) {
                 lastfm.tag.getTopArtists({ tag: tag.name }, function (err, tagArtists) {
                     if(err || !tagArtists) {
                         console.log('error retrieving top artists for tag');
@@ -45,7 +57,10 @@ function crawlArtistTags(artists) {
                                 } else {
                                     db.hasArtist(artist, function (err, result) {
                                         if(err || !result) {
+                                            console.log('inserting info for artist ', artist.name);
                                             insertArtistWithTags(artist, tags.tag);
+                                        } else {
+                                            console.log('already has info for artist ', artist.name);
                                         }
                                     });
                                 }
@@ -64,7 +79,7 @@ function crawlArtistTags(artists) {
     });
 }
 
-function startCrawlingSongTags() {
+function startCrawlingTrackTags() {
     db.getInitialTags(function (err, tags) {
         crawlTracksForTags(tags);
     });
@@ -87,7 +102,10 @@ function crawlTracksForTags(tags) {
                             track.tags = result.tag;
                             db.hasTrack(track, function (err, result) {
                                 if(err || !result) {
+                                    console.log('inserting info for ', track.name);
                                     db.insertTrackTags(track, _.noop);
+                                } else {
+                                    console.log('already has info for ', track.name); 
                                 }
                             });
                             nextTags = _.union(nextTags, track.tags);
