@@ -137,11 +137,7 @@ function getTrackSimilarityForUser(user, activeUser) {
         activeUserDenominator += (activeUserTracks[name].score - activeUser.averageScore) * (activeUserTracks[name].score - activeUser.averageScore);
     });
 
-    if(currentUserDenominator === 0 || activeUserDenominator === 0) {
-        return 0;
-    }
-
-    return (nominator / Math.sqrt(currentUserDenominator * activeUserDenominator)) * Math.min(commonTrackNames.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
+    return getSimilatiy(nominator, Math.sqrt(currentUserDenominator * activeUserDenominator), commonTrackNames);
 }
 
 function getArtistSimilarityForUser(user, activeUser) {
@@ -162,8 +158,7 @@ function getArtistSimilarityForUser(user, activeUser) {
         userAverageScore = userTotalScore / userArtistsNames.length,
         nominator = 0,
         userDenominator = 0,
-        artistsDenominator = 0,
-        denominator;
+        artistsDenominator = 0;
 
     _.each(commonArtistsNames, function (name) {
         var userScore = playCountsPerArtist[name] - userAverageScore,
@@ -174,11 +169,13 @@ function getArtistSimilarityForUser(user, activeUser) {
         artistsDenominator += artistScore * artistScore;
     });
 
-    denominator = Math.sqrt(userDenominator * artistsDenominator);
+    return getSimilatiy(nominator, Math.sqrt(userDenominator * artistsDenominator), commonArtistsNames);
+}
 
+function getSimilatiy(nominator, denominator, commonItems) {
     if(denominator === 0) {
         return 0;
     }
 
-    return (nominator / denominator) * Math.min(commonArtistsNames.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
+    return (nominator / denominator) * Math.min(commonItems.length / THRESHOLD_COMMON_ARTISTS_COUNT, 1);
 }
