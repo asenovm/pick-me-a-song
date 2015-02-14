@@ -8,6 +8,7 @@ var express = require('express'),
     evaluator = require('./evaluator'),
     db = require('./db'),
     app = express(),
+    async = require('async'),
     LIMIT_COUNT_ARTISTS = 70,
     METHOD_HEAD = "HEAD";
 
@@ -34,33 +35,41 @@ app.post('/recommendations', function (req, res) {
         db.writeEvaluationMetrics(userId, metrics, _.noop);
     }
 
-    db.updateUserRecommendations(userId, recommendedTracks, function (err, result) {
-        db.retrieveRecommendations(userId, function (err, previousRecommendations) {
+    async.waterfall([
+        function (callback) {
+            db.updateUserRecommendations(userId, recommendedTracks, callback);
+        },
+        function (result, callback) {
+            db.retrieveRecommendations(userId, callback);
+        },
+        function (previousRecommendations, callback) {
             db.updateUserArtists(userId, userProfile.artists, function (err, result) {
-                db.retrieveUserArtists(userId, function (err, result) {
-                    userProfile.artists = _.first(userProfile.artists, LIMIT_COUNT_ARTISTS);
-                    var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length,
-                        userProfileArtistNames = _.map(userProfile.artists, function (artist) {
-                            return artist.name;
-                        });
-
-                    if(openPositionsCount > 0) {
-                        _.each(result, function (artist) {
-                            if(openPositionsCount > 0 && !_.contains(userProfileArtistNames, artist.name)) {
-                                --openPositionsCount;
-                                userProfile.artists.push(artist);
-                            }
-                        });
-                    }
-                    fetchAndSendRecommendations(userProfile, previousRecommendations.tracks, options, res);
-                });
+                callback(err, previousRecommendations);
             });
-        });
-    });
-});
+        },
+        function (previousRecommendations, callback) {
+            db.retrieveUserArtists(userId, function (err, result) {
+                callback(err, previousRecommendations, result);
+            });
+        },
+        function (previousRecommendations, artists, callback) {
+            userProfile.artists = _.first(userProfile.artists, LIMIT_COUNT_ARTISTS);
+            var openPositionsCount = LIMIT_COUNT_ARTISTS - userProfile.artists.length,
+                userProfileArtistNames = _.map(userProfile.artists, function (artist) {
+                    return artist.name;
+                });
 
-function fetchAndSendRecommendations(userProfile, previousRecommendations, options, res) {
-    recommender.getRecommendationsFor(userProfile, previousRecommendations, options, function (err, recommendedTracks) {
+            if(openPositionsCount > 0) {
+                _.each(artists, function (artist) {
+                    if(openPositionsCount > 0 && !_.contains(userProfileArtistNames, artist.name)) {
+                        --openPositionsCount;
+                        userProfile.artists.push(artist);
+                    }
+                });
+            }
+            recommender.getRecommendationsFor(userProfile, previousRecommendations, options, callback);
+        }
+    ], function (err, recommendedTracks) {
         if(err) {
             res.status(500).end();
         } else {
@@ -68,8 +77,9 @@ function fetchAndSendRecommendations(userProfile, previousRecommendations, optio
                 recommendedTracks: recommendedTracks
             }).end();
         }
+    
     });
-}
+});
 
 app.get('/tracksToRate', function (req, res) {
     db.getTracksToRate(function (err, result) {

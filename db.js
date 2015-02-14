@@ -44,12 +44,20 @@ exports.retrieveAllUsersForArtists = function (artistNames, callback) {
 
 exports.updateUserRecommendations = function (userId, recommendations, callback) {
     var collection = db.collection(COLLECTION_RECOMMENDATIONS);
-    collection.update({ userId: userId }, { $pushAll: { tracks: recommendations }}, { upsert: true }, callback);
+    collection.update({ userId: userId }, { $pushAll: { tracks: recommendations }}, { upsert: true }, function (err, result) {
+        callback(err, result);
+    });
 };
 
 exports.retrieveRecommendations = function (userId, callback) {
     var recommendations = db.collection(COLLECTION_RECOMMENDATIONS);
-    recommendations.findOne({ userId: userId }, callback);
+    recommendations.findOne({ userId: userId }, function (err, result) {
+        if(err || !result) {
+            callback(err, result);
+        } else {
+            callback(err, result.tracks);
+        }
+    });
 };
 
 exports.updateUserProfile = function (user, callback) {
