@@ -3,6 +3,9 @@
 angular.module('pickMeASong')
   .controller('SettingsController', ['$scope', 'recommendationsService', function ($scope, recommendationsService) {
 
+    var KEY_COLLABORATIVE_FILTERING = 'isCollaborativeFilteringUsed';
+    var KEY_ARTISTS = 'areArtistsUsed';
+
     $scope.isCollaborativeFilteringUsed = recommendationsService.getCollaborativeFilteringUsed();
     $scope.areArtistsUsed = recommendationsService.getArtistsUsed();
 
@@ -11,9 +14,9 @@ angular.module('pickMeASong')
     };
 
     $scope.setValue = function (key, value) {
-        if(key === 'isCollaborativeFilteringUsed') {
+        if(key === KEY_COLLABORATIVE_FILTERING) {
             $scope.setCollaborativeFilteringUsed(value);
-        } else if (key === 'areArtistsUsed') {
+        } else if (key === KEY_ARTISTS) {
             $scope.setArtistsUsed(value);
         }
     };

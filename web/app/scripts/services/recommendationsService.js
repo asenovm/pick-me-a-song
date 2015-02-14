@@ -4,12 +4,20 @@ angular.module('pickMeASong')
     .service('recommendationsService', ['$http', '$q', 'localStorageService', function ($http, $q, $localStorage) {
 
     var SCORE_ARTIST_DEFAULT = 5;
+
     var KEY_RECOMMENDED_ITEMS = 'recommendedItems';
     var KEY_USER_ID = 'userId';
     var KEY_TRACKS_TO_RATE = 'tracksToRate';
     var KEY_NEIGHBOURS_COUNT = 'neighboursCount';
     var KEY_COLLABORATIVE_FILTERING_USED = 'collaborativeFilteringUsed';
     var KEY_ARTISTS_USED = 'artistsUsed';
+
+    var ALGORITHM_TYPE_COLLABORATIVE_FILTERING = 'collaborativeFiltering';
+    var ALGORITHM_TYPE_CONTENT_FILTERING = 'contentFiltering';
+
+    var METRIC_TYPE_ARTISTS = 'artists';
+    var METRIC_TYPE_TRACKS = 'tracks';
+
     var recommendations = $localStorage.get(KEY_RECOMMENDED_ITEMS) || [];
     var userId = $localStorage.get(KEY_USER_ID) || 1;
     var tracksToRate = $localStorage.get(KEY_TRACKS_TO_RATE) || [];
@@ -52,8 +60,8 @@ angular.module('pickMeASong')
                 },
                 options: {
                     neighboursCount: $localStorage.get(KEY_NEIGHBOURS_COUNT),
-                    algorithmType: that.getCollaborativeFilteringUsed() ? 'collaborativeFiltering' : 'contentFiltering',
-                    metricType: that.getArtistsUsed() ? 'artists' : 'tracks'
+                    algorithmType: that.getCollaborativeFilteringUsed() ? ALGORITHM_TYPE_COLLABORATIVE_FILTERING : ALGORITHM_TYPE_CONTENT_FILTERING,
+                    metricType: that.getArtistsUsed() ? METRIC_TYPE_ARTISTS : METRIC_TYPE_TRACKS
                 },
                 likedTracksPositions: likedTracksPositions,
                 recommendedTracks: recommendedTracks,

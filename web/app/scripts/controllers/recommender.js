@@ -5,6 +5,7 @@ angular.module('pickMeASong')
 
     var PATH_RECOMMENDATIONS = 'recommendations';
     var PATH_RATE_ITEMS = 'rateItems';
+    var STATUS_CONNECTED = 'connected';
 
     var MIN_RATE_LIKED_ITEM = 2.5;
 
@@ -15,7 +16,7 @@ angular.module('pickMeASong')
         $location.path(PATH_RECOMMENDATIONS);
     };
 
-    if ($location.path().indexOf('rateItems') >= 0) {
+    if ($location.path().indexOf(PATH_RATE_ITEMS) >= 0) {
         $scope.tracksToRate = recommendationsService.getTracksToRate();
         $scope.callback = $scope.showRecommendations;
     } else {
@@ -111,7 +112,7 @@ angular.module('pickMeASong')
     });
 
     FB.getLoginStatus(function (response) {
-        if(response.status === "connected") {
+        if(response.status === STATUS_CONNECTED) {
             $scope.isLoggedOnFacebook = true;
             recommendationsService.onFacebookConnected(response.authResponse);
         } else {
