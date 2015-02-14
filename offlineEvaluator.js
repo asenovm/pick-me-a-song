@@ -4,10 +4,9 @@ var _ = require('underscore'),
     contentBasedRecommender = require('./contentBasedRecommender'),
     evaluator = require('./evaluator'),
     async = require('async'),
-    fs = require('fs'),
     ArgumentParser = require('argparse').ArgumentParser,
     parser = new ArgumentParser({ version: '0.0.1', addHelp: true, description: 'last.fm crawler' }),
-    NEW_LINE = '\n',
+    fileWriter = require('./fileWriter'),
     LENGTH_SET_MIN = 50,
     LENGTH_TRAINING_SET = 30;
 
@@ -103,11 +102,11 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                     precision_5 = evaluator.getPrecision(intersection_5.length, 5),
                     f1_5 = evaluator.getF1Measure(precision_5, recall) || 0;
 
-                fs.appendFileSync(resultFile, 'nDCG: ' + nDCG + NEW_LINE);
-                fs.appendFileSync(resultFile, 'recall: ' + recall + NEW_LINE);
-                fs.appendFileSync(resultFile, 'metrics @20 ' + precision +  ' ' + f1 + NEW_LINE);
-                fs.appendFileSync(resultFile, 'metrics @10 ' + precision_10 + ' ' + f1_10 + NEW_LINE);
-                fs.appendFileSync(resultFile, 'metrics @5 ' + precision_5 + ' ' + f1_5 + NEW_LINE);
+                fileWriter.append(resultFile, 'nDCG: ' + nDCG);
+                fileWriter.append(resultFile, 'recall: ' + recall);
+                fileWriter.append(resultFile, 'metrics @20 ' + precision +  ' ' + f1);
+                fileWriter.append(resultFile, 'metrics @10 ' + precision_10 + ' ' + f1_10);
+                fileWriter.append(resultFile, 'metrics @5 ' + precision_5 + ' ' + f1_5);
 
                 accumulatedPrecision += precision;
                 accumulatedRecall += recall;
@@ -133,11 +132,11 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
                 meanF1_5 = accumulatedF1_5 / users.length,
                 meanNDCG = accumulatedNDCG / users.length;
 
-            fs.appendFileSync(resultFile, 'mean nDCG: ' + meanNDCG + NEW_LINE);
-            fs.appendFileSync(resultFile, 'mean recall: ' + meanRecall + NEW_LINE);
-            fs.appendFileSync(resultFile, 'mean values @20: ' + meanPrecision + ' ' + meanF1 + NEW_LINE);
-            fs.appendFileSync(resultFile, 'mean values @10: ' + meanPrecision_10 + ' ' + meanF1_10 + NEW_LINE);
-            fs.appendFileSync(resultFile, 'mean values @5: ' + meanPrecision_5 + ' ' + meanF1_5 + NEW_LINE);
+            fileWriter.append(resultFile, 'mean nDCG: ' + meanNDCG);
+            fileWriter.append(resultFile, 'mean recall: ' + meanRecall);
+            fileWriter.append(resultFile, 'mean values @20: ' + meanPrecision + ' ' + meanF1);
+            fileWriter.append(resultFile, 'mean values @10: ' + meanPrecision_10 + ' ' + meanF1_10);
+            fileWriter.append(resultFile, 'mean values @5: ' + meanPrecision_5 + ' ' + meanF1_5);
         });
     });
 }
