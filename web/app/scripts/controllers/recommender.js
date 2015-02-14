@@ -9,6 +9,16 @@ angular.module('pickMeASong')
 
     var MIN_RATE_LIKED_ITEM = 2.5;
 
+    $scope.$watch('$location.path()', function () {
+        if($location.path().indexOf(PATH_RATE_ITEMS) >= 0) {
+            $scope.headerText = 'Rate some items.';
+            $scope.subheaderText = ['This is a list of the most listened tracks in the system. Let us know which ones you like and', 'once you are ready feel free to '];
+        } else {
+            $scope.headerText = 'Your recommended items.';
+            $scope.subheaderText = ['This is a list of tracks we think you may enjoy. Let us know which ones you like and', 'once you are ready feel free to ']
+        }
+    });
+
     $scope.minNumberRatedTracks = 5;
 
     $scope.showRecommendations = function () {

@@ -1,5 +1,5 @@
-<h3 class="text-center">Rate some items.</h3>
-<h5 class="text-center info-footer">This is a list of the most listened tracks in the system. Let us know which ones you like and<br/>once you are ready feel free to <button class="btn btn-default btn-sm" ng-click="submitRatedTracks();">Submit <i class="fa fa-send-o"></i></button></h5>
+<h3 class="text-center">{{ headerText }}</h3>
+<h5 class="text-center info-footer"> <span ng-repeat="line in subheaderText"> {{ line }} <br ng-hide="$last" /></span><button class="btn btn-default btn-sm" ng-click="submitRatedTracks();">Submit <i class="fa fa-send-o"></i></button></h5>
 <div class="alert alert-danger" role="alert" ng-show="submitError">Please rate at least {{ minNumberRatedTracks }} items.</div>
 <table class="table table-bordered table-striped">
     <th>Artist Name</th>
