@@ -39,7 +39,7 @@ function startContentBasedEvaluation() {
 }
 
 function startOfflineEvaluation(fetchRecommendationsFunc) {
-    var resultFile = "evaluation_" + Date.now();
+    var resultFile = "evaluation_" + Date.now() + "_" + (args.neighbours || "default_neighbours_count");
     db.retrieveUsersForEvaluation(function (err, users) {
         var userInfo = _.filter(_.map(users, function (user) {
             return {
