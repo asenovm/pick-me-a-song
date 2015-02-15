@@ -8,7 +8,8 @@ var _ = require('underscore'),
     parser = new ArgumentParser({ version: '0.0.1', addHelp: true, description: 'last.fm crawler' }),
     fileWriter = require('./fileWriter'),
     LENGTH_SET_MIN = 50,
-    LENGTH_TRAINING_SET = 25;
+    LENGTH_TRAINING_SET = 25,
+    COUNT_FOLDS = 3;
 
 parser.addArgument(['-cl', '--collaborative'], { help: 'evaluates the performance of the system when collaborative filtering is used', action: 'storeTrue' });
 parser.addArgument(['-cb', '--content-based'], { help: 'evaluates the performance of the system when content-based filtering is used', action: 'storeTrue' });
@@ -60,46 +61,68 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
         async.eachSeries(userInfo, function (user, callback) {
             var tracks = user.tracks,
                 evaluationSet = _.first(tracks, LENGTH_SET_MIN),
-                trainingSet = _.first(evaluationSet, LENGTH_TRAINING_SET),
-                validationSet = _.last(evaluationSet, evaluationSet.length - trainingSet.length),
                 artists = {},
-                userProfile = { name: user.name, artists: [], tracks: trainingSet };
+                itemsInFold = parseInt(evaluationSet.length / COUNT_FOLDS),
+                crossValidationSets = _.initial(_.toArray(_.groupBy(evaluationSet, function (track, index) {
+                    return Math.floor(index / itemsInFold);
+                }))), precision = 0, recall = 0, f1 = 0, nDCG = 0,
+                precision_10 = 0, f1_10 = 0, precision_5 = 0, f1_5 = 0;
 
-            _.each(trainingSet, function (track) {
-                var playcount = parseInt(track.playcount, 10);
-                artists[track.artist.name] = artists[track.artist.name] || 0;
-                artists[track.artist.name] += playcount;
-            });
+            async.eachSeries(crossValidationSets, function (validationSet, crossValidationCallback) {
+                var trainingSet = _.flatten(_.without(crossValidationSets, validationSet)),
+                    userProfile = { name: user.name, artists: [], tracks: trainingSet };
 
-            _.each(artists, function (value, key) {
-                userProfile.artists.push({
-                    name: key,
-                    score: value
+                console.log('training set len is ', trainingSet.length);
+
+                _.each(trainingSet, function (track) {
+                    var playcount = parseInt(track.playcount, 10);
+                    artists[track.artist.name] = artists[track.artist.name] || 0;
+                    artists[track.artist.name] += playcount;
                 });
-            });
 
-            fetchRecommendationsFunc(userProfile, trainingSet, function (err, recommendations) {
-                var recommendedArtistNames = _.map(recommendations, function (track) {
-                    return track.artist.name;
-                }), validationArtistNames = _.map(validationSet, function (track) {
-                    return track.artist.name;
-                }), intersection = _.intersection(recommendedArtistNames, validationArtistNames),
-                    relevantItemsPositions = _.map(intersection, function (artistName) {
-                        return _.indexOf(recommendedArtistNames, artistName);
+                _.each(artists, function (value, key) {
+                    userProfile.artists.push({
+                        name: key,
+                        score: value
                     });
+                });
 
-                var precision = evaluator.getPrecision(intersection.length, recommendedArtistNames.length),
-                    recall = evaluator.getRecall(intersection.length, validationArtistNames.length),
-                    f1 = evaluator.getF1Measure(precision, recall) || 0,
-                    nDCG = evaluator.getNDCG(relevantItemsPositions, recommendedArtistNames.length);
+                fetchRecommendationsFunc(userProfile, trainingSet, function (err, recommendations) {
+                    var recommendedArtistNames = _.map(recommendations, function (track) {
+                        return track.artist.name;
+                    }), validationArtistNames = _.map(validationSet, function (track) {
+                        return track.artist.name;
+                    }), intersection = _.intersection(recommendedArtistNames, validationArtistNames),
+                        relevantItemsPositions = _.map(intersection, function (artistName) {
+                            return _.indexOf(recommendedArtistNames, artistName);
+                        });
 
-                var intersection_10 = _.intersection(_.first(recommendedArtistNames, 10), validationArtistNames),
-                    precision_10 = evaluator.getPrecision(intersection_10.length, 10),
-                    f1_10 = evaluator.getF1Measure(precision_10, recall) || 0;
+                    precision += evaluator.getPrecision(intersection.length, recommendedArtistNames.length);
+                    recall += evaluator.getRecall(intersection.length, validationArtistNames.length),
+                    f1 += evaluator.getF1Measure(precision, recall) || 0,
+                    nDCG += evaluator.getNDCG(relevantItemsPositions, recommendedArtistNames.length);
 
-                var intersection_5 = _.intersection(_.first(recommendedArtistNames, 5), validationArtistNames),
-                    precision_5 = evaluator.getPrecision(intersection_5.length, 5),
-                    f1_5 = evaluator.getF1Measure(precision_5, recall) || 0;
+                    var intersection_10 = _.intersection(_.first(recommendedArtistNames, 10), validationArtistNames);
+                    precision_10 += evaluator.getPrecision(intersection_10.length, 10);
+                    f1_10 += evaluator.getF1Measure(precision_10, recall) || 0;
+
+                    var intersection_5 = _.intersection(_.first(recommendedArtistNames, 5), validationArtistNames);
+                    precision_5 += evaluator.getPrecision(intersection_5.length, 5),
+                    f1_5 += evaluator.getF1Measure(precision_5, recall) || 0;
+
+                    crossValidationCallback();
+                });
+            }, function (err) {
+                precision = precision / COUNT_FOLDS;
+                precision_10 = precision_10 / COUNT_FOLDS;
+                precision_5 = precision_5 / COUNT_FOLDS;
+
+                recall = recall / COUNT_FOLDS;
+                nDCG = nDCG / COUNT_FOLDS;
+
+                f1 = f1 / COUNT_FOLDS;
+                f1_10 = f1_10 / COUNT_FOLDS;
+                f1_5 = f1_5 / COUNT_FOLDS;
 
                 fileWriter.append(resultFile, 'nDCG: ' + nDCG);
                 fileWriter.append(resultFile, 'recall: ' + recall);
