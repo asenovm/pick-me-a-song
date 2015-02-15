@@ -8,7 +8,7 @@ var _ = require('underscore'),
     parser = new ArgumentParser({ version: '0.0.1', addHelp: true, description: 'last.fm crawler' }),
     fileWriter = require('./fileWriter'),
     LENGTH_SET_MIN = 50,
-    LENGTH_TRAINING_SET = 30;
+    LENGTH_TRAINING_SET = 25;
 
 parser.addArgument(['-cl', '--collaborative'], { help: 'evaluates the performance of the system when collaborative filtering is used', action: 'storeTrue' });
 parser.addArgument(['-cb', '--content-based'], { help: 'evaluates the performance of the system when content-based filtering is used', action: 'storeTrue' });

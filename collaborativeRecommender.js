@@ -132,7 +132,7 @@ function getTrackSimilarityForUser(user, activeUser) {
 
     _.each(commonTrackNames, function (name) {
         var currentUserPlaycount = parseInt(currentUserTracks[name].playcount, 10),
-            activeUserScore = parseInt(activeUserTracks[name].userValue, 10);
+            activeUserScore = parseFloat(activeUserTracks[name].userValue || activeUserTracks[name].playcount, 10);
 
         nominator += (currentUserPlaycount - user.averagePlaycount) * (activeUserScore - activeUser.averageScore);
         currentUserDenominator += (currentUserPlaycount - user.averagePlaycount) * (currentUserPlaycount - user.averagePlaycount);
