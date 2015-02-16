@@ -35,7 +35,7 @@ app.post('/recommendations', function (req, res) {
     });
 
     if(recommendedTracks.length > 0) {
-        metrics[evaluator.METRIC_NAME_PRECISION_20] = evaluator.getPrecision(likedTracksPositions.length, recommendedTracks.length);
+        metrics[evaluator.METRIC_NAME_PRECISION_25] = evaluator.getPrecision(likedTracksPositions.length, recommendedTracks.length);
         metrics[evaluator.METRIC_NAME_PRECISION_10] = evaluator.getPrecision(likedTracksPositions_10.length, 10);
         metrics[evaluator.METRIC_NAME_PRECISION_5] = evaluator.getPrecision(likedTracksPositions_5.length, 5);
         metrics[evaluator.METRIC_NAME_NDCG] = evaluator.getNDCG(likedTracksPositions, recommendedTracks.length);
@@ -68,27 +68,18 @@ app.post('/recommendations', function (req, res) {
             recommender.getRecommendationsFor(userProfile, previousRecommendations, options, callback);
         }
     ], function (err, recommendedTracks) {
-        if(err) {
-            res.status(500).end();
-        } else {
-            res.json({
-                recommendedTracks: recommendedTracks
-            }).end();
-        }
-    
+        responseHandler(err, {
+            recommendedTracks: recommendedTracks
+        }, res);
     });
 });
 
 app.get('/tracksToRate', function (req, res) {
     db.getTracksToRate(function (err, result) {
-        if(err) {
-            res.status(500).end();
-        } else {
-            res.json({
-                userId: uuid.v4(),
-                tracks: result
-            }).end();
-        }
+        responseHandler(err, {
+            userId: uuid.v4(),
+            tracks: result
+        }, res);
     });
 });
 
@@ -99,5 +90,13 @@ app.get('*', function (req, res) {
         fileServer.serve(req, res);
     }
 });
+
+function responseHandler(err, json, res) {
+    if(err) {
+        res.status(500).end();
+    } else {
+        res.json(json).end();
+    }
+}
 
 app.listen(process.env.PORT || 3000);
