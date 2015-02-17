@@ -4,12 +4,12 @@ var _ = require('underscore'),
     COUNT_TAGS_PER_TRACK = 6,
     COUNT_TAGS_PER_ARTIST = 3;
 
-exports.getRecommendations = function (userInfo, previousRecommendations, options, callback) {
-    db.getTagsForArtists(userInfo.artists, function (err, taggedArtists) {
+exports.getRecommendations = function (user, previousRecommendations, options, callback) {
+    db.getTagsForArtists(user.artists, function (err, taggedArtists) {
         if(err) {
             callback(err, []);
         } else {
-            var userProfile = getUserProfile(userInfo, taggedArtists);
+            var userProfile = getUserProfile(user, taggedArtists);
 
             db.getTracksForTags(userProfile.tags, function (err, tracks) {
                 _.each(tracks, function (track) {
@@ -42,10 +42,10 @@ exports.getRecommendations = function (userInfo, previousRecommendations, option
     });
 }
 
-function getUserProfile(userInfo, userArtists) {
+function getUserProfile(user, userArtists) {
     var userProfile = {},
         tags = [],
-        scoredArtists = _.indexBy(userInfo.artists, 'name');
+        scoredArtists = _.indexBy(user.artists, 'name');
 
     _.each(userArtists, function (artist) {
         var artistTags = _.first(artist.tags, COUNT_TAGS_PER_ARTIST),
