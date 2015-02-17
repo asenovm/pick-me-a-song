@@ -16,16 +16,14 @@ exports.getRecommendations = function (user, previousRecommendations, options, c
 };
 
 function getRecommendationsFromTracks(user, previousRecommendations, options, callback) {
-    var trackNames = _.map(user.tracks, function (track) {
-        return track.name;
-    }), activeUser = getUserProfile(user, options, 'tracks');
+    var trackNames = _.pluck(user.tracks, 'name'),
+        activeUser = getUserProfile(user, options, 'tracks');
     db.retrieveAllUsersForTracks(trackNames, fetchAndSendRecommendations(activeUser, previousRecommendations, getTrackSimilarityForUser, callback));
 };
 
 function getRecommendationsFromArtists(user, previousRecommendations, options, callback) {
-    var artistNames = _.map(user.artists, function (artist) {
-        return artist.name;
-    }), activeUser = getUserProfile(user, options, 'artists');
+    var artistNames = _.pluck(user.artists, 'name'),
+        activeUser = getUserProfile(user, options, 'artists');
 
     db.retrieveAllUsersForArtists(artistNames, fetchAndSendRecommendations(activeUser, previousRecommendations, getArtistSimilarityForUser, callback));
 }
@@ -41,9 +39,7 @@ function fetchAndSendRecommendations(activeUser, previousRecommendations, simila
 }
 
 function getUserProfile(user, options, model) {
-    var artistNames = _.map(user.artists, function (artist) {
-        return artist.name;
-    });
+    var artistNames = _.pluck(user.artists, 'name');
 
     return {
         name: user.name,
@@ -118,15 +114,12 @@ function getNeighboursTrackScores(neighbours) {
 }
 
 function getTrackSimilarityForUser(user, activeUser) {
-    var currentUserTrackNames = _.map(user.tracks, function (track) {
-            return track.name;
-        }), activeUserTrackNames = _.map(activeUser.tracks, function (track) {
-            return track.name;
-        }), commonTrackNames = _.intersection(currentUserTrackNames, activeUserTrackNames),
+    var currentUserTrackNames = _.pluck(user.tracks, 'name'),
+        activeUserTrackNames = _.pluck(activeUser.tracks, 'name'),
+        commonTrackNames = _.intersection(currentUserTrackNames, activeUserTrackNames),
         currentUserTracks = _.indexBy(user.tracks, 'name'),
-        activeUserTracks = _.indexBy(activeUser.tracks, 'name');
-
-    var nominator = 0,
+        activeUserTracks = _.indexBy(activeUser.tracks, 'name'),
+        nominator = 0,
         currentUserDenominator = 0,
         activeUserDenominator = 0;
 

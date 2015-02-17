@@ -208,9 +208,7 @@ exports.insertArtistTags = function (artist, callback) {
 
 exports.getTagsForArtists = function (artists, callback) {
     var taggedArtists = db.collection(COLLECTION_TAGGED_ARTISTS),
-        artistNames = _.map(artists, function (artist) {
-            return artist.name;
-        });
+        artistNames = _.pluck(artists, 'name');
 
     taggedArtists.find({ name: {$in: artistNames }}).toArray(callback);
 };
