@@ -90,9 +90,9 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
 
                 fetchRecommendationsFunc(userProfile, trainingSet, function (err, recommendations) {
                     var recommendedArtistNames = _.map(recommendations, function (track) {
-                        return track.artist.name + track.name;
+                        return track.artist.name;
                     }), validationArtistNames = _.map(validationSet, function (track) {
-                        return track.artist.name + track.name;
+                        return track.artist.name;
                     }), intersection = _.intersection(recommendedArtistNames, validationArtistNames),
                         relevantItemsPositions = _.map(intersection, function (artistName) {
                             return _.indexOf(recommendedArtistNames, artistName);

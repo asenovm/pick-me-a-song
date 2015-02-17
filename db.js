@@ -13,7 +13,6 @@ var mongo = require('mongodb'),
     COLLECTION_RECOMMENDATIONS = 'recommendations',
     COLLECTION_ARTISTS_INDEX = 'artistsIndex',
     COLLECTION_TRACKS_INDEX = 'tracksIndex',
-    FILE_TOP_TRACKS = 'topTracks.json',
     NUMBER_TRACKS_TO_RATE = 15,
     NUMBER_USERS_FOR_EVALUATION = 1000;
 
@@ -106,15 +105,6 @@ exports.writeEvaluationMetrics = function (userId, metrics, callback) {
 exports.getTracksToRate = function (callback) {
     var tracksToRate = db.collection(COLLECTION_TRACKS_TO_RATE);
     tracksToRate.find({}).toArray(callback);
-};
-
-exports.findAndSaveTracksToRate = function () {
-    var topTracks = JSON.parse(fs.readFileSync(FILE_TOP_TRACKS)),
-        tracksToRate = db.collection(COLLECTION_TRACKS_TO_RATE);
-
-    tracksToRate.remove({}, function (err, result) {
-        tracksToRate.insert(topTracks, _.noop);
-    });
 };
 
 exports.getInitialTags = function (callback) {
