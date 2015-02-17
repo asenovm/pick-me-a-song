@@ -26,11 +26,50 @@ if (args.tracks) {
     startCrawlingUsers();
 }
 
-function insertArtistWithTags(artist, tags) {
-    artist.tags = _.filter(tags, function (tag) {
-        return parseInt(tag.count, 10) > 0;
+function startCrawlingUsers() {
+    crawlUser(config.crawlRoot);
+}
+
+function crawlUser(user) {
+    visitNode(user, config.startPage, config.startPage);
+    lastfm.user.getFriends({ user: user }, function (err, result) {
+        if(err) {
+            console.log('an error occurred');
+            console.dir(err);
+        } else {
+            var friends = result.user;
+            _.each(friends, function (friend) {
+                db.hasUser(friend.name, function (err, result) {
+                    if(!result && friend.name) {
+                        crawlUser(friend.name);
+                    }
+                });
+            });
+        }
     });
-    db.insertArtistTags(artist, _.noop);
+}
+
+function visitNode (user, page, totalPages) {
+    if (page > totalPages || page >= config.endPage) {
+        return;
+    }
+
+    console.log('crawling ' + user + ' ' + page);
+
+    lastfm.user.getTopTracks({ user: user, page: page, limit: config.itemsPerPage}, function (err, result) {
+        if (err) {
+            console.log('get tracks err is ', err);
+            visitNode(user, page + 1, totalPages);
+        } else if (result['@attr']) {
+            var meta = result['@attr'],
+                totalPages = meta.totalPages,
+                tracks = _.isArray(result.track) ? result.track : [result.track];
+
+            db.updateUserProfile({ name: user, tracks: tracks }, function (err, result) {
+                visitNode(user, page + 1, totalPages);
+            });
+        }
+    });
 }
 
 function startCrawlingArtistTags() {
@@ -79,6 +118,13 @@ function crawlArtistTags(artists) {
     });
 }
 
+function insertArtistWithTags(artist, tags) {
+    artist.tags = _.filter(tags, function (tag) {
+        return parseInt(tag.count, 10) > 0;
+    });
+    db.insertArtistTags(artist, _.noop);
+}
+
 function startCrawlingTrackTags() {
     db.getInitialTags(function (err, tags) {
         crawlTracksForTags(tags);
@@ -120,48 +166,3 @@ function crawlTracksForTags(tags) {
     });
 }
 
-function startCrawlingUsers() {
-    crawlUser(config.crawlRoot);
-}
-
-function crawlUser(user) {
-    visitNode(user, config.startPage, config.startPage);
-    lastfm.user.getFriends({ user: user }, function (err, result) {
-        if(err) {
-            console.log('an error occurred');
-            console.dir(err);
-        } else {
-            var friends = result.user;
-            _.each(friends, function (friend) {
-                db.hasUser(friend.name, function (err, result) {
-                    if(!result && friend.name) {
-                        crawlUser(friend.name);
-                    }
-                });
-            });
-        }
-    });
-}
-
-function visitNode (user, page, totalPages) {
-    if (page > totalPages || page >= config.endPage) {
-        return;
-    }
-
-    console.log('crawling ' + user + ' ' + page);
-
-    lastfm.user.getTopTracks({ user: user, page: page, limit: config.itemsPerPage}, function (err, result) {
-        if (err) {
-            console.log('get tracks err is ', err);
-            visitNode(user, page + 1, totalPages);
-        } else if (result['@attr']) {
-            var meta = result['@attr'],
-                totalPages = meta.totalPages,
-                tracks = _.isArray(result.track) ? result.track : [result.track];
-
-            db.updateUserProfile({ name: user, tracks: tracks }, function (err, result) {
-                visitNode(user, page + 1, totalPages);
-            });
-        }
-    });
-}
