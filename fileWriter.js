@@ -1,6 +1,6 @@
 var fs = require('fs'),
-    NEW_LINE = '\n';
+    os = require('os');
 
 exports.append = function (file, text) {
-    fs.appendFileSync(file, text + NEW_LINE);
+    fs.appendFileSync(file, text + os.EOL);
 };
