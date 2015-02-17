@@ -5,7 +5,7 @@ var express = require('express'),
     uuid = require('node-uuid'),
     fileServer = new static.Server('./web'),
     recommender = require('./recommender'),
-    evaluator = require('./evaluator'),
+    metricsEvaluator = require('./metricsEvaluator'),
     db = require('./db'),
     app = express(),
     async = require('async'),
@@ -35,10 +35,10 @@ app.post('/recommendations', function (req, res) {
     });
 
     if(recommendedTracks.length > 0) {
-        metrics[evaluator.METRIC_NAME_PRECISION_25] = evaluator.getPrecision(likedTracksPositions.length, recommendedTracks.length);
-        metrics[evaluator.METRIC_NAME_PRECISION_10] = evaluator.getPrecision(likedTracksPositions_10.length, 10);
-        metrics[evaluator.METRIC_NAME_PRECISION_5] = evaluator.getPrecision(likedTracksPositions_5.length, 5);
-        metrics[evaluator.METRIC_NAME_NDCG] = evaluator.getNDCG(likedTracksPositions, recommendedTracks.length);
+        metrics[metricsEvaluator.METRIC_NAME_PRECISION_25] = metricsEvaluator.getPrecision(likedTracksPositions.length, recommendedTracks.length);
+        metrics[metricsEvaluator.METRIC_NAME_PRECISION_10] = metricsEvaluator.getPrecision(likedTracksPositions_10.length, 10);
+        metrics[metricsEvaluator.METRIC_NAME_PRECISION_5] = metricsEvaluator.getPrecision(likedTracksPositions_5.length, 5);
+        metrics[metricsEvaluator.METRIC_NAME_NDCG] = metricsEvaluator.getNDCG(likedTracksPositions, recommendedTracks.length);
         db.writeEvaluationMetrics(userId, metrics, _.noop);
     }
 
