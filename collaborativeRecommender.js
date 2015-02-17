@@ -1,7 +1,7 @@
 var _ = require('underscore'),
     db = require('./db'),
     recommenderUtil = require('./recommenderUtil'),
-    COUNT_NEIGHBOURS_DEFAULT = 22,
+    COUNT_NEIGHBOURS_DEFAULT = 12,
     THRESHOLD_COMMON_ARTISTS_COUNT = 10,
     METRIC_TYPE_ARTISTS = 'artists',
     METRIC_TYPE_TRACKS = 'tracks';
