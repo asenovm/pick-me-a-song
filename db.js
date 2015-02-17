@@ -216,11 +216,8 @@ exports.getTagsForArtists = function (artists, callback) {
 };
 
 exports.getTracksForTags = function (tags, callback) {
-    var taggedTracks = db.collection(COLLECTION_TAGGED_TRACKS),
-        tagNames = _.map(tags, function (tag) {
-            return tag.name;
-        });
-    taggedTracks.find({ "tags.name": { $in: tagNames }}).toArray(callback);
+    var taggedTracks = db.collection(COLLECTION_TAGGED_TRACKS);
+    taggedTracks.find({ "tags.name": { $in: tags }}).toArray(callback);
 };
 
 exports.retrieveAllUsersForTracks = function (trackNames, callback) {

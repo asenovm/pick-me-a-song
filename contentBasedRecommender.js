@@ -1,8 +1,8 @@
 var _ = require('underscore'),
     db = require('./db'),
     recommenderUtil = require('./recommenderUtil'),
-    COUNT_TAGS_PER_TRACK = 6,
-    COUNT_TAGS_PER_ARTIST = 3;
+    COUNT_TAGS_PER_TRACK = 10,
+    COUNT_TAGS_PER_ARTIST = 10;
 
 exports.getRecommendations = function (user, previousRecommendations, options, callback) {
     db.getTagsForArtists(user.artists, function (err, taggedArtists) {
@@ -30,10 +30,7 @@ exports.getRecommendations = function (user, previousRecommendations, options, c
                         trackDenominator += value * value;
                     });
 
-                    userDenominator = Math.sqrt(userDenominator);
-                    trackDenominator = Math.sqrt(trackDenominator);
-
-                    track.score = nominator / (userDenominator * trackDenominator);
+                    track.score = nominator / Math.sqrt(userDenominator * trackDenominator);
                 });
 
                 callback(false, recommenderUtil.getRecommendationsFromPredictions(tracks, previousRecommendations));
@@ -42,12 +39,12 @@ exports.getRecommendations = function (user, previousRecommendations, options, c
     });
 }
 
-function getUserProfile(user, userArtists) {
+function getUserProfile(user, taggedArtists) {
     var userProfile = {},
         tags = [],
         scoredArtists = _.indexBy(user.artists, 'name');
 
-    _.each(userArtists, function (artist) {
+    _.each(taggedArtists, function (artist) {
         var artistTags = _.first(artist.tags, COUNT_TAGS_PER_ARTIST),
             scoredArtist = scoredArtists[artist.name],
             artistScore = parseInt(scoredArtist.score, 10);
@@ -57,7 +54,7 @@ function getUserProfile(user, userArtists) {
             userProfile[tag.name] += artistScore;
         });
 
-        tags = _.union(tags, artistTags);
+        tags = _.union(tags, _.pluck(artistTags, 'name'));
     });
 
     return {
