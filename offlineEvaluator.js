@@ -15,10 +15,13 @@ parser.addArgument(['-cl', '--collaborative'], { help: 'evaluates the performanc
 parser.addArgument(['-cb', '--content-based'], { help: 'evaluates the performance of the system when content-based filtering is used', action: 'storeTrue' });
 parser.addArgument(['-t', '--tracks'], { help: 'evaluates the performance of the system when similarity is computed using tracks', action: 'storeTrue' });
 parser.addArgument(['-n', '--neighbours'], { help: 'set the number of neighbours to be taken into account', type: 'int' });
+parser.addArgument(['-o', '--online'], { help: 'retrieve the statits from the usage of the system as persisted in the db', action: 'storeTrue'});
 
 var args = parser.parseArgs();
 
-if(args.collaborative) {
+if(args.online) {
+    startOnlineEvaluation();
+} else if(args.collaborative) {
     var metricType = args.tracks ? 'tracks' : 'artists',
         neighboursCount = args.neighbours;
 
@@ -89,9 +92,9 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
 
                 fetchRecommendationsFunc(userProfile, trainingSet, function (err, recommendations) {
                     var recommendedArtistNames = _.map(recommendations, function (track) {
-                        return track.artist.name;
+                        return track.artist.name + track.name;
                     }), validationArtistNames = _.map(validationSet, function (track) {
-                        return track.artist.name;
+                        return track.artist.name + track.name;
                     }), intersection = _.intersection(recommendedArtistNames, validationArtistNames),
                         relevantItemsPositions = _.map(intersection, function (artistName) {
                             return _.indexOf(recommendedArtistNames, artistName);
@@ -126,7 +129,7 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
 
                 fileWriter.append(resultFile, 'nDCG: ' + nDCG);
                 fileWriter.append(resultFile, 'recall: ' + recall);
-                fileWriter.append(resultFile, 'metrics @20 ' + precision +  ' ' + f1);
+                fileWriter.append(resultFile, 'metrics @25 ' + precision +  ' ' + f1);
                 fileWriter.append(resultFile, 'metrics @10 ' + precision_10 + ' ' + f1_10);
                 fileWriter.append(resultFile, 'metrics @5 ' + precision_5 + ' ' + f1_5);
 
@@ -156,9 +159,38 @@ function startOfflineEvaluation(fetchRecommendationsFunc) {
 
             fileWriter.append(resultFile, 'mean nDCG: ' + meanNDCG);
             fileWriter.append(resultFile, 'mean recall: ' + meanRecall);
-            fileWriter.append(resultFile, 'mean values @20: ' + meanPrecision + ' ' + meanF1);
+            fileWriter.append(resultFile, 'mean values @25: ' + meanPrecision + ' ' + meanF1);
             fileWriter.append(resultFile, 'mean values @10: ' + meanPrecision_10 + ' ' + meanF1_10);
             fileWriter.append(resultFile, 'mean values @5: ' + meanPrecision_5 + ' ' + meanF1_5);
         });
+    });
+}
+
+function startOnlineEvaluation() {
+    var resultFile = "online_evaluation_" + Date.now();
+
+    db.getEvaluations(function (err, result) {
+        var precision_25 = 0,
+            precision_10 = 0,
+            precision_5 = 0,
+            ndcg = 0;
+
+        _.each(result, function (user) {
+            var metrics = user.metrics;
+            precision_25 += metrics[evaluator.METRIC_NAME_PRECISION_25];
+            precision_10 += metrics[evaluator.METRIC_NAME_PRECISION_10];
+            precision_5 += metrics[evaluator.METRIC_NAME_PRECISION_5];
+            ndcg += metrics[evaluator.METRIC_NAME_NDCG];
+        });
+
+        precision_25 = precision_25 / result.length;
+        precision_10 = precision_10 / result.length;
+        precision_5 = precision_5 / result.length;
+        ndcg = ndcg / result.length;
+
+        fileWriter.append(resultFile, 'mean precision @25: ' + precision_25);
+        fileWriter.append(resultFile, 'mean precision @10: ' + precision_10);
+        fileWriter.append(resultFile, 'mean precision @5: ' + precision_5);
+        fileWriter.append(resultFile, 'mean nDCG: ' + ndcg);
     });
 }

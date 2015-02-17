@@ -1,6 +1,6 @@
 var _ = require('underscore');
 
-exports.METRIC_NAME_PRECISION_20 = 'precision@20';
+exports.METRIC_NAME_PRECISION_25 = 'precision@25';
 exports.METRIC_NAME_PRECISION_10 = 'precision@10';
 exports.METRIC_NAME_PRECISION_5 = 'precision@5';
 exports.METRIC_NAME_NDCG = 'ndcg';

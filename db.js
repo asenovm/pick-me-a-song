@@ -236,3 +236,10 @@ exports.retrieveAllUsersForTracks = function (trackNames, callback) {
         });
     });
 };
+
+exports.getEvaluations = function (callback) {
+    MongoClient.connect(config.dbURL, function (err, db) {
+        var evaluations = db.collection(COLLECTION_EVALUATION);
+        evaluations.find({}).limit(NUMBER_USERS_FOR_EVALUATION).toArray(callback);
+    });
+};
